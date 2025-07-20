@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db"
-import { adminSetup, user } from "@paperjet/db/schema"
+import { user } from "@paperjet/db/schema"
 import { eq } from "drizzle-orm"
 
 export const isSetupRequired = async () => {

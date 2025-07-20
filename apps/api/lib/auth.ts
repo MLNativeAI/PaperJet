@@ -5,12 +5,11 @@ import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { betterAuth, type User } from "better-auth";
 
-import { APIError } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, createAuthMiddleware, magicLink } from "better-auth/plugins";
+import { admin, magicLink } from "better-auth/plugins";
 import type { Context, Next } from "hono";
 import { Resend } from "resend";
-import { envVars, getAuthMode } from "./env";
+import { envVars } from "./env";
 
 const publicRoutes = ["/api/health", "/api/auth/**"];
 
