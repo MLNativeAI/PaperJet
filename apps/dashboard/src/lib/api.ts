@@ -346,7 +346,7 @@ export const updateWorkflowBasicData = async (
 };
 
 export const isAdminSetupRequired = async () => {
-  const response = await api.admin.$get({});
+  const response = await api.admin["setup-required"].$get({});
   return response.json();
 };
 
@@ -362,5 +362,30 @@ export const getUsageData = async () => {
 
 export const getUsageStats = async () => {
   const response = await api.admin["usage-stats"].$get({});
+  return response.json();
+};
+
+export const getConfiguration = async () => {
+  const response = await api.admin.config.$get({});
+  return response.json();
+};
+
+export const updateConfiguration = async (
+  workflowId: string,
+  data: {
+    slug: string;
+    description?: string;
+  },
+) => {
+  const response = await api.workflows[":id"]["basic-data"].$patch({
+    param: { id: workflowId },
+    json: data,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update workflow");
+  }
+
   return response.json();
 };

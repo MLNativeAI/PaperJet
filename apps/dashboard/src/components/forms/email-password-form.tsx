@@ -62,7 +62,7 @@ export function EmailPasswordForm({
   const form = useForm<z.infer<typeof emailPasswordSchema>>({ resolver: zodResolver(emailPasswordSchema) });
 
   const callAuthFunction = async (values: z.infer<typeof emailPasswordSchema>) => {
-    if (formMode == "sign-in") {
+    if (formMode === "sign-in") {
       const { data, error } = await authClient.signIn.email({
         email: values.email,
         password: values.password,

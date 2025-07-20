@@ -190,7 +190,7 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
           <span className="text-muted-foreground text-sm">Filter by</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className={cn("ml-auto", selectedFilter.name == "None" && "opacity-75")}>
+              <Button variant="outline" className={cn("ml-auto", selectedFilter.name === "None" && "opacity-75")}>
                 {selectedFilter.name} <ChevronDown />
               </Button>
             </DropdownMenuTrigger>

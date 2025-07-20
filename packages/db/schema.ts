@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, integer, numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const file = pgTable("file", {
   id: text("id").primaryKey(),
@@ -129,7 +129,14 @@ export const usageData = pgTable("usage_data", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const adminSetup = pgTable("admin_setup", {
+export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
+
+export const configuration = pgTable("configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
   admin_exists: boolean("admin_exists").notNull().default(false),
+  modelType: modeTypeEnum().notNull().default("cloud"),
+  geminiApiKey: text("gemini_api_key"),
+  customModelUrl: text("custom_model_url"),
+  customModelName: text("custom_model_name"),
+  customModelToken: text("custom_model_token"),
 });

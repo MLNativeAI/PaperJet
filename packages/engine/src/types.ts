@@ -1,6 +1,25 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
 
+export type Configuration = {
+  modelType: ModelType;
+  isValid: boolean;
+  geminiApiKey?: string;
+  customModelUrl?: string;
+  customModelName?: string;
+  customModelToken?: string;
+};
+
+export type ConfigurationUpdate = {
+  modelType: ModelType;
+  geminiApiKey?: string;
+  customModelUrl?: string;
+  customModelName?: string;
+  customModeltoken?: string;
+};
+
+export type ModelType = "cloud" | "custom";
+
 export type PdfSplitResult = {
   success: boolean;
   total_pages: number;
