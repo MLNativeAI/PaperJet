@@ -1,6 +1,5 @@
-
-import { getUsageStats } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { getUsageStats } from "@/lib/api";
 
 export function useUsageStats() {
   const {
@@ -10,9 +9,11 @@ export function useUsageStats() {
   } = useQuery({
     queryKey: ["usage-stats"],
     queryFn: getUsageStats,
-  })
+  });
 
   return {
-    usageStats, isLoading, refetch
-  }
+    usageStats,
+    isLoading,
+    refetch,
+  };
 }

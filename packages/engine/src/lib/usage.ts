@@ -55,7 +55,7 @@ const calculateCost = (
 };
 
 export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
-  const context = getExecutionContext()
+  const context = getExecutionContext();
 
   console.log("context", context);
 

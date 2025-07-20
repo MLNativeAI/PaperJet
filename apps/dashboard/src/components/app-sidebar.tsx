@@ -10,6 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
@@ -38,6 +41,16 @@ const data = {
       url: "/admin",
       icon: Shield,
       adminOnly: true,
+      items: [
+        {
+          title: "Configuration",
+          url: "/admin/config",
+        },
+        {
+          title: "Usage",
+          url: "/admin/usage",
+        },
+      ],
     },
     {
       title: "Documentation",
@@ -63,25 +76,49 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {data.navMain.map((item) => (
-                <SidebarMenuItem key={item.title} hidden={item.adminOnly && !isAdmin}>
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
-                      target={item.url.startsWith("http") ? "_blank" : undefined}
-                      rel={item.url.startsWith("http") ? "noopener noreferrer" : undefined}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {item.title}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <SidebarMenu>
+            {data.navMain.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton hidden={item.adminOnly && !isAdmin} asChild>
+                  <a href={item.url} className="font-medium">
+                    {item.title}
+                  </a>
+                </SidebarMenuButton>
+                {item.items?.length ? (
+                  <SidebarMenuSub>
+                    {item.items.map((item) => (
+                      <SidebarMenuSubItem key={item.title}>
+                        <SidebarMenuSubButton asChild>
+                          <a href={item.url}>{item.title}</a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                ) : null}
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
         </SidebarGroup>
+        {/* <SidebarGroup> */}
+        {/*   <SidebarGroupContent> */}
+        {/*     <SidebarMenu> */}
+        {/*       {data.navMain.map((item) => ( */}
+        {/*         <SidebarMenuItem key={item.title} hidden={item.adminOnly && !isAdmin}> */}
+        {/*           <SidebarMenuButton asChild> */}
+        {/*             <a */}
+        {/*               href={item.url} */}
+        {/*               target={item.url.startsWith("http") ? "_blank" : undefined} */}
+        {/*               rel={item.url.startsWith("http") ? "noopener noreferrer" : undefined} */}
+        {/*             > */}
+        {/*               <item.icon className="h-4 w-4" /> */}
+        {/*               {item.title} */}
+        {/*             </a> */}
+        {/*           </SidebarMenuButton> */}
+        {/*         </SidebarMenuItem> */}
+        {/*       ))} */}
+        {/*     </SidebarMenu> */}
+        {/*   </SidebarGroupContent> */}
+        {/* </SidebarGroup> */}
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>

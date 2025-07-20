@@ -2,15 +2,15 @@ import { Link, useRouteContext } from "@tanstack/react-router";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { EmailPasswordForm } from "./forms/email-password-form";
 import MagicLinkForm from "./forms/magic-link-form";
 import { SocialForm } from "./forms/social-form";
-import { EmailPasswordForm } from "./forms/email-password-form";
 
 export function SignInForm({ className, ...props }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const { authMode } = useRouteContext({ from: '/auth/sign-in' })
+  const { authMode } = useRouteContext({ from: "/auth/sign-in" });
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -21,26 +21,24 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
-            <SocialForm
-              setError={setError}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />
-            {authMode === 'magic-link' && <MagicLinkForm
-              magicLinkSent={magicLinkSent}
-              setMagicLinkSent={setMagicLinkSent}
-              setError={setError}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />}
-            {authMode === 'password' &&
-              <EmailPasswordForm
-                formMode='sign-in'
+            <SocialForm setError={setError} isLoading={isLoading} setIsLoading={setIsLoading} />
+            {authMode === "magic-link" && (
+              <MagicLinkForm
+                magicLinkSent={magicLinkSent}
+                setMagicLinkSent={setMagicLinkSent}
                 setError={setError}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
               />
-            }
+            )}
+            {authMode === "password" && (
+              <EmailPasswordForm
+                formMode="sign-in"
+                setError={setError}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+              />
+            )}
 
             {error && <div className="text-sm text-red-500">{error}</div>}
           </div>

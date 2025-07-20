@@ -1,14 +1,6 @@
-
-
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { UsageStats } from "@paperjet/engine/types"
-import { renderMonetaryValue } from "./format-utils"
+import type { UsageStats } from "@paperjet/engine/types";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { renderMonetaryValue } from "./format-utils";
 
 export function UsageStatCards({ usageStats }: { usageStats: UsageStats }) {
   return (
@@ -98,5 +90,5 @@ export function UsageStatCards({ usageStats }: { usageStats: UsageStats }) {
         {/* </CardFooter> */}
       </Card>
     </div>
-  )
+  );
 }

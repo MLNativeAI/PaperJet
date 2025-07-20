@@ -1,6 +1,6 @@
+import { Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
 
 const GoogleIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" role="img" aria-label="Google logo">

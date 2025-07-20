@@ -1,17 +1,21 @@
-import { authClient } from "@/lib/auth-client";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export default function MagicLinkForm({
-  magicLinkSent, setMagicLinkSent, setError, isLoading, setIsLoading
+  magicLinkSent,
+  setMagicLinkSent,
+  setError,
+  isLoading,
+  setIsLoading,
 }: {
-  magicLinkSent: boolean,
-  setMagicLinkSent: (_: boolean) => void,
-  setError: (_: string) => void,
-  isLoading: boolean,
-  setIsLoading: (_: boolean) => void
+  magicLinkSent: boolean;
+  setMagicLinkSent: (_: boolean) => void;
+  setError: (_: string) => void;
+  isLoading: boolean;
+  setIsLoading: (_: boolean) => void;
 }) {
   const handleMagicLinkSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,14 +50,7 @@ export default function MagicLinkForm({
         <form onSubmit={handleMagicLinkSignIn}>
           <div className="flex flex-col gap-3">
             <div className="grid gap-2">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                disabled={isLoading}
-              />
+              <Input id="email" name="email" type="email" placeholder="m@example.com" required disabled={isLoading} />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -79,7 +76,6 @@ export default function MagicLinkForm({
           </Button>
         </div>
       )}
-    </div>)
-
+    </div>
+  );
 }
-

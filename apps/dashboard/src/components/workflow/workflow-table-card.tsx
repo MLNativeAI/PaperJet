@@ -10,10 +10,13 @@ import { renderCellValue } from "../table-utils";
 
 interface WorkflowTableCardProps {
   table: TableConfiguration[number];
-  sampleData: {
-    slug: string;
-    rows: Record<string, string | number | boolean | Date | null>[];
-  } | null | undefined;
+  sampleData:
+    | {
+        slug: string;
+        rows: Record<string, string | number | boolean | Date | null>[];
+      }
+    | null
+    | undefined;
   sampleDataExtractedAt?: Date | null;
   onEdit: (table: TableConfiguration[number]) => void;
 }
@@ -59,7 +62,7 @@ export default function WorkflowTableCard({
                 <tbody>
                   {sampleData.rows.map((row, idx) => (
                     <tr key={`${table.slug}-row-${idx}`} className="border-b last:border-0">
-                      {table.columns.map(col => renderCellValue(col, row))}
+                      {table.columns.map((col) => renderCellValue(col, row))}
                     </tr>
                   ))}
                 </tbody>

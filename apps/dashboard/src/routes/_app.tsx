@@ -10,18 +10,17 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
 import { isAdminSetupRequired } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
   beforeLoad: async ({ location }) => {
-
-    const { isSetupRequired } = await isAdminSetupRequired()
+    const { isSetupRequired } = await isAdminSetupRequired();
     if (isSetupRequired) {
       throw redirect({
-        to: "/admin/setup"
-      })
+        to: "/admin/setup",
+      });
     }
     const { data: session } = await authClient.getSession();
     if (!session) {

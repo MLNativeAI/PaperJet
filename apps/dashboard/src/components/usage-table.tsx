@@ -1,20 +1,20 @@
-import * as React from "react"
+import type { UsageData } from "@paperjet/engine/types";
 import {
-  ColumnDef,
-  ColumnFiltersState,
+  type ColumnDef,
+  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
+  type SortingState,
   useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -23,29 +23,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { UsageData } from "@paperjet/engine/types"
-import { TableBodyWithSkeleton } from "./table-body-with-skeleton"
-import { UserFilterComboBox } from "./usage-table/user-filter-combo-box"
-import { cn } from "@/lib/utils"
-import { WorkflowFilterComboBox } from "./usage-table/workflow-filter-combo-box"
-import { getColumn } from "./format-utils"
+} from "@/components/ui/dropdown-menu";
+import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { getColumn } from "./format-utils";
+import { TableBodyWithSkeleton } from "./table-body-with-skeleton";
+import { UserFilterComboBox } from "./usage-table/user-filter-combo-box";
+import { WorkflowFilterComboBox } from "./usage-table/workflow-filter-combo-box";
 
 export const columns: ColumnDef<UsageData>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -80,35 +71,35 @@ export const columns: ColumnDef<UsageData>[] = [
   getColumn({
     identifier: "userEmail",
     label: "User email",
-    sortable: false
+    sortable: false,
   }),
   getColumn({
     identifier: "workflowId",
     label: "Workflow",
-    sortable: false
+    sortable: false,
   }),
   getColumn({
     identifier: "executionId",
     label: "Execution ID",
-    sortable: false
+    sortable: false,
   }),
   getColumn({
     identifier: "totalTokens",
     label: "Total tokens",
-    columnType: 'token'
+    columnType: "token",
   }),
   getColumn({
     identifier: "totalCost",
     label: "Cost",
-    columnType: 'monetary'
+    columnType: "monetary",
   }),
-  getColumn({ identifier: "durationMs", label: "Duration", columnType: 'duration' }),
-  getColumn({ identifier: "createdAt", label: "Created at", columnType: 'timestamp' }),
+  getColumn({ identifier: "durationMs", label: "Duration", columnType: "duration" }),
+  getColumn({ identifier: "createdAt", label: "Created at", columnType: "timestamp" }),
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const payment = row.original;
 
       return (
         <DropdownMenu>
@@ -120,9 +111,7 @@ export const columns: ColumnDef<UsageData>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -130,45 +119,50 @@ export const columns: ColumnDef<UsageData>[] = [
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
-
-
-export default function UsageTable({ usageData, isLoading }: { usageData: UsageData[], isLoading: boolean }) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({
-      "id": false,
-      "userId": false,
-    })
-  const [rowSelection, setRowSelection] = React.useState({})
+export default function UsageTable({ usageData, isLoading }: { usageData: UsageData[]; isLoading: boolean }) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    id: false,
+    userId: false,
+  });
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const filters = [
     {
       name: "None",
-      component: null
+      component: null,
     },
     {
       name: "User",
-      component: <UserFilterComboBox usageData={usageData} updateFilter={((email: string) => {
-        table.getColumn("userEmail")?.setFilterValue(email)
-      })} />
+      component: (
+        <UserFilterComboBox
+          usageData={usageData}
+          updateFilter={(email: string) => {
+            table.getColumn("userEmail")?.setFilterValue(email);
+          }}
+        />
+      ),
     },
     {
       name: "Workflow",
-      component: <WorkflowFilterComboBox usageData={usageData} updateFilter={(workflowId: string) => {
-        table.getColumn("workflowId")?.setFilterValue(workflowId)
-      }} />
-    }
-  ]
+      component: (
+        <WorkflowFilterComboBox
+          usageData={usageData}
+          updateFilter={(workflowId: string) => {
+            table.getColumn("workflowId")?.setFilterValue(workflowId);
+          }}
+        />
+      ),
+    },
+  ];
 
-  const [selectedFilter, selectFilter] = React.useState(filters[0])
+  const [selectedFilter, selectFilter] = React.useState(filters[0]);
 
   const table = useReactTable({
     data: usageData,
@@ -187,16 +181,13 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <div className="flex gap-2 items-center"
-        >
-          <span className="text-muted-foreground text-sm">
-            Filter by
-          </span>
+        <div className="flex gap-2 items-center">
+          <span className="text-muted-foreground text-sm">Filter by</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className={cn("ml-auto", selectedFilter.name == "None" && "opacity-75")}>
@@ -204,13 +195,18 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {filters.map(filter => {
-                return <DropdownMenuItem key={filter.name} onClick={(_) => {
-                  selectFilter(filter)
-                  table.resetColumnFilters()
-                }}>
-                  {filter.name}
-                </DropdownMenuItem>
+              {filters.map((filter) => {
+                return (
+                  <DropdownMenuItem
+                    key={filter.name}
+                    onClick={(_) => {
+                      selectFilter(filter);
+                      table.resetColumnFilters();
+                    }}
+                  >
+                    {filter.name}
+                  </DropdownMenuItem>
+                );
               })}
               {/* {table */}
               {/*   .getAllColumns() */}
@@ -257,13 +253,11 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -276,14 +270,9 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -293,8 +282,8 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+          selected.
         </div>
         <div className="space-x-2">
           <Button
@@ -305,17 +294,11 @@ export default function UsageTable({ usageData, isLoading }: { usageData: UsageD
           >
             Previous
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
             Next
           </Button>
         </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }
-

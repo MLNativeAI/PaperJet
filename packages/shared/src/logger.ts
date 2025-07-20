@@ -27,7 +27,7 @@ const createLogger = () => {
 
   const injectContext = () => {
     if (process.env.NODE_ENV === "production") {
-      const context = getExecutionContext()
+      const context = getExecutionContext();
       return context || {};
     }
     return {};

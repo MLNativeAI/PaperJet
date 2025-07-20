@@ -1,5 +1,5 @@
-import { getUsageData } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { getUsageData } from "@/lib/api";
 
 export function useUsageData() {
   const {
@@ -9,9 +9,11 @@ export function useUsageData() {
   } = useQuery({
     queryKey: ["usage-data"],
     queryFn: getUsageData,
-  })
+  });
 
   return {
-    usageData, isLoading, refetch
-  }
+    usageData,
+    isLoading,
+    refetch,
+  };
 }

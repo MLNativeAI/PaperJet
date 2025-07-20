@@ -346,21 +346,21 @@ export const updateWorkflowBasicData = async (
 };
 
 export const isAdminSetupRequired = async () => {
-  const response = await api.admin.$get({})
+  const response = await api.admin.$get({});
   return response.json();
-}
+};
 
 export const getAuthMode = async () => {
-  const response = await api.admin['auth-mode'].$get({})
+  const response = await api.admin["auth-mode"].$get({});
   return response.json();
-}
+};
 
 export const getUsageData = async () => {
-  const response = await api.admin['usage-data'].$get({})
+  const response = await api.admin["usage-data"].$get({});
   return response.json();
-}
+};
 
 export const getUsageStats = async () => {
-  const response = await api.admin['usage-stats'].$get({})
+  const response = await api.admin["usage-stats"].$get({});
   return response.json();
-}
+};

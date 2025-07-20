@@ -1,6 +1,6 @@
+import { runExecutionContext } from "@paperjet/shared/src/context";
 import type { Context } from "hono";
 import { getUserIfLoggedIn as getUserIdIfLoggedIn } from "./auth";
-import { runExecutionContext } from "@paperjet/shared/src/context";
 
 export const withContext = async <T>(c: Context, next: () => Promise<T>): Promise<T> => {
   const userId = await getUserIdIfLoggedIn(c);

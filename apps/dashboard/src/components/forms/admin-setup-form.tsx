@@ -1,19 +1,9 @@
+import { useState } from "react";
+import { EmailPasswordForm } from "@/components/forms/email-password-form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { EmailPasswordForm } from "@/components/forms/email-password-form"
-import { useState } from "react"
-
-export function AdminSetupForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function AdminSetupForm({ className, ...props }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   return (
@@ -21,9 +11,7 @@ export function AdminSetupForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome to PaperJet!</CardTitle>
-          <CardDescription>
-            Let's start by creating an admin account.
-          </CardDescription>
+          <CardDescription>Let's start by creating an admin account.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
@@ -37,6 +25,6 @@ export function AdminSetupForm({
           </div>
         </CardContent>
       </Card>
-    </div >
-  )
+    </div>
+  );
 }
