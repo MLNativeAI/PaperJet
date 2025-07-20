@@ -4,7 +4,7 @@ import type { ExtractionResult, WorkflowConfiguration } from "../types";
 import { buildExtractionSchema } from "../utils/build-extraction-schema";
 
 export async function runDocumentExtraction(
-  presignedUrl: string,
+  imageData: string,
   configuration: WorkflowConfiguration,
 ): Promise<ExtractionResult> {
   logger.info("Starting data extraction from document");
@@ -50,7 +50,7 @@ Instructions:
           },
           {
             type: "image",
-            image: new URL(presignedUrl),
+            image: imageData,
           },
         ],
       },

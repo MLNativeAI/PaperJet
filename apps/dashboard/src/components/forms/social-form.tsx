@@ -32,13 +32,15 @@ const MicrosoftIcon = () => (
   </svg>
 );
 
-export function SocialForm({ setError, isLoading, setIsLoading }: {
-  setError: (_: string) => void,
-  isLoading: boolean,
-  setIsLoading: (_: boolean) => void
+export function SocialForm({
+  setError,
+  isLoading,
+  setIsLoading,
+}: {
+  setError: (_: string) => void;
+  isLoading: boolean;
+  setIsLoading: (_: boolean) => void;
 }) {
-
-
   const handleSocialSignIn = async (provider: "google" | "microsoft") => {
     setError("");
     setIsLoading(true);
@@ -47,12 +49,12 @@ export function SocialForm({ setError, isLoading, setIsLoading }: {
       provider,
     });
 
-    setIsLoading(false)
     if (error) {
-      if (error.code == 'PROVIDER_NOT_FOUND') {
-        setError('Social provider not configured.')
+      setIsLoading(false);
+      if (error.code === "PROVIDER_NOT_FOUND") {
+        setError("Social provider not configured.");
       } else {
-        setError(error.message || 'Failed to sign in')
+        setError(error.message || "Failed to sign in");
       }
     }
   };
@@ -91,5 +93,5 @@ export function SocialForm({ setError, isLoading, setIsLoading }: {
         </div>
       </div>
     </>
-  )
+  );
 }

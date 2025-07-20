@@ -1,6 +1,17 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
 
+export type PdfSplitResult = {
+  success: boolean;
+  total_pages: number;
+  pages: {
+    page_number: number;
+    image_data: string;
+    width: number;
+    height: number;
+  }[];
+};
+
 export type IDReference = {
   userId?: string;
   workflowId?: string;
@@ -111,12 +122,12 @@ export type UsageData = {
   totalCost: number;
   durationMs: number;
   createdAt: string;
-}
+};
 
 export type UsageStats = {
-  timePeriod: '30days',
-  cost: number,
-  requests: number,
-  users: number,
-  executions: number
-}
+  timePeriod: "30days";
+  cost: number;
+  requests: number;
+  users: number;
+  executions: number;
+};

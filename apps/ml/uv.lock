@@ -459,6 +459,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "fitz" },
     { name = "pymupdf" },
+    { name = "python-multipart" },
 ]
 
 [package.metadata]
@@ -466,6 +467,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "fitz", specifier = ">=0.0.1.dev2" },
     { name = "pymupdf", specifier = ">=1.26.3" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
 ]
 
 [[package]]

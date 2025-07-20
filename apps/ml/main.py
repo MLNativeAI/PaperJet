@@ -1,10 +1,13 @@
 import base64
 import logging
 import os
-import tempfile
+# import tempfile
 
+from pymupdf.mupdf import pdf_document
+import requests
 import pymupdf
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, Form
+from typing import Annotated
 from fastapi.middleware.cors import CORSMiddleware
 
 # Configure logging
@@ -37,33 +40,25 @@ async def root():
 
 
 @app.post("/split-pdf")
-async def split_pdf(pdf: UploadFile = File(...)):
-    """
-    Split a PDF file into images and return them as base64-encoded strings.
-
-    Args:
-        pdf: The uploaded PDF file
-        job_id: Unique identifier for this processing job (UUID)
-
-    Returns:
-        Dictionary containing job information and base64-encoded page images
-    """
+async def split_pdf(presigned_url: Annotated[str, Form()]):
     try:
-        # Create a temporary directory for the uploaded PDF
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
-            # Write uploaded file to temporary location
-            content = await pdf.read()
-            temp_pdf.write(content)
-            temp_pdf_path = temp_pdf.name
+        # # Create a temporary directory for the uploaded PDF
+        # with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
+        #     # Write uploaded file to temporary location
+        #     content = await pdf.read()
+        #     temp_pdf.write(content)
+        #     temp_pdf_path = temp_pdf.name
 
         # Open the PDF file
-        pdf_document = pymupdf.open(temp_pdf_path)
+        r = requests.get(presigned_url)
+        data = r.content
+        pdf_document = pymupdf.Document(stream=data)
         total_pages = len(pdf_document)
         pages_data = []
 
-        # Calculate zoom factor for 300 DPI (default PDF is 72dpi)
-        zoom = 300 / 72
-
+        # # Calculate zoom factor for 300 DPI (default PDF is 72dpi)
+        # zoom = 300 / 72
+        #
         # Process each page
         for page_num in range(total_pages):
             page = pdf_document[page_num]
@@ -94,7 +89,7 @@ async def split_pdf(pdf: UploadFile = File(...)):
         pdf_document.close()
 
         # Clean up temporary PDF file
-        os.unlink(temp_pdf_path)
+        # os.unlink(temp_pdf_path)
 
         return {
             "success": True,
@@ -105,4 +100,5 @@ async def split_pdf(pdf: UploadFile = File(...)):
 
     except Exception as e:
         logger.error(f"Error splitting PDF: {str(e)}")
+        return {"error": str(e)}
         # Clean up temporary file if it exists
