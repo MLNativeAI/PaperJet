@@ -1,6 +1,11 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
 
+export type ConnectionValidationResult = {
+  isValid: boolean;
+  error: string | null;
+};
+
 export type Configuration = {
   modelType: ModelType;
   geminiApiKey?: string;

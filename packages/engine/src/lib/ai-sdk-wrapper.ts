@@ -27,7 +27,7 @@ export async function generateObject<T extends z.ZodType>(
       schema: options.schema,
       messages: options.messages,
       prompt: options.prompt,
-      mode: "json",
+      // mode: "json",
     });
 
     const durationMs = Date.now() - startTime;

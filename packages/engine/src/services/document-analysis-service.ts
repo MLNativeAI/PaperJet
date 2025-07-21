@@ -1,9 +1,9 @@
 import { logger } from "@paperjet/shared";
 import { z } from "zod";
 import { generateObject } from "../lib/ai-sdk-wrapper";
+import { prepareUserInput } from "../lib/user-input";
 import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { prepareUserInput } from "../lib/user-input";
 
 export type AnalysisResult = {
   workflowName: string;

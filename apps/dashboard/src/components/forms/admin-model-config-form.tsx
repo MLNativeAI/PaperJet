@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Configuration } from "@paperjet/engine/types";
+import type { Configuration, ConnectionValidationResult } from "@paperjet/engine/types";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -8,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useUpdateConfiguration } from "@/hooks/use-update-configuration";
+import { useValidateConnection } from "@/hooks/use-validate-connection";
 
 export default function AdminModelConfigForm({ configuration }: { configuration: Configuration }) {
   const schema = z.object({
@@ -27,6 +30,15 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
   const watchedModelType = form.watch("modelType");
 
   const { mutateAsync, isPending } = useUpdateConfiguration();
+  const { mutateAsync: validateConnection, isPending: isValidating } = useValidateConnection();
+  const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
+
+  const runConnectionValidation = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setValidationResult(null);
+    const result = await validateConnection(form.getValues());
+    setValidationResult(result);
+  };
 
   const onSubmit = async (_values: z.infer<typeof schema>) => {
     await mutateAsync(_values);
@@ -42,7 +54,10 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
             render={({ field }) => (
               <FormItem>
                 <RadioGroup
-                  onValueChange={field.onChange}
+                  onValueChange={(e) => {
+                    setValidationResult(null);
+                    field.onChange(e);
+                  }}
                   defaultValue={field.value}
                   className="grid grid-cols-2 gap-4"
                 >
@@ -132,10 +147,21 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
         )}
         <div className="space-y-4">
           <div className="flex justify-between">
-            <Button variant="outline" className="flex items-center gap-2 bg-transparent">
-              Validate connection
-            </Button>
-
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="outline"
+                disabled={isValidating}
+                className="flex items-center gap-2 bg-transparent"
+                onClick={runConnectionValidation}
+              >
+                {isValidating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Validate connection
+              </Button>
+              {validationResult?.isValid && <div className="text-green-500 text-sm ">Connection is valid</div>}
+              {validationResult && !validationResult?.isValid && (
+                <div className="text-red-500 text-sm ">{validationResult.error}</div>
+              )}
+            </div>
             <div className="flex gap-3">
               <Button type="submit" disabled={isPending}>
                 Save settings

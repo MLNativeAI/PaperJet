@@ -1,10 +1,17 @@
-import { getConfiguration, getUsageData, getUsageStats, isSetupRequired, updateConfiguration } from "@paperjet/engine";
-import { Hono } from "hono";
-import { getAuthMode } from "@/lib/env";
 import { zValidator } from "@hono/zod-validator";
+import {
+  getConfiguration,
+  getUsageData,
+  getUsageStats,
+  isSetupRequired,
+  updateConfiguration,
+  validateConnection,
+} from "@paperjet/engine";
 import { configUpdateSchema } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
+import { Hono } from "hono";
 import z from "zod";
+import { getAuthMode } from "@/lib/env";
 
 const app = new Hono();
 
@@ -49,6 +56,21 @@ const router = app
       }
       return c.json({ error: "Internal server error" }, 500);
     }
+  })
+  .post("/validate-connection", zValidator("json", configUpdateSchema), async (c) => {
+    try {
+      const body = c.req.valid("json");
+      const validationResponse = await validateConnection(body);
+      return c.json(validationResponse);
+    } catch (error) {
+      logger.error(error, "Update workflow basic data error:");
+      if (error instanceof z.ZodError) {
+        return c.json({ error: "Invalid config data", details: error.errors }, 400);
+      }
+      if (error instanceof Error && error.message === "Workflow not found") {
+        return c.json({ error: "Workflow not found" }, 404);
+      }
+      return c.json({ error: "Internal server error" }, 500);
+    }
   });
-
 export default router;

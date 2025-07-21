@@ -3,8 +3,6 @@ import { configuration, user } from "@paperjet/db/schema";
 import { eq } from "drizzle-orm";
 import type { Configuration, ConfigurationUpdate, ValidModelConfig } from "../types";
 
-export const validateConnection = () => {};
-
 export const getValidModelConfig = async () => {
   const configuration = await getConfiguration();
   return validateModelConfiguration(configuration);
@@ -19,7 +17,7 @@ export const isSetupRequired = async () => {
   }
 };
 
-const validateModelConfiguration = (config: Configuration): ValidModelConfig => {
+export const validateModelConfiguration = (config: Configuration): ValidModelConfig => {
   if (config.modelType === "cloud" && config.geminiApiKey) {
     return {
       type: config.modelType,
@@ -34,7 +32,7 @@ const validateModelConfiguration = (config: Configuration): ValidModelConfig => 
       customModelUrl: config.customModelUrl,
     };
   }
-  throw new Error("Model configuration is invalid");
+  throw new Error("Model configuration is invalid. Please check if all required fields are set.");
 };
 
 export const getConfiguration = async (): Promise<Configuration> => {

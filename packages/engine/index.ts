@@ -1,5 +1,5 @@
-export * from "./src/lib/ai-sdk-wrapper";
 export * from "./src/services/admin-service.ts";
+export * from "./src/services/ai-service.ts";
 export * from "./src/services/document-analysis-service";
 export * from "./src/services/document-extraction-service";
 export * from "./src/services/execution-service";

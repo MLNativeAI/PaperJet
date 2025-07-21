@@ -368,11 +368,27 @@ export const getUsageStats = async () => {
 
 export const getConfiguration = async () => {
   const response = await api.admin.config.$get({});
+  if (!response.ok) {
+    throw new Error("Failed to fetch executions");
+  }
   return response.json();
 };
 
 export const updateConfiguration = async (config: ConfigurationUpdate) => {
   const response = await api.admin.config.$patch({
+    json: config,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update configuration");
+  }
+
+  return response.json();
+};
+
+export const validateConnection = async (config: ConfigurationUpdate) => {
+  const response = await api.admin["validate-connection"].$post({
     json: config,
   });
 

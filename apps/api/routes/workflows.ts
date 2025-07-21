@@ -224,8 +224,7 @@ const router = app
       const { id: workflowId } = c.req.valid("param");
 
       // dont await, we want to return immediately
-
-      await withExecutionContext({ workflowId }, async () => {
+      withExecutionContext({ workflowId }, async () => {
         return await analyzeWorkflowDocument(workflowId);
       });
 

@@ -32,7 +32,7 @@ export async function analyzeWorkflowDocument(workflowId: string): Promise<void>
   }
 
   // Get presigned URL for the existing file
-  const presignedUrl = await s3Client.presign(workflowData.filename);
+  const presignedUrl = s3Client.presign(workflowData.filename);
 
   // Use the document analysis service to perform complete analysis
   const analysisResult = await performCompleteAnalysis(presignedUrl);
@@ -75,7 +75,7 @@ export async function extractDataFromDocument(
   }
 
   // Get presigned URL for the file
-  const presignedUrl = await s3Client.presign(fileRecord.filename);
+  const presignedUrl = s3Client.presign(fileRecord.filename);
 
   // Use the document extraction service
   const extractionResult = await runDocumentExtraction(presignedUrl, configuration);
