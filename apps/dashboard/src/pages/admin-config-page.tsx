@@ -19,10 +19,7 @@ export default function AdminConfigPage() {
         </div>
       </div>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Model configuration</h2>
-        </div>
-        {<AdminModelConfigForm configuration={configuration} />}
+        <AdminModelConfigForm configuration={configuration} />
       </div>
     </div>
   );
