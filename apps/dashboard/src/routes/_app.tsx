@@ -78,6 +78,18 @@ function PathlessLayoutComponent() {
       };
     }
 
+    if (pathname === "/admin/config") {
+      return {
+        parent: "Admin",
+        current: "Configuration",
+      };
+    }
+    if (pathname === "/admin/usage") {
+      return {
+        parent: "Admin",
+        current: "Usage",
+      };
+    }
     // Default fallback
     return {
       parent: "Workflows",

@@ -37,7 +37,7 @@ const data = {
     },
     {
       title: "Admin",
-      url: "/admin",
+      url: "/admin/config",
       icon: Shield,
       adminOnly: true,
       items: [

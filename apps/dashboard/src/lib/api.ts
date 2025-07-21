@@ -1,4 +1,5 @@
 import type { ApiRoutes } from "@api/index";
+import { ConfigurationUpdate } from "@paperjet/engine/types";
 import { hc } from "hono/client";
 
 const client = hc<ApiRoutes>("/");
@@ -370,21 +371,14 @@ export const getConfiguration = async () => {
   return response.json();
 };
 
-export const updateConfiguration = async (
-  workflowId: string,
-  data: {
-    slug: string;
-    description?: string;
-  },
-) => {
-  const response = await api.workflows[":id"]["basic-data"].$patch({
-    param: { id: workflowId },
-    json: data,
+export const updateConfiguration = async (config: ConfigurationUpdate) => {
+  const response = await api.admin.config.$patch({
+    json: config,
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || "Failed to update workflow");
+    throw new Error(error.error || "Failed to update configuration");
   }
 
   return response.json();

@@ -1,7 +1,7 @@
 import { db } from "@paperjet/db";
 import { configuration, user } from "@paperjet/db/schema";
 import { eq } from "drizzle-orm";
-import type { Configuration } from "../types";
+import type { Configuration, ConfigurationUpdate } from "../types";
 
 export const isSetupRequired = async () => {
   const adminUsers = await db.select().from(user).where(eq(user.role, "admin"));
@@ -41,4 +41,14 @@ export const getConfiguration = async (): Promise<Configuration> => {
     isValid: false,
     modelType: "cloud",
   };
+};
+
+export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {
+  await db.update(configuration).set({
+    customModelName: configUpdate.customModelName,
+    customModelToken: configUpdate.customModeltoken,
+    customModelUrl: configUpdate.customModelUrl,
+    modelType: configUpdate.modelType,
+    geminiApiKey: configUpdate.geminiApiKey,
+  });
 };

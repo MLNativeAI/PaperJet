@@ -10,13 +10,23 @@ export type Configuration = {
   customModelToken?: string;
 };
 
-export type ConfigurationUpdate = {
-  modelType: ModelType;
-  geminiApiKey?: string;
-  customModelUrl?: string;
-  customModelName?: string;
-  customModeltoken?: string;
-};
+export const configUpdateSchema = z.object({
+  modelType: z.enum(["cloud", "custom"]),
+  geminiApiKey: z.string(),
+  customModelUrl: z.string(),
+  customModelName: z.string(),
+  customModelToken: z.string(),
+});
+
+export type ConfigurationUpdate = z.infer<typeof configUpdateSchema>;
+//
+// export type ConfigurationUpdate = {
+//   modelType: ModelType;
+//   geminiApiKey?: string;
+//   customModelUrl?: string;
+//   customModelName?: string;
+//   customModeltoken?: string;
+// };
 
 export type ModelType = "cloud" | "custom";
 
