@@ -7,7 +7,6 @@ import { s3Client } from "../lib/s3";
 import type { CategoriesConfiguration, WorkflowConfiguration, WorkflowRun } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
 import { runDocumentExtraction } from "./document-extraction-service";
-import { convertPdfToImages } from "./pdf-image-service";
 
 export async function executeWorkflow(
   workflowId: string,
@@ -51,9 +50,7 @@ export async function executeWorkflow(
 
   let extractionResult: any;
   await withExecutionContext({ executionId, workflowId }, async () => {
-    const pdfSplitResult = await convertPdfToImages(presignedUrl);
-
-    extractionResult = await runDocumentExtraction(pdfSplitResult.pages[0]?.image_data, config);
+    extractionResult = await runDocumentExtraction(presignedUrl, config);
   });
 
   // Update execution with results

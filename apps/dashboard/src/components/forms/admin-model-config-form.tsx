@@ -12,10 +12,10 @@ import { useUpdateConfiguration } from "@/hooks/use-update-configuration";
 export default function AdminModelConfigForm({ configuration }: { configuration: Configuration }) {
   const schema = z.object({
     modelType: z.enum(["cloud", "custom"]),
-    geminiApiKey: z.string(),
-    customModelUrl: z.string(),
-    customModelName: z.string(),
-    customModelToken: z.string(),
+    geminiApiKey: z.string().optional(),
+    customModelUrl: z.string().optional(),
+    customModelName: z.string().optional(),
+    customModelToken: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof schema>>({
@@ -26,10 +26,10 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
   });
   const watchedModelType = form.watch("modelType");
 
-  const updateConfigMutation = useUpdateConfiguration();
+  const { mutateAsync, isPending } = useUpdateConfiguration();
 
   const onSubmit = async (_values: z.infer<typeof schema>) => {
-    await updateConfigMutation.mutateAsync(_values);
+    await mutateAsync(_values);
   };
 
   return (
@@ -104,7 +104,7 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
             />
             <FormField
               control={form.control}
-              name="customModelUrl"
+              name="customModelName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Model name</FormLabel>
@@ -117,7 +117,7 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
             />
             <FormField
               control={form.control}
-              name="customModelUrl"
+              name="customModelToken"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Access token (optional)</FormLabel>
@@ -137,7 +137,9 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
             </Button>
 
             <div className="flex gap-3">
-              <Button type="submit">Save Settings</Button>
+              <Button type="submit" disabled={isPending}>
+                Save settings
+              </Button>
             </div>
           </div>
         </div>

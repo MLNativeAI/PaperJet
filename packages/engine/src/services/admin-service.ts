@@ -1,7 +1,14 @@
 import { db } from "@paperjet/db";
 import { configuration, user } from "@paperjet/db/schema";
 import { eq } from "drizzle-orm";
-import type { Configuration, ConfigurationUpdate } from "../types";
+import type { Configuration, ConfigurationUpdate, ValidModelConfig } from "../types";
+
+export const validateConnection = () => {};
+
+export const getValidModelConfig = async () => {
+  const configuration = await getConfiguration();
+  return validateModelConfiguration(configuration);
+};
 
 export const isSetupRequired = async () => {
   const adminUsers = await db.select().from(user).where(eq(user.role, "admin"));
@@ -12,41 +19,43 @@ export const isSetupRequired = async () => {
   }
 };
 
+const validateModelConfiguration = (config: Configuration): ValidModelConfig => {
+  if (config.modelType === "cloud" && config.geminiApiKey) {
+    return {
+      type: config.modelType,
+      geminiApiKey: config.geminiApiKey,
+    };
+  }
+  if (config.modelType === "custom" && config.customModelUrl && config.customModelName) {
+    return {
+      type: config.modelType,
+      customModelName: config.customModelName,
+      customModelToken: config.customModelToken,
+      customModelUrl: config.customModelUrl,
+    };
+  }
+  throw new Error("Model configuration is invalid");
+};
+
 export const getConfiguration = async (): Promise<Configuration> => {
   const configEntries = await db.select().from(configuration).limit(1);
   if (configEntries[0]) {
     const config = configEntries[0];
-    if (config.modelType === "cloud" && config.geminiApiKey) {
-      return {
-        isValid: true,
-        modelType: config.modelType,
-        customModelName: config.customModelName || undefined,
-        customModelToken: config.customModelToken || undefined,
-        customModelUrl: config.customModelUrl || undefined,
-        geminiApiKey: config.geminiApiKey || undefined,
-      };
-    }
-    if (config.modelType === "custom" && config.customModelUrl && config.customModelName) {
-      return {
-        isValid: true,
-        modelType: config.modelType,
-        customModelName: config.customModelName || undefined,
-        customModelToken: config.customModelToken || undefined,
-        customModelUrl: config.customModelUrl || undefined,
-        geminiApiKey: config.geminiApiKey || undefined,
-      };
-    }
+    return {
+      ...config,
+      geminiApiKey: config.geminiApiKey || undefined,
+      customModelToken: config.customModelToken || undefined,
+      customModelName: config.customModelName || undefined,
+      customModelUrl: config.customModelUrl || undefined,
+    };
   }
-  return {
-    isValid: false,
-    modelType: "cloud",
-  };
+  throw new Error("Configuration not found");
 };
 
 export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {
   await db.update(configuration).set({
     customModelName: configUpdate.customModelName,
-    customModelToken: configUpdate.customModeltoken,
+    customModelToken: configUpdate.customModelToken,
     customModelUrl: configUpdate.customModelUrl,
     modelType: configUpdate.modelType,
     geminiApiKey: configUpdate.geminiApiKey,

@@ -2,7 +2,7 @@ import { logger } from "@paperjet/shared";
 import type { CoreMessage, GenerateObjectResult, LanguageModelV1, Message } from "ai";
 import { generateObject as aiGenerateObject } from "ai";
 import type { z } from "zod";
-import { aiSdkModel } from "./model";
+import { getModelInstance } from "./model";
 import { trackUsage } from "./usage";
 
 export type GenerateObjectOptions<T extends z.ZodType> = {
@@ -17,7 +17,7 @@ export async function generateObject<T extends z.ZodType>(
   options: GenerateObjectOptions<T>,
 ): Promise<GenerateObjectResult<z.infer<T>>> {
   const startTime = Date.now();
-  const model = options.model || aiSdkModel();
+  const model = options.model || (await getModelInstance());
 
   try {
     logger.info({ operationName, modelId: model.modelId }, "Starting AI generation");

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { generateObject } from "../lib/ai-sdk-wrapper";
 import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
+import { prepareUserInput } from "../lib/user-input";
 
 export type AnalysisResult = {
   workflowName: string;
@@ -68,6 +69,7 @@ const documentTypeSchema = z.object({
 async function analyzeDocumentType(presignedUrl: string): Promise<z.infer<typeof documentTypeSchema>> {
   logger.info("Starting document type analysis");
 
+  const userInput = await prepareUserInput(presignedUrl);
   const prompt = `You're a document analysis expert. Analyze this document and provide:
 
         1. Document type (invoice, contract, form, purchase order, receipt, bank statement, etc.)
@@ -85,10 +87,7 @@ async function analyzeDocumentType(presignedUrl: string): Promise<z.infer<typeof
             type: "text",
             text: prompt,
           },
-          {
-            type: "image",
-            image: new URL(presignedUrl),
-          },
+          ...userInput,
         ],
       },
     ],
@@ -115,6 +114,8 @@ const categoriesZodSchema = z.object({
 
 async function identifyCategoriesAndTables(presignedUrl: string): Promise<z.infer<typeof categoriesZodSchema>> {
   logger.info({ presignedUrl }, "Starting categories and tables extraction");
+
+  const userInput = await prepareUserInput(presignedUrl);
 
   const prompt = `Analyze this document and extract information in a structured way:
 
@@ -143,10 +144,7 @@ Important: Categories should be listed in the order they appear in the document,
             type: "text",
             text: prompt,
           },
-          {
-            type: "image",
-            image: new URL(presignedUrl),
-          },
+          ...userInput,
         ],
       },
     ],
@@ -192,6 +190,7 @@ async function extractAllFieldsWithCategories(
     "Starting unified field extraction for all categories",
   );
 
+  const userInput = await prepareUserInput(presignedUrl);
   const categoriesDescription = categories
     .map((cat) => `- ${cat.categoryId}: "${cat.displayName}" (${cat.slug})`)
     .join("\n");
@@ -230,10 +229,7 @@ Extract all fields from the document, ensuring no duplicates.`;
             type: "text",
             text: prompt,
           },
-          {
-            type: "image",
-            image: new URL(presignedUrl),
-          },
+          ...userInput,
         ],
       },
     ],
@@ -304,7 +300,7 @@ Analyze the actual tabular data for "${table.slug}" and provide:
 - Provide detailed descriptions for AI extraction guidance
 
 If the table "${table.slug}" is not found or has no actual tabular data in the document, return an empty columns array.`;
-
+  const userInput = await prepareUserInput(presignedUrl);
   const result = await generateObject("table-fields-extraction", {
     schema: singleTableExtractionSchema,
     messages: [
@@ -315,10 +311,7 @@ If the table "${table.slug}" is not found or has no actual tabular data in the d
             type: "text",
             text: prompt,
           },
-          {
-            type: "image",
-            image: new URL(presignedUrl),
-          },
+          ...userInput,
         ],
       },
     ],

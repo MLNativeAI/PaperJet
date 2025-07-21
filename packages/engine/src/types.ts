@@ -3,32 +3,35 @@ import z from "zod";
 
 export type Configuration = {
   modelType: ModelType;
-  isValid: boolean;
   geminiApiKey?: string;
   customModelUrl?: string;
   customModelName?: string;
   customModelToken?: string;
 };
 
+export type ValidModelConfig =
+  | {
+      type: "cloud";
+      geminiApiKey: string;
+    }
+  | {
+      type: "custom";
+      customModelUrl: string;
+      customModelName: string;
+      customModelToken?: string;
+    };
+
+export type ModelType = "cloud" | "custom";
+
 export const configUpdateSchema = z.object({
   modelType: z.enum(["cloud", "custom"]),
-  geminiApiKey: z.string(),
-  customModelUrl: z.string(),
-  customModelName: z.string(),
-  customModelToken: z.string(),
+  geminiApiKey: z.string().optional(),
+  customModelName: z.string().optional(),
+  customModelToken: z.string().optional(),
+  customModelUrl: z.string().optional(),
 });
 
 export type ConfigurationUpdate = z.infer<typeof configUpdateSchema>;
-//
-// export type ConfigurationUpdate = {
-//   modelType: ModelType;
-//   geminiApiKey?: string;
-//   customModelUrl?: string;
-//   customModelName?: string;
-//   customModeltoken?: string;
-// };
-
-export type ModelType = "cloud" | "custom";
 
 export type PdfSplitResult = {
   success: boolean;

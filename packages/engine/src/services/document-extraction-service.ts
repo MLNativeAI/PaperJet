@@ -1,15 +1,18 @@
 import { logger } from "@paperjet/shared";
 import { generateObject } from "../lib/ai-sdk-wrapper";
+import { prepareUserInput } from "../lib/user-input";
 import type { ExtractionResult, WorkflowConfiguration } from "../types";
 import { buildExtractionSchema } from "../utils/build-extraction-schema";
 
 export async function runDocumentExtraction(
-  imageData: string,
+  presignedUrl: string,
   configuration: WorkflowConfiguration,
 ): Promise<ExtractionResult> {
   logger.info("Starting data extraction from document");
   // Build dynamic schema object based on provided fields and tables
   const schemaObj = buildExtractionSchema(configuration);
+
+  const userInput = await prepareUserInput(presignedUrl);
 
   // Build extraction prompt with field descriptions
   const fieldDescriptions = configuration.fields
@@ -48,10 +51,7 @@ Instructions:
             type: "text",
             text: prompt,
           },
-          {
-            type: "image",
-            image: imageData,
-          },
+          ...userInput,
         ],
       },
     ],

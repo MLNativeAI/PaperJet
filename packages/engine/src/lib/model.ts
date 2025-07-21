@@ -1,15 +1,22 @@
-// import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import type { LanguageModelV1 } from "ai";
+import { getValidModelConfig } from "../services/admin-service";
 
-export const aiSdkModel = () => {
-  // const apiKey = Bun.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  // if (!apiKey) {
-  //   throw new Error("Google API key not configured");
-  // }
-  return createOpenAICompatible({
-    baseURL: "http://localhost:11434/v1",
-    apiKey: "ollama",
-    name: "granite",
-  }).chatModel("hf.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF:UD-Q4_K_XL");
-  // return google("gemini-2.5-flash");
+export const getModelInstance = async (): Promise<LanguageModelV1> => {
+  const modelConfig = await getValidModelConfig();
+  if (modelConfig.type === "cloud") {
+    const google = createGoogleGenerativeAI({
+      apiKey: modelConfig.geminiApiKey,
+    });
+    return google("gemini-2.5-flash", {
+      structuredOutputs: true,
+    });
+  } else {
+    return createOpenAICompatible({
+      baseURL: modelConfig.customModelUrl,
+      apiKey: modelConfig.customModelToken,
+      name: modelConfig.customModelName,
+    }).chatModel(modelConfig.customModelName, {});
+  }
 };

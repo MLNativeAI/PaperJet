@@ -133,7 +133,6 @@ export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
 
 export const configuration = pgTable("configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  admin_exists: boolean("admin_exists").notNull().default(false),
   modelType: modeTypeEnum().notNull().default("cloud"),
   geminiApiKey: text("gemini_api_key"),
   customModelUrl: text("custom_model_url"),
