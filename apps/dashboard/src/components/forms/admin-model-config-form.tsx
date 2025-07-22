@@ -19,6 +19,7 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
     customModelUrl: z.string().optional(),
     customModelName: z.string().optional(),
     customModelToken: z.string().optional(),
+    structuredOutputMode: z.enum(["json", "tool"]).optional(),
   });
 
   const form = useForm<z.infer<typeof schema>>({
@@ -169,6 +170,47 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
                   </FormItem>
                 )}
               />
+
+              <div className="grid gap-3">
+                <FormField
+                  control={form.control}
+                  name="structuredOutputMode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Structured output</FormLabel>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || "json"}
+                        className="grid grid-cols-2 gap-4"
+                        disabled={!editModeEnabled}
+                      >
+                        <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="tool" id="tool" disabled={!editModeEnabled} />
+                          <Label htmlFor="tool" className="flex items-center gap-2 cursor-pointer flex-1">
+                            <div>
+                              <div className="font-medium">Tool Mode</div>
+                              <div className="text-sm text-muted-foreground">
+                                Use tool calling for structured output (recommended)
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="json" id="json" disabled={!editModeEnabled} />
+                          <Label htmlFor="json" className="flex items-center gap-2 cursor-pointer flex-1">
+                            <div>
+                              <div className="font-medium">JSON Mode</div>
+                              <div className="text-sm text-muted-foreground">
+                                Standard JSON output. Use only if a model doesn't support tools.
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           )}
           <div className="space-y-4">

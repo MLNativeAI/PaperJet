@@ -1,8 +1,11 @@
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { logger } from "@paperjet/shared";
 import type { CoreMessage, GenerateObjectResult, LanguageModelV1, Message } from "ai";
 import { generateObject as aiGenerateObject } from "ai";
 import type { z } from "zod";
-import { getModelInstance } from "./model";
+import { getValidModelConfig } from "../services/admin-service";
+import type { ValidModelConfig } from "../types";
 import { trackUsage } from "./usage";
 
 export type GenerateObjectOptions<T extends z.ZodType> = {
@@ -10,6 +13,7 @@ export type GenerateObjectOptions<T extends z.ZodType> = {
   messages: CoreMessage[] | Omit<Message, "id">[];
   model?: LanguageModelV1;
   prompt?: string;
+  modelConfig?: ValidModelConfig;
 };
 
 export async function generateObject<T extends z.ZodType>(
@@ -17,7 +21,8 @@ export async function generateObject<T extends z.ZodType>(
   options: GenerateObjectOptions<T>,
 ): Promise<GenerateObjectResult<z.infer<T>>> {
   const startTime = Date.now();
-  const model = options.model || (await getModelInstance());
+  const modelConfig = options.modelConfig || (await getValidModelConfig());
+  const model = options.model || (await getModelInstance(modelConfig));
 
   try {
     const result = await aiGenerateObject({
@@ -25,7 +30,7 @@ export async function generateObject<T extends z.ZodType>(
       schema: options.schema,
       messages: options.messages,
       prompt: options.prompt,
-      mode: "json",
+      mode: getToolMode(modelConfig),
     });
 
     const durationMs = Date.now() - startTime;
@@ -59,5 +64,30 @@ export async function generateObject<T extends z.ZodType>(
     );
 
     throw error;
+  }
+}
+
+export async function getModelInstance(modelConfig: ValidModelConfig): Promise<LanguageModelV1> {
+  if (modelConfig.type === "cloud") {
+    const google = createGoogleGenerativeAI({
+      apiKey: modelConfig.geminiApiKey,
+    });
+    return google("gemini-2.5-flash", {
+      structuredOutputs: true,
+    });
+  } else {
+    return createOpenAICompatible({
+      baseURL: modelConfig.customModelUrl,
+      apiKey: modelConfig.customModelToken,
+      name: modelConfig.customModelName,
+    }).chatModel(modelConfig.customModelName, {});
+  }
+}
+
+function getToolMode(modelConfig: ValidModelConfig): "auto" | "json" | "tool" {
+  if (modelConfig.type === "cloud") {
+    return "auto";
+  } else {
+    return modelConfig.structuredOutputMode;
   }
 }

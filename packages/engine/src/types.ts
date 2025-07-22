@@ -1,6 +1,5 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
-import type { MarkdownDocument } from "./services/internal/markdown-service";
 
 export type ConnectionValidationResult = {
   isValid: boolean;
@@ -13,6 +12,7 @@ export type Configuration = {
   customModelUrl?: string;
   customModelName?: string;
   customModelToken?: string;
+  structuredOutputMode?: "json" | "tool";
 };
 
 export type ValidModelConfig =
@@ -25,6 +25,7 @@ export type ValidModelConfig =
       customModelUrl: string;
       customModelName: string;
       customModelToken?: string;
+      structuredOutputMode: "json" | "tool";
     };
 
 export type ModelType = "cloud" | "custom";
@@ -35,6 +36,7 @@ export const configUpdateSchema = z.object({
   customModelName: z.string().optional(),
   customModelToken: z.string().optional(),
   customModelUrl: z.string().optional(),
+  structuredOutputMode: z.enum(["json", "tool"]).optional(),
 });
 
 export type ConfigurationUpdate = z.infer<typeof configUpdateSchema>;

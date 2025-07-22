@@ -9,9 +9,9 @@ import type { Configuration, ConfigurationUpdate, ConnectionValidationResult, Va
 
 export const validateConnection = async (configuration: Configuration): Promise<ConnectionValidationResult> => {
   try {
-    const validConnection = validateModelConfiguration(configuration);
+    const validModelConfig = validateModelConfiguration(configuration);
 
-    logger.info(validConnection, "Validating connection");
+    logger.info(validModelConfig, "Validating connection");
 
     const prompt = `Respond with pong.`;
     const result = await generateObject("validateConnection", {
@@ -29,6 +29,7 @@ export const validateConnection = async (configuration: Configuration): Promise<
           ],
         },
       ],
+      modelConfig: validModelConfig,
     });
 
     logger.info(result.object.answer, "Validation result:");
@@ -92,6 +93,7 @@ export const validateModelConfiguration = (config: Configuration): ValidModelCon
       customModelName: config.customModelName,
       customModelToken: config.customModelToken,
       customModelUrl: config.customModelUrl,
+      structuredOutputMode: config.structuredOutputMode || "tool",
     };
   }
   throw new Error("Model configuration is invalid. Please check if all required fields are set.");
@@ -107,6 +109,7 @@ export const getConfiguration = async (): Promise<Configuration> => {
       customModelToken: config.customModelToken || undefined,
       customModelName: config.customModelName || undefined,
       customModelUrl: config.customModelUrl || undefined,
+      structuredOutputMode: config.structuredOutputMode || "json",
     };
   }
   throw new Error("Configuration not found");
@@ -119,5 +122,6 @@ export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => 
     customModelUrl: configUpdate.customModelUrl,
     modelType: configUpdate.modelType,
     geminiApiKey: configUpdate.geminiApiKey,
+    structuredOutputMode: configUpdate.structuredOutputMode,
   });
 };

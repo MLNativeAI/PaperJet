@@ -1,0 +1,2 @@
+CREATE TYPE "public"."structuredOutputMode" AS ENUM('json', 'tool');--> statement-breakpoint
+ALTER TABLE "configuration" ADD COLUMN "structuredOutputMode" "structuredOutputMode" DEFAULT 'json' NOT NULL;

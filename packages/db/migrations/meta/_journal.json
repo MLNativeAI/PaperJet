@@ -43,6 +43,13 @@
       "when": 1753101978100,
       "tag": "0005_friendly_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753185682869,
+      "tag": "0006_brave_quentin_quire",
+      "breakpoints": true
     }
   ]
 }

@@ -131,6 +131,8 @@ export const usageData = pgTable("usage_data", {
 
 export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
 
+export const structuredOutputModeEnum = pgEnum("structuredOutputMode", ["json", "tool"]);
+
 export const configuration = pgTable("configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
   modelType: modeTypeEnum().notNull().default("cloud"),
@@ -138,4 +140,5 @@ export const configuration = pgTable("configuration", {
   customModelUrl: text("custom_model_url"),
   customModelName: text("custom_model_name"),
   customModelToken: text("custom_model_token"),
+  structuredOutputMode: structuredOutputModeEnum().notNull().default("json"),
 });
