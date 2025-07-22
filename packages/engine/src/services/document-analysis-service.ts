@@ -4,6 +4,7 @@ import { generateObject } from "../lib/ai-sdk-wrapper";
 import { prepareUserInput } from "../lib/user-input";
 import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
+import { convertDocumentToMarkdown, type MarkdownDocument } from "./markdown-service";
 
 export type AnalysisResult = {
   workflowName: string;
@@ -15,10 +16,14 @@ export type AnalysisResult = {
 
 export async function performCompleteAnalysis(presignedUrl: string): Promise<AnalysisResult> {
   logger.info("Starting complete document analysis");
+
+  // Step 0: Convert to markdown
+  const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
+
   // Step 1: Analyze document type and identify categories/tables
   const [documentTypeAnalysis, categoriesAndTables] = await Promise.all([
-    analyzeDocumentType(presignedUrl),
-    identifyCategoriesAndTables(presignedUrl),
+    analyzeDocumentType(markdownDocument),
+    identifyCategoriesAndTables(markdownDocument),
   ]);
 
   const categories = categoriesAndTables.categories.map((category, idx) => ({
@@ -36,7 +41,7 @@ export async function performCompleteAnalysis(presignedUrl: string): Promise<Ana
   );
 
   // Step 2: Extract ALL fields at once with category assignments
-  const allFieldsWithCategories = await extractAllFieldsWithCategories(presignedUrl, categories);
+  const allFieldsWithCategories = await extractAllFieldsWithCategories(markdownDocument, categories);
 
   // Step 3: Extract table fields for each table in parallel
   const tableFieldPromises = allTables.map((table) => extractFieldsForTable(presignedUrl, table));
@@ -66,10 +71,9 @@ const documentTypeSchema = z.object({
   description: z.string(),
 });
 
-async function analyzeDocumentType(presignedUrl: string): Promise<z.infer<typeof documentTypeSchema>> {
+async function analyzeDocumentType(markdownDocument: MarkdownDocument): Promise<z.infer<typeof documentTypeSchema>> {
   logger.info("Starting document type analysis");
 
-  const userInput = await prepareUserInput(presignedUrl);
   const prompt = `You're a document analysis expert. Analyze this document and provide:
 
         1. Document type (invoice, contract, form, purchase order, receipt, bank statement, etc.)
@@ -87,7 +91,10 @@ async function analyzeDocumentType(presignedUrl: string): Promise<z.infer<typeof
             type: "text",
             text: prompt,
           },
-          ...userInput,
+          {
+            type: "text",
+            text: markdownDocument.fullDocument,
+          },
         ],
       },
     ],
@@ -112,10 +119,10 @@ const categoriesZodSchema = z.object({
   ),
 });
 
-async function identifyCategoriesAndTables(presignedUrl: string): Promise<z.infer<typeof categoriesZodSchema>> {
-  logger.info({ presignedUrl }, "Starting categories and tables extraction");
-
-  const userInput = await prepareUserInput(presignedUrl);
+async function identifyCategoriesAndTables(
+  markdownDocument: MarkdownDocument,
+): Promise<z.infer<typeof categoriesZodSchema>> {
+  logger.info("Starting categories and tables extraction");
 
   const prompt = `Analyze this document and extract information in a structured way:
 
@@ -134,6 +141,7 @@ For each table within a category, provide:
 - description: What the table contains
 
 Important: Categories should be listed in the order they appear in the document, and tables should be nested within their respective categories. Focus on business-relevant data structures and logical information groupings.`;
+
   const result = await generateObject("categories-and-tables", {
     schema: categoriesZodSchema,
     messages: [
@@ -144,7 +152,10 @@ Important: Categories should be listed in the order they appear in the document,
             type: "text",
             text: prompt,
           },
-          ...userInput,
+          {
+            type: "text",
+            text: markdownDocument.fullDocument,
+          },
         ],
       },
     ],
@@ -175,7 +186,7 @@ const allFieldsExtractionSchema = z.object({
 });
 
 async function extractAllFieldsWithCategories(
-  presignedUrl: string,
+  markdownDocument: MarkdownDocument,
   categories: Array<{
     categoryId: string;
     displayName: string;
@@ -190,7 +201,6 @@ async function extractAllFieldsWithCategories(
     "Starting unified field extraction for all categories",
   );
 
-  const userInput = await prepareUserInput(presignedUrl);
   const categoriesDescription = categories
     .map((cat) => `- ${cat.categoryId}: "${cat.displayName}" (${cat.slug})`)
     .join("\n");
@@ -229,7 +239,10 @@ Extract all fields from the document, ensuring no duplicates.`;
             type: "text",
             text: prompt,
           },
-          ...userInput,
+          {
+            type: "text",
+            text: markdownDocument.fullDocument,
+          },
         ],
       },
     ],

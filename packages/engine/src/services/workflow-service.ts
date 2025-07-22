@@ -196,7 +196,7 @@ export async function getDocumentForFile(fileId: string, userId: string) {
   }
 
   // Get presigned URL for the file
-  const presignedUrl = await s3Client.presign(fileRecord.filename);
+  const presignedUrl = s3Client.presign(fileRecord.filename);
 
   const result = {
     fileId,
