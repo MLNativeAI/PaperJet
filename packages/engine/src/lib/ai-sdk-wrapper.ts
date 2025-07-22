@@ -20,8 +20,6 @@ export async function generateObject<T extends z.ZodType>(
   const model = options.model || (await getModelInstance());
 
   try {
-    // logger.info({ operationName, modelId: model.modelId }, "Starting AI generation");
-
     const result = await aiGenerateObject({
       model,
       schema: options.schema,
