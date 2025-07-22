@@ -13,12 +13,12 @@ export const Route = createFileRoute("/admin/setup")({
       });
     }
 
-    const { data: session } = await authClient.getSession();
-    if (session) {
-      throw redirect({
-        to: "/",
-      });
-    }
+    // const { data: session } = await authClient.getSession();
+    // if (session) {
+    //   throw redirect({
+    //     to: "/",
+    //   });
+    // }
   },
   component: AdminSetupPage,
 });

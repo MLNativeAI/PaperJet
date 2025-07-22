@@ -1,10 +1,10 @@
-import { logger } from "@paperjet/shared";
+import { envVars, logger } from "@paperjet/shared";
 import type { PdfSplitResult } from "../../types";
 
 export const convertPdfToImages = async (presignedUrl: string): Promise<PdfSplitResult> => {
   const formData = new FormData();
   formData.set("presigned_url", presignedUrl);
-  const response = await fetch("http://localhost:8000/split-pdf", {
+  const response = await fetch(`${envVars.ML_SERVICE_URL}/split-pdf`, {
     method: "POST",
     body: formData,
   });

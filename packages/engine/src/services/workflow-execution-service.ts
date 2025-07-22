@@ -35,6 +35,8 @@ export async function executeWorkflow(
   logger.info({ executionId, workflowId }, "Starting data extraction for workflow execution");
   const presignedUrl = s3Client.presign(filename);
 
+  logger.info(`Presigend URL: ${presignedUrl}`);
+
   // Create execution record with file reference
   await db.insert(workflowExecution).values({
     id: executionId,

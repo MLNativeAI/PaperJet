@@ -1,4 +1,4 @@
-import { type EnvVars, envSchema } from "@paperjet/shared";
+import { type EnvVars, envSchema } from "./env-schema";
 
 export const validateEnv = (): EnvVars => {
   const env = envSchema.safeParse(process.env);

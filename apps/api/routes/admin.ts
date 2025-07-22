@@ -8,10 +8,9 @@ import {
   validateConnection,
 } from "@paperjet/engine";
 import { configUpdateSchema } from "@paperjet/engine/types";
-import { logger } from "@paperjet/shared";
+import { getAuthMode, logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { getAuthMode } from "@/lib/env";
 
 const app = new Hono();
 
