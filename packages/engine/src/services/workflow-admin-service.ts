@@ -12,22 +12,10 @@ import {
   workflowConfigurationSchema,
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { executeWorkflow } from "./execution-service";
+import { executeWorkflow } from "./workflow-execution-service";
 
 async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration> {
   const parsed = JSON.parse(configuration);
-
-  // Migration: Convert old 'name' field to 'slug' field for tables
-  if (parsed.tables) {
-    parsed.tables = parsed.tables.map((table: any) => {
-      if (table.name && !table.slug) {
-        // Convert old 'name' field to 'slug'
-        return { ...table, slug: table.name };
-      }
-      return table;
-    });
-  }
-
   const parsedConfig = workflowConfigurationSchema.safeParse(parsed);
   if (!parsedConfig.success) {
     logger.warn(parsedConfig.error, `Invalid workflow configuration: ${configuration}`);

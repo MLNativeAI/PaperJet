@@ -1,6 +1,6 @@
 import { logger } from "@paperjet/shared";
 import { z } from "zod";
-import { generateObject } from "../lib/ai-sdk-wrapper";
+import { generateObject } from "../../lib/ai-sdk-wrapper";
 import { convertPdfToImages } from "./pdf-image-service";
 
 export type MarkdownDocument = {
@@ -10,6 +10,8 @@ export type MarkdownDocument = {
 
 export const convertDocumentToMarkdown = async (presignedUrl: string): Promise<MarkdownDocument> => {
   const pdfSplitResult = await convertPdfToImages(presignedUrl);
+
+  logger.info("Converting document to markdown");
 
   const markdownPages = [];
   // we need to add queueing support for large documents to do this in parallel

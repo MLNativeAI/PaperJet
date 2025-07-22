@@ -1,5 +1,6 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
+import type { MarkdownDocument } from "./services/internal/markdown-service";
 
 export type ConnectionValidationResult = {
   isValid: boolean;

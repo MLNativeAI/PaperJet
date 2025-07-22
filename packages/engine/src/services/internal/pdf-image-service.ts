@@ -1,5 +1,5 @@
 import { logger } from "@paperjet/shared";
-import type { PdfSplitResult } from "../types";
+import type { PdfSplitResult } from "../../types";
 
 export const convertPdfToImages = async (presignedUrl: string): Promise<PdfSplitResult> => {
   const formData = new FormData();

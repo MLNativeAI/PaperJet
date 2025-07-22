@@ -356,7 +356,7 @@ const router = app
       const workflowData = await getWorkflow(workflowId, user.id);
 
       // Re-extract data from the sample document
-      await extractDataFromDocument(workflowId, workflowData.fileId, user.id, workflowData.configuration);
+      await extractDataFromDocument(workflowId, workflowData.configuration);
 
       return c.json({ message: "Data extraction started successfully" });
     } catch (error) {

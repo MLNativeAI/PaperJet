@@ -6,7 +6,8 @@ import { and, desc, eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import type { CategoriesConfiguration, WorkflowConfiguration, WorkflowRun } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { runDocumentExtraction } from "./document-extraction-service";
+import { runDocumentExtraction } from "./internal/document-extraction-service";
+import { convertDocumentToMarkdown } from "./internal/markdown-service";
 
 export async function executeWorkflow(
   workflowId: string,
@@ -16,13 +17,10 @@ export async function executeWorkflow(
 ) {
   logger.info("Starting workflow execution");
 
-  // Create execution record for single file
   const executionId = generateId(ID_PREFIXES.workflowExecution);
   const fileId = generateId(ID_PREFIXES.file);
   const filename = `executions/${executionId}/${uploadedFile.name}`;
 
-  // Save file to storage
-  logger.info({ fileId, filename }, "Saving execution file to storage");
   await db.insert(file).values({
     id: fileId,
     filename,
@@ -32,6 +30,10 @@ export async function executeWorkflow(
 
   const fileBuffer = await uploadedFile.arrayBuffer();
   await s3Client.file(filename).write(fileBuffer);
+
+  // Extract data using extraction service
+  logger.info({ executionId, workflowId }, "Starting data extraction for workflow execution");
+  const presignedUrl = s3Client.presign(filename);
 
   // Create execution record with file reference
   await db.insert(workflowExecution).values({
@@ -44,13 +46,11 @@ export async function executeWorkflow(
     ownerId: userId,
   });
 
-  // Extract data using extraction service
-  logger.info({ executionId, workflowId }, "Starting data extraction for workflow execution");
-  const presignedUrl = s3Client.presign(filename);
+  const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
 
   let extractionResult: any;
   await withExecutionContext({ executionId, workflowId }, async () => {
-    extractionResult = await runDocumentExtraction(presignedUrl, config);
+    extractionResult = await runDocumentExtraction(markdownDocument, config);
   });
 
   // Update execution with results

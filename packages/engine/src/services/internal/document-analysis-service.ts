@@ -1,10 +1,9 @@
 import { logger } from "@paperjet/shared";
 import { z } from "zod";
-import { generateObject } from "../lib/ai-sdk-wrapper";
-import { prepareUserInput } from "../lib/user-input";
-import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../types";
-import { generateId, ID_PREFIXES } from "../utils/id";
-import { convertDocumentToMarkdown, type MarkdownDocument } from "./markdown-service";
+import { generateObject } from "../../lib/ai-sdk-wrapper";
+import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../../types";
+import { generateId, ID_PREFIXES } from "../../utils/id";
+import type { MarkdownDocument } from "./markdown-service";
 
 export type AnalysisResult = {
   workflowName: string;
@@ -14,11 +13,8 @@ export type AnalysisResult = {
   tables: TableConfiguration;
 };
 
-export async function performCompleteAnalysis(presignedUrl: string): Promise<AnalysisResult> {
+export async function performCompleteAnalysis(markdownDocument: MarkdownDocument): Promise<AnalysisResult> {
   logger.info("Starting complete document analysis");
-
-  // Step 0: Convert to markdown
-  const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
 
   // Step 1: Analyze document type and identify categories/tables
   const [documentTypeAnalysis, categoriesAndTables] = await Promise.all([
@@ -44,7 +40,7 @@ export async function performCompleteAnalysis(presignedUrl: string): Promise<Ana
   const allFieldsWithCategories = await extractAllFieldsWithCategories(markdownDocument, categories);
 
   // Step 3: Extract table fields for each table in parallel
-  const tableFieldPromises = allTables.map((table) => extractFieldsForTable(presignedUrl, table));
+  const tableFieldPromises = allTables.map((table) => extractFieldsForTable(markdownDocument, table));
   const tableFieldResults = await Promise.all(tableFieldPromises);
 
   logger.info("Complete document analysis finished");
@@ -286,7 +282,7 @@ const singleTableExtractionSchema = z.object({
 });
 
 async function extractFieldsForTable(
-  presignedUrl: string,
+  markdownDocument: MarkdownDocument,
   table: {
     slug: string;
     description: string;
@@ -313,7 +309,6 @@ Analyze the actual tabular data for "${table.slug}" and provide:
 - Provide detailed descriptions for AI extraction guidance
 
 If the table "${table.slug}" is not found or has no actual tabular data in the document, return an empty columns array.`;
-  const userInput = await prepareUserInput(presignedUrl);
   const result = await generateObject("table-fields-extraction", {
     schema: singleTableExtractionSchema,
     messages: [
@@ -324,7 +319,10 @@ If the table "${table.slug}" is not found or has no actual tabular data in the d
             type: "text",
             text: prompt,
           },
-          ...userInput,
+          {
+            type: "text",
+            text: markdownDocument.fullDocument,
+          },
         ],
       },
     ],

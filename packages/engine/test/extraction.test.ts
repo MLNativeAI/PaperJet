@@ -1,5 +1,5 @@
 import { describe, test } from "bun:test";
-import { runDocumentExtraction } from "../src/services/document-extraction-service";
+import { runDocumentExtraction } from "../src/services/internal/document-extraction-service";
 import {
   compareExtractionResults,
   ensureCacheDir,
