@@ -1,3 +1,5 @@
+CREATE TYPE "public"."modelType" AS ENUM('cloud', 'custom');--> statement-breakpoint
+CREATE TYPE "public"."structuredOutputMode" AS ENUM('json', 'tool');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -12,6 +14,16 @@ CREATE TABLE "account" (
 	"password" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "configuration" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"modelType" "modelType" DEFAULT 'cloud' NOT NULL,
+	"gemini_api_key" text,
+	"custom_model_url" text,
+	"custom_model_name" text,
+	"custom_model_token" text,
+	"structuredOutputMode" "structuredOutputMode" DEFAULT 'tool' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "file" (
@@ -30,7 +42,34 @@ CREATE TABLE "session" (
 	"ip_address" text,
 	"user_agent" text,
 	"user_id" text NOT NULL,
+	"impersonated_by" text,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
+CREATE TABLE "usage_data" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"model" text NOT NULL,
+	"user_id" text,
+	"workflow_id" text,
+	"execution_id" text,
+	"input_tokens" integer NOT NULL,
+	"input_cost" numeric,
+	"output_tokens" integer NOT NULL,
+	"output_cost" numeric,
+	"total_tokens" integer NOT NULL,
+	"total_cost" numeric(10, 4),
+	"duration_ms" integer,
+	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "usage_model_price" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"model" text NOT NULL,
+	"input_cost_per_million_tokens" numeric(10, 4) NOT NULL,
+	"output_cost_per_million_tokens" numeric(10, 4) NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
@@ -41,6 +80,10 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
+	"role" text,
+	"banned" boolean,
+	"ban_reason" text,
+	"ban_expires" timestamp,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -55,7 +98,7 @@ CREATE TABLE "verification" (
 --> statement-breakpoint
 CREATE TABLE "workflow" (
 	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
+	"slug" text NOT NULL,
 	"description" text DEFAULT '' NOT NULL,
 	"categories" text NOT NULL,
 	"configuration" text NOT NULL,

@@ -140,5 +140,5 @@ export const configuration = pgTable("configuration", {
   customModelUrl: text("custom_model_url"),
   customModelName: text("custom_model_name"),
   customModelToken: text("custom_model_token"),
-  structuredOutputMode: structuredOutputModeEnum().notNull().default("json"),
+  structuredOutputMode: structuredOutputModeEnum().notNull().default("tool"),
 });

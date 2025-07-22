@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1751634806203,
-      "tag": "0000_funny_sugar_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752141086766,
-      "tag": "0001_tense_menace",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752222057811,
-      "tag": "0002_shocking_morg",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752226379148,
-      "tag": "0003_open_sugar_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752232237969,
-      "tag": "0004_rich_sally_floyd",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1753101978100,
-      "tag": "0005_friendly_iron_lad",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1753185682869,
-      "tag": "0006_brave_quentin_quire",
+      "when": 1753187514257,
+      "tag": "0000_friendly_zemo",
       "breakpoints": true
     }
   ]
