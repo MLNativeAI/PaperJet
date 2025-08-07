@@ -143,6 +143,7 @@ export type ExtractedTable = z.infer<typeof extractedTableSchema>;
 export type ExtractionResult = z.infer<typeof extractionResultSchema>;
 
 // Workflow runs / execution types
+export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {
   filename: string;

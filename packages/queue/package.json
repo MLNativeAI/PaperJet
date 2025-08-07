@@ -1,0 +1,16 @@
+{
+  "name": "@paperjet/queue",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@paperjet/db": "workspace:*",
+    "@paperjet/engine": "workspace:*",
+    "@paperjet/shared": "workspace:*",
+    "bullmq": "^5.56.9",
+    "ioredis": "^5.7.0",
+    "zod": "^3.25.49"
+  }
+}
