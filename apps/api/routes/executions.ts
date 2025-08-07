@@ -1,11 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
 import {
   deleteExecution,
-  executeWorkflowFromConfig,
   getAllExecutions,
   getExecutionDetails,
   getWorkflowExecutions,
+  updateExecutionJobId,
+  uploadFileAndCreateExecution,
 } from "@paperjet/engine";
+import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -63,8 +65,18 @@ const router = app
         return c.json({ error: "File is required" }, 400);
       }
 
-      const result = await executeWorkflowFromConfig(workflowId, user.id, uploadedFile);
-      return c.json(result);
+      const execution = await uploadFileAndCreateExecution(workflowId, user.id, uploadedFile);
+      const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+        workflowId: execution.workflowId,
+        workflowExecutionId: execution.workflowExecutionId,
+      });
+      const jobId = job.data.jobId;
+      await updateExecutionJobId(execution.workflowExecutionId, jobId);
+
+      return c.json({
+        ...execution,
+        jobId: jobId,
+      });
     } catch (error) {
       logger.error(error, "Execution error:");
       if (error instanceof Error && error.message === "Workflow not found") {
@@ -90,7 +102,19 @@ const router = app
 
       // Create individual executions for each file
       const results = await Promise.all(
-        uploadedFiles.map((file) => executeWorkflowFromConfig(workflowId, user.id, file)),
+        uploadedFiles.map(async (file) => {
+          const execution = await uploadFileAndCreateExecution(workflowId, user.id, file);
+          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+            workflowId: execution.workflowId,
+            workflowExecutionId: execution.workflowExecutionId,
+          });
+          const jobId = job.data.jobId;
+          await updateExecutionJobId(execution.workflowExecutionId, jobId);
+          return {
+            ...execution,
+            jobId,
+          };
+        }),
       );
 
       return c.json({ executions: results });

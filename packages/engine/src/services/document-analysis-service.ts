@@ -1,9 +1,9 @@
 import { logger } from "@paperjet/shared";
+import { generateId, generateObject } from "ai";
 import { z } from "zod";
-import { generateObject } from "../../lib/ai-sdk-wrapper";
-import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../../types";
-import { generateId, ID_PREFIXES } from "../../utils/id";
-import type { MarkdownDocument } from "../markdown-service";
+import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../types";
+import { ID_PREFIXES } from "../utils/id";
+import type { MarkdownDocument } from "./markdown-service";
 
 export type AnalysisResult = {
   workflowName: string;

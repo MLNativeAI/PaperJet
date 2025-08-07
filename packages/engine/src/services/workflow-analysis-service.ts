@@ -4,9 +4,8 @@ import { logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import type { WorkflowConfiguration } from "../types";
-import { performCompleteAnalysis } from "./internal/document-analysis-service";
-import { runDocumentExtraction } from "./internal/document-extraction-service";
-import { convertDocumentToMarkdown, type MarkdownDocument } from "./internal/markdown-service";
+import { runDocumentExtraction } from "./document-extraction-service";
+import type { MarkdownDocument } from "./markdown-service";
 
 // since we're not saving the extracted markdown data on the workflow level (maybe we should, alongside sample data), we need a way to support re-extracting data without having to parse into markdown again
 const localMarkdownCache = new Map<string, MarkdownDocument>();
@@ -36,52 +35,52 @@ export async function analyzeWorkflowDocument(workflowId: string): Promise<void>
   }
 
   const presignedUrl = s3Client.presign(workflowData.filename);
-
-  try {
-    const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
-    localMarkdownCache.set(workflowId, markdownDocument);
-    // Use the document analysis service to perform complete analysis
-    const analysisResult = await performCompleteAnalysis(markdownDocument);
-    // Update workflow configuration with analysis results and set status to extracting
-    const configuration: WorkflowConfiguration = {
-      fields: analysisResult.fields,
-      tables: analysisResult.tables,
-    };
-
-    await db
-      .update(workflow)
-      .set({
-        slug: analysisResult.workflowName,
-        description: analysisResult.description,
-        categories: JSON.stringify(analysisResult.categories),
-        configuration: JSON.stringify(configuration),
-        status: "extracting",
-        updatedAt: new Date(),
-      })
-      .where(eq(workflow.id, workflowId));
-
-    logger.info("Workflow document analysis completed, triggering data extraction");
-
-    await extractDataFromDocument(workflowId, configuration);
-
-    // Update workflow status to configuring after extraction
-    await db
-      .update(workflow)
-      .set({
-        status: "configuring",
-        updatedAt: new Date(),
-      })
-      .where(eq(workflow.id, workflowId));
-  } catch (error) {
-    logger.error(error, "Document analysis has failed");
-    await db
-      .update(workflow)
-      .set({
-        status: "failed",
-        updatedAt: new Date(),
-      })
-      .where(eq(workflow.id, workflowId));
-  }
+  //
+  // try {
+  //   const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
+  //   localMarkdownCache.set(workflowId, markdownDocument);
+  //   // Use the document analysis service to perform complete analysis
+  //   const analysisResult = await performCompleteAnalysis(markdownDocument);
+  //   // Update workflow configuration with analysis results and set status to extracting
+  //   const configuration: WorkflowConfiguration = {
+  //     fields: analysisResult.fields,
+  //     tables: analysisResult.tables,
+  //   };
+  //
+  //   await db
+  //     .update(workflow)
+  //     .set({
+  //       slug: analysisResult.workflowName,
+  //       description: analysisResult.description,
+  //       categories: JSON.stringify(analysisResult.categories),
+  //       configuration: JSON.stringify(configuration),
+  //       status: "extracting",
+  //       updatedAt: new Date(),
+  //     })
+  //     .where(eq(workflow.id, workflowId));
+  //
+  //   logger.info("Workflow document analysis completed, triggering data extraction");
+  //
+  //   await extractDataFromDocument(workflowId, configuration);
+  //
+  //   // Update workflow status to configuring after extraction
+  //   await db
+  //     .update(workflow)
+  //     .set({
+  //       status: "configuring",
+  //       updatedAt: new Date(),
+  //     })
+  //     .where(eq(workflow.id, workflowId));
+  // } catch (error) {
+  //   logger.error(error, "Document analysis has failed");
+  //   await db
+  //     .update(workflow)
+  //     .set({
+  //       status: "failed",
+  //       updatedAt: new Date(),
+  //     })
+  //     .where(eq(workflow.id, workflowId));
+  // }
 }
 
 export async function extractDataFromDocument(workflowId: string, configuration: WorkflowConfiguration) {

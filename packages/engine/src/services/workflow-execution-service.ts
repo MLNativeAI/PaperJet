@@ -1,82 +1,15 @@
 import { db } from "@paperjet/db";
 import { file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { s3Client } from "../lib/s3";
-import { type CategoriesConfiguration, WorkflowExecutionStatus, type WorkflowRun } from "../types";
-import { generateId, ID_PREFIXES } from "../utils/id";
+import type { CategoriesConfiguration, WorkflowRun } from "../types";
 
-export async function createExecutionAndEnqueue(workflowId: string, userId: string, uploadedFile: File) {
-  const executionId = generateId(ID_PREFIXES.workflowExecution);
-  const fileId = generateId(ID_PREFIXES.file);
-  const filename = `executions/${executionId}/${uploadedFile.name}`;
-
-  await s3Client.file(filename).write(await uploadedFile.arrayBuffer());
-  await db.insert(file).values({
-    id: fileId,
-    filename,
-    ownerId: userId,
-    createdAt: new Date(),
-  });
-
-  await db.insert(workflowExecution).values({
-    id: executionId,
-    workflowId,
-    fileId,
-    status: WorkflowExecutionStatus.enum.Queued,
-    startedAt: new Date(),
-    createdAt: new Date(),
-    ownerId: userId,
-  });
-
-  const jobData = await workflowExecutionQueue.add(executionId, {
-    workflowId: workflowId,
-    workflowExecutionId: executionId,
-  });
-
-  await db.update(workflowExecution).set({
-    jobId: jobData.data.jobId,
-  });
-
-  return {
-    workflowExecutionId: executionId,
-    status: WorkflowExecutionStatus.enum.Queued,
-    jobId: jobData.data.jobId,
-  };
-  //
-  // const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
-  //
-  // let extractionResult: any;
-  // await withExecutionContext({ executionId, workflowId }, async () => {
-  //   extractionResult = await runDocumentExtraction(markdownDocument, config);
-  // });
-  //
-  // // Update execution with results
-  // await db
-  //   .update(workflowExecution)
-  //   .set({
-  //     extractionResult: JSON.stringify(extractionResult),
-  //     status: "completed",
-  //     completedAt: new Date(),
-  //   })
-  //   .where(eq(workflowExecution.id, executionId));
-  //
-  // logger.info(
-  //   {
-  //     executionId,
-  //     workflowId,
-  //     extractedFieldsCount: extractionResult.fields.length,
-  //     extractedTablesCount: extractionResult.tables.length,
-  //   },
-  //   "Workflow execution completed successfully",
-  // );
-  //
-  // return {
-  //   executionId,
-  //   status: "completed",
-  //   fileId,
-  //   filename: uploadedFile.name,
-  //   extractionResult,
-  // };
+export async function updateExecutionJobId(executionId: string, jobId: string) {
+  await db
+    .update(workflowExecution)
+    .set({
+      jobId,
+    })
+    .where(eq(workflowExecution.id, executionId));
 }
 
 export async function getWorkflowExecutions(workflowId: string, _userId: string): Promise<WorkflowRun[]> {

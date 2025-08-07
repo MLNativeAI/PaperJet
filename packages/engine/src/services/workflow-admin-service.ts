@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db";
-import { file, workflow } from "@paperjet/db/schema";
+import { file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { logger } from "@paperjet/shared";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -10,9 +10,9 @@ import {
   type Workflow,
   type WorkflowConfiguration,
   workflowConfigurationSchema,
+  WorkflowExecutionStatus,
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { createExecutionAndEnqueue } from "./workflow-execution-service";
 
 export async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration | null> {
   const parsed = JSON.parse(configuration);
@@ -195,18 +195,7 @@ export async function getDocumentForFile(fileId: string, userId: string) {
   return result;
 }
 
-export async function executeWorkflowFromConfig(workflowId: string, userId: string, uploadedFile: File) {
-  logger.info(
-    {
-      workflowId,
-      userId,
-      fileName: uploadedFile.name,
-      fileSize: uploadedFile.size,
-      fileType: uploadedFile.type,
-    },
-    "Starting workflow execution",
-  );
-
+export async function uploadFileAndCreateExecution(workflowId: string, userId: string, uploadedFile: File) {
   const [workflowData] = await db
     .select()
     .from(workflow)
@@ -216,7 +205,35 @@ export async function executeWorkflowFromConfig(workflowId: string, userId: stri
     throw new Error("Workflow not found");
   }
 
-  return await createExecutionAndEnqueue(workflowId, userId, uploadedFile);
+  const executionId = generateId(ID_PREFIXES.workflowExecution);
+  const fileId = generateId(ID_PREFIXES.file);
+  const filename = `executions/${executionId}/${uploadedFile.name}`;
+
+  await s3Client.file(filename).write(await uploadedFile.arrayBuffer());
+  await db.insert(file).values({
+    id: fileId,
+    filename,
+    ownerId: userId,
+    createdAt: new Date(),
+  });
+
+  await db.insert(workflowExecution).values({
+    id: executionId,
+    workflowId,
+    fileId,
+    status: WorkflowExecutionStatus.enum.Queued,
+    startedAt: new Date(),
+    createdAt: new Date(),
+    ownerId: userId,
+  });
+
+  return {
+    workflowExecutionId: executionId,
+    workflowId,
+    status: WorkflowExecutionStatus.enum.Queued,
+    fileId,
+    filename: uploadedFile.name,
+  };
 }
 
 export async function deleteWorkflow(workflowId: string, userId: string) {

@@ -3,7 +3,6 @@ import "./instrumentation";
 
 import { otel } from "@hono/otel";
 import { envVars, logger } from "@paperjet/shared";
-import { allWorkers } from "@paperjet/queue";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
@@ -68,6 +67,7 @@ const server = Bun.serve({
   idleTimeout: 60,
 });
 
+import { allWorkers } from "@paperjet/queue";
 logger.info(`Started ${allWorkers.length} job workers`);
 
 logger.info(
