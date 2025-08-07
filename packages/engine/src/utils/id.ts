@@ -11,6 +11,7 @@ export const ID_PREFIXES = {
   workflowFile: "wfl",
   WORKFLOW_SAMPLE: "wsp",
   user: "usr",
+  page: "page",
   session: "ses",
   account: "acc",
   verification: "ver",

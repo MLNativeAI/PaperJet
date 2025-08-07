@@ -1,3 +1,4 @@
+import { splitPdfIntoImages } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
@@ -24,7 +25,8 @@ export const splitPdfWorker = new Worker(
   QUEUE_NAMES.SPLIT_JOB,
   async (job: Job<SplitPdfJobData>) => {
     logger.info("Starting PDF split job");
-    await splitDocumentIntoImages();
+    await splitPdfIntoImages(job.data.workflowExecutionId);
+    logger.info("PDF split job completed");
   },
   {
     connection: redisConnection,
@@ -32,6 +34,3 @@ export const splitPdfWorker = new Worker(
     name: "split-pdf-worker",
   },
 );
-async function splitDocumentIntoImages() {
-  throw new Error("Function not implemented.");
-}

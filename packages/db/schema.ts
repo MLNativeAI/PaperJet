@@ -1,15 +1,5 @@
 import { sql } from "drizzle-orm";
 import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-
-export const file = pgTable("file", {
-  id: text("id").primaryKey(),
-  filename: text("filename").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  ownerId: text("owner_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-});
-
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -65,6 +55,15 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
+export const file = pgTable("file", {
+  id: text("id").primaryKey(),
+  filename: text("filename").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+  ownerId: text("owner_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
 export const workflow = pgTable("workflow", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull(),
@@ -92,6 +91,7 @@ export const workflowExecution = pgTable("workflow_execution", {
   fileId: text("file_id")
     .notNull()
     .references(() => file.id, { onDelete: "cascade" }),
+  jobId: text(),
   status: text("status").notNull(), // 'pending', 'processing', 'completed', 'failed'
   extractionResult: text("extraction_result"), // JSON result for the file
   errorMessage: text("error_message"),
@@ -104,7 +104,7 @@ export const workflowExecution = pgTable("workflow_execution", {
 });
 
 export const documentPage = pgTable("document_page", {
-  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: text("id").primaryKey(),
   workflowExecutionId: text("workflow_execution_id")
     .notNull()
     .references(() => workflowExecution.id, { onDelete: "cascade" }),

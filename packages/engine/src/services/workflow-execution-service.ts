@@ -1,26 +1,17 @@
 import { db } from "@paperjet/db";
 import { file, workflow, workflowExecution } from "@paperjet/db/schema";
-import { logger } from "@paperjet/shared";
-import { withExecutionContext } from "@paperjet/shared/src/context";
+import { workflowExecutionQueue } from "@paperjet/queue";
 import { and, desc, eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
-import type { CategoriesConfiguration, WorkflowConfiguration, WorkflowRun } from "../types";
+import { type CategoriesConfiguration, WorkflowExecutionStatus, type WorkflowRun } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { runDocumentExtraction } from "./internal/document-extraction-service";
-import { convertDocumentToMarkdown } from "./internal/markdown-service";
 
-export async function executeWorkflow(
-  workflowId: string,
-  config: WorkflowConfiguration,
-  userId: string,
-  uploadedFile: File,
-) {
-  logger.info("Starting workflow execution");
-
+export async function createExecutionAndEnqueue(workflowId: string, userId: string, uploadedFile: File) {
   const executionId = generateId(ID_PREFIXES.workflowExecution);
   const fileId = generateId(ID_PREFIXES.file);
   const filename = `executions/${executionId}/${uploadedFile.name}`;
 
+  await s3Client.file(filename).write(await uploadedFile.arrayBuffer());
   await db.insert(file).values({
     id: fileId,
     filename,
@@ -28,60 +19,65 @@ export async function executeWorkflow(
     createdAt: new Date(),
   });
 
-  const fileBuffer = await uploadedFile.arrayBuffer();
-  await s3Client.file(filename).write(fileBuffer);
-
-  // Extract data using extraction service
-  logger.info({ executionId, workflowId }, "Starting data extraction for workflow execution");
-  const presignedUrl = s3Client.presign(filename);
-
-  logger.info(`Presigend URL: ${presignedUrl}`);
-
-  // Create execution record with file reference
   await db.insert(workflowExecution).values({
     id: executionId,
     workflowId,
     fileId,
-    status: "processing",
+    status: WorkflowExecutionStatus.enum.Queued,
     startedAt: new Date(),
     createdAt: new Date(),
     ownerId: userId,
   });
 
-  const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
-
-  let extractionResult: any;
-  await withExecutionContext({ executionId, workflowId }, async () => {
-    extractionResult = await runDocumentExtraction(markdownDocument, config);
+  const jobData = await workflowExecutionQueue.add(executionId, {
+    workflowId: workflowId,
+    workflowExecutionId: executionId,
   });
 
-  // Update execution with results
-  await db
-    .update(workflowExecution)
-    .set({
-      extractionResult: JSON.stringify(extractionResult),
-      status: "completed",
-      completedAt: new Date(),
-    })
-    .where(eq(workflowExecution.id, executionId));
-
-  logger.info(
-    {
-      executionId,
-      workflowId,
-      extractedFieldsCount: extractionResult.fields.length,
-      extractedTablesCount: extractionResult.tables.length,
-    },
-    "Workflow execution completed successfully",
-  );
+  await db.update(workflowExecution).set({
+    jobId: jobData.data.jobId,
+  });
 
   return {
-    executionId,
-    status: "completed",
-    fileId,
-    filename: uploadedFile.name,
-    extractionResult,
+    workflowExecutionId: executionId,
+    status: WorkflowExecutionStatus.enum.Queued,
+    jobId: jobData.data.jobId,
   };
+  //
+  // const markdownDocument = await convertDocumentToMarkdown(presignedUrl);
+  //
+  // let extractionResult: any;
+  // await withExecutionContext({ executionId, workflowId }, async () => {
+  //   extractionResult = await runDocumentExtraction(markdownDocument, config);
+  // });
+  //
+  // // Update execution with results
+  // await db
+  //   .update(workflowExecution)
+  //   .set({
+  //     extractionResult: JSON.stringify(extractionResult),
+  //     status: "completed",
+  //     completedAt: new Date(),
+  //   })
+  //   .where(eq(workflowExecution.id, executionId));
+  //
+  // logger.info(
+  //   {
+  //     executionId,
+  //     workflowId,
+  //     extractedFieldsCount: extractionResult.fields.length,
+  //     extractedTablesCount: extractionResult.tables.length,
+  //   },
+  //   "Workflow execution completed successfully",
+  // );
+  //
+  // return {
+  //   executionId,
+  //   status: "completed",
+  //   fileId,
+  //   filename: uploadedFile.name,
+  //   extractionResult,
+  // };
 }
 
 export async function getWorkflowExecutions(workflowId: string, _userId: string): Promise<WorkflowRun[]> {

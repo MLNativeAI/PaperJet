@@ -1,7 +1,7 @@
 import { db } from "@paperjet/db";
 import { file, workflow } from "@paperjet/db/schema";
 import { logger } from "@paperjet/shared";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { s3Client } from "../lib/s3";
 import {
@@ -12,7 +12,7 @@ import {
   workflowConfigurationSchema,
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
-import { executeWorkflow } from "./workflow-execution-service";
+import { createExecutionAndEnqueue } from "./workflow-execution-service";
 
 async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration> {
   const parsed = JSON.parse(configuration);
@@ -207,29 +207,16 @@ export async function executeWorkflowFromConfig(workflowId: string, userId: stri
     "Starting workflow execution",
   );
 
-  // Get workflow and verify ownership
-  const [workflowData] = await db.select().from(workflow).where(eq(workflow.id, workflowId));
+  const [workflowData] = await db
+    .select()
+    .from(workflow)
+    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, userId)));
 
-  if (!workflowData || workflowData.ownerId !== userId) {
+  if (!workflowData) {
     throw new Error("Workflow not found");
   }
 
-  // Parse workflow configuration
-  const config = await parseWorkflowConfiguration(workflowData.configuration);
-
-  // Use the workflow execution service
-  const result = await executeWorkflow(workflowId, config, userId, uploadedFile);
-
-  logger.info(
-    {
-      workflowId,
-      executionId: result.executionId,
-      status: result.status,
-    },
-    "Workflow execution completed via service",
-  );
-
-  return result;
+  return await createExecutionAndEnqueue(workflowId, userId, uploadedFile);
 }
 
 export async function deleteWorkflow(workflowId: string, userId: string) {

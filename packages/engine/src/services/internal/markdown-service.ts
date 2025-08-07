@@ -1,7 +1,6 @@
 import { logger } from "@paperjet/shared";
 import { z } from "zod";
 import { generateObject } from "../../lib/ai-sdk-wrapper";
-import { convertPdfToImages } from "./pdf-image-service";
 
 export type MarkdownDocument = {
   pages: string[];
