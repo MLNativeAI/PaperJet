@@ -103,6 +103,15 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export const documentPage = pgTable("document_page", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  workflowExecutionId: text("workflow_execution_id")
+    .notNull()
+    .references(() => workflowExecution.id, { onDelete: "cascade" }),
+  pageNumber: integer("page_number").notNull(),
+  rawMarkdown: text("raw_markdown"),
+});
+
 export const usageModelPrice = pgTable("usage_model_price", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
   model: text("model").notNull(),

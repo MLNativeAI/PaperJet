@@ -1,11 +1,11 @@
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
-import { baseQueueOptions } from "../queues";
 import { redisConnection } from "../redis";
+import { baseQueueOptions } from "../shared";
 import { QUEUE_NAMES } from "../types";
 
-export const extractMarkdownQueue = new Queue(QUEUE_NAMES.MARKDOWN_JOB, {
+export const markdownQueue = new Queue(QUEUE_NAMES.MARKDOWN_JOB, {
   ...baseQueueOptions,
   defaultJobOptions: {
     ...baseQueueOptions.defaultJobOptions,
@@ -13,23 +13,23 @@ export const extractMarkdownQueue = new Queue(QUEUE_NAMES.MARKDOWN_JOB, {
   },
 });
 
-const extractMarkdownJobSchema = z.object({
+const markdownJobSchema = z.object({
   workflowId: z.uuid(),
   workflowExecutionId: z.uuid(),
 });
 
-export type ExtractMarkdownJobData = z.infer<typeof extractMarkdownJobSchema>;
+export type MarkdownJobData = z.infer<typeof markdownJobSchema>;
 
-export const extractMarkdownWorker = new Worker(
+export const markdownWorker = new Worker(
   QUEUE_NAMES.MARKDOWN_JOB,
-  async (job: Job<ExtractMarkdownJobData>) => {
-    logger.info({ job: job.data }, "Starting markdown extraction job");
+  async (job: Job<MarkdownJobData>) => {
+    logger.info({ job: job.data }, "Starting markdown job");
     await extractMarkdownFromImages();
   },
   {
     connection: redisConnection,
     concurrency: 10,
-    name: "extract-markdown-worker",
+    name: "markdown-worker",
   },
 );
 

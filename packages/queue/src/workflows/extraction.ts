@@ -5,10 +5,11 @@ import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import { eq } from "drizzle-orm";
 import z from "zod";
-import { baseQueueOptions } from "./queues";
-import { QUEUE_NAMES } from "./types";
-import { splitPdfQueue } from "./jobs/split-pdf";
-import { extractMarkdownQueue } from "./jobs/extract-markdown";
+import { extractionQueue } from "../jobs/extraction";
+import { markdownQueue } from "../jobs/markdown";
+import { splitPdfQueue } from "../jobs/split-pdf";
+import { baseQueueOptions } from "../shared";
+import { QUEUE_NAMES } from "../types";
 
 export const workflowExecutionQueue = new Queue(QUEUE_NAMES.EXTRACTION_WORKFLOW, {
   ...baseQueueOptions,
@@ -39,7 +40,6 @@ export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema
 export const extractionWorkflowWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_WORKFLOW,
   async (job: Job<WorkflowExtractionData>, token?: string) => {
-    const { workflowId, workflowExecutionId } = job.data;
     let step = job.data.step;
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
@@ -48,8 +48,7 @@ export const extractionWorkflowWorker = new Worker(
           break;
         }
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
-          await validateJobTokenAndStatus(job, token);
-          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT);
+          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
           step = workflowSteps.enum.MARKDOWN;
           break;
         }
@@ -58,19 +57,18 @@ export const extractionWorkflowWorker = new Worker(
           break;
         }
         case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
-          await validateJobTokenAndStatus(job, token);
-          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN);
+          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
           step = workflowSteps.enum.EXTRACTION;
           break;
         }
         case workflowSteps.enum.EXTRACTION: {
-          await handleExtraction(job, workflowId);
+          await handleExtraction(job);
           step = workflowSteps.enum.WAITING_FOR_EXTRACTION;
           break;
         }
         case workflowSteps.enum.WAITING_FOR_EXTRACTION: {
-          await validateJobTokenAndStatus(job, token);
-          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_EXTRACTION);
+          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_EXTRACTION, token);
+          await finalizeWorkflow();
           step = workflowSteps.enum.FINISHED;
           break;
         }
@@ -101,14 +99,13 @@ async function handleDocumentSplit(job: Job<WorkflowExtractionData>) {
   await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
   return workflowSteps.enum.WAITING_FOR_SPLIT;
 }
-async function handleExtractMarkdown(job: Job<WorkflowExtractionData>) {
-  const { workflowId, workflowExecutionId } = job.data;
 
+async function handleExtractMarkdown(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await extractMarkdownQueue.add(QUEUE_NAMES.MARKDOWN_JOB, job.data, {
+  await markdownQueue.add(QUEUE_NAMES.MARKDOWN_JOB, job.data, {
     parent: {
       id: job.id,
       queue: job.queueQualifiedName,
@@ -118,31 +115,41 @@ async function handleExtractMarkdown(job: Job<WorkflowExtractionData>) {
   await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
   return workflowSteps.enum.WAITING_FOR_MARKDOWN;
 }
-async function handleMarkdownCompleteStep(job: Job<WorkflowExtractionData>) {}
-async function handleExtraction(_job: Job<WorkflowExtractionData>, _workflowId: string) {
-  throw new Error("Function not implemented.");
-}
-async function finalizeWorkflow() {
-  throw new Error("Function not implemented.");
-}
 
-async function checkChildJobsCompletedSuccessfully(job, jobName: string) {
-  const childrenValues = await job.getChildrenValues();
-  const failedChildren = Object.entries(childrenValues).filter(([_, result]) => result instanceof Error);
-
-  if (failedChildren.length > 0) {
-    logger.error("PDF split job failed");
-    throw new Error("PDF split failed");
+async function handleExtraction(job: Job<WorkflowExtractionData>) {
+  if (!job.id) {
+    throw new Error("Fatal error, job ID missing");
   }
+
+  await extractionQueue.add(QUEUE_NAMES.EXTRACTION_JOB, job.data, {
+    parent: {
+      id: job.id,
+      queue: job.queueQualifiedName,
+    },
+  });
+
+  await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_EXTRACTION });
+  return workflowSteps.enum.WAITING_FOR_EXTRACTION;
 }
 
-async function validateJobTokenAndStatus(job: Job<WorkflowExtractionData>, token?: string) {
+async function finalizeWorkflow() {
+  logger.info("Workflow execution completed");
+}
+
+async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionData>, jobName: string, token?: string) {
   if (!token) {
     logger.error("Invalid token");
     throw new Error("Invalid token");
   }
-  const shouldWaitForSplit = await job.moveToWaitingChildren(token);
+  const shouldWaitForSplit = await job.moveToWaitingChildren(token); // weird bullmq "waiting" logic
   if (shouldWaitForSplit) {
     throw new WaitingChildrenError();
+  }
+  const childrenValues = await job.getChildrenValues();
+  const failedChildren = Object.entries(childrenValues).filter(([_, result]) => result instanceof Error);
+
+  if (failedChildren.length > 0) {
+    logger.error(`${jobName} failed`);
+    throw new Error(`${jobName} failed`);
   }
 }

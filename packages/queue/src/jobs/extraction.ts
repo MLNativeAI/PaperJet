@@ -5,7 +5,7 @@ import { redisConnection } from "../redis";
 import { baseQueueOptions } from "../shared";
 import { QUEUE_NAMES } from "../types";
 
-export const splitPdfQueue = new Queue(QUEUE_NAMES.SPLIT_JOB, {
+export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
   ...baseQueueOptions,
   defaultJobOptions: {
     ...baseQueueOptions.defaultJobOptions,
@@ -13,25 +13,26 @@ export const splitPdfQueue = new Queue(QUEUE_NAMES.SPLIT_JOB, {
   },
 });
 
-const splitPdfJobSchema = z.object({
+const extractionJobSchema = z.object({
   workflowId: z.uuid(),
   workflowExecutionId: z.uuid(),
 });
 
-export type SplitPdfJobData = z.infer<typeof splitPdfJobSchema>;
+export type ExtractionJobData = z.infer<typeof extractionJobSchema>;
 
-export const splitPdfWorker = new Worker(
-  QUEUE_NAMES.SPLIT_JOB,
-  async (job: Job<SplitPdfJobData>) => {
-    logger.info("Starting PDF split job");
-    await splitDocumentIntoImages();
+export const extractWorker = new Worker(
+  QUEUE_NAMES.EXTRACTION_JOB,
+  async (job: Job<ExtractionJobData>) => {
+    logger.info({ job: job.data }, "Starting extraction job");
+    await extractData();
   },
   {
     connection: redisConnection,
-    concurrency: 20,
-    name: "split-pdf-worker",
+    concurrency: 10,
+    name: "extract-worker",
   },
 );
-async function splitDocumentIntoImages() {
+
+async function extractData() {
   throw new Error("Function not implemented.");
 }
