@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db";
-import { documentPage, file, workflowExecution } from "@paperjet/db/schema";
+import { documentData, documentPage, file, workflowExecution } from "@paperjet/db/schema";
 import { envVars, logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
@@ -36,6 +36,13 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
   }
 
   const splitResult = (await response.json()) as unknown as PdfSplitResult;
+  const documentDataId = generateId(ID_PREFIXES.documentData);
+
+  await db.insert(documentData).values({
+    id: documentDataId,
+    workflowExecutionId: workflowExecutionId,
+    createdAt: new Date(),
+  });
 
   for (const page of splitResult.pages) {
     const pageId = generateId(ID_PREFIXES.user);
@@ -47,6 +54,7 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
       id: pageId,
       pageNumber: page.page_number,
       workflowExecutionId: workflowExecutionId,
+      documentDataId: documentDataId,
     });
   }
 }

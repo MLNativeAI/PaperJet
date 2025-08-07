@@ -1,9 +1,9 @@
 import { db } from "@paperjet/db";
-import { workflowExecution } from "@paperjet/db/schema";
+import { documentPage, workflow, workflowExecution } from "@paperjet/db/schema";
 import { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import z from "zod";
 import { extractionQueue } from "../jobs/extraction";
 import { markdownQueue } from "../jobs/markdown";
@@ -50,10 +50,11 @@ export const extractionWorkflowWorker = new Worker(
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
           step = workflowSteps.enum.MARKDOWN;
+          await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
           break;
         }
         case workflowSteps.enum.MARKDOWN: {
-          step = await handleExtractMarkdown(job);
+          step = await handleMarkdown(job);
           break;
         }
         case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
@@ -89,7 +90,7 @@ async function handleDocumentSplit(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await splitPdfQueue.add(QUEUE_NAMES.SPLIT_JOB, job.data, {
+  await splitPdfQueue.add(workflowExecutionId, job.data, {
     parent: {
       id: job.id,
       queue: job.queueQualifiedName,
@@ -100,20 +101,31 @@ async function handleDocumentSplit(job: Job<WorkflowExtractionData>) {
   return workflowSteps.enum.WAITING_FOR_SPLIT;
 }
 
-async function handleExtractMarkdown(job: Job<WorkflowExtractionData>) {
+async function handleMarkdown(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
     throw new Error("Fatal error, job ID missing");
   }
-
-  await markdownQueue.add(QUEUE_NAMES.MARKDOWN_JOB, job.data, {
-    parent: {
-      id: job.id,
-      queue: job.queueQualifiedName,
-    },
+  const { workflowExecutionId } = job.data;
+  const pageData = await db.query.documentPage.findMany({
+    where: eq(documentPage.workflowExecutionId, workflowExecutionId),
+    orderBy: [asc(documentPage.pageNumber)],
   });
-
-  await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
-  return workflowSteps.enum.WAITING_FOR_MARKDOWN;
+  const bulkJobData = pageData.map((pageEntry) => {
+    return {
+      name: workflowExecutionId,
+      data: {
+        workflowExecutionId: workflowExecutionId,
+        documentPageId: pageEntry.id,
+        parent: {
+          id: job.id,
+          queue: job.queueQualifiedName,
+        },
+      },
+    };
+  });
+  await markdownQueue.addBulk(bulkJobData);
+  await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
+  return workflowSteps.enum.MARKDOWN;
 }
 
 async function handleExtraction(job: Job<WorkflowExtractionData>) {
@@ -121,7 +133,8 @@ async function handleExtraction(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await extractionQueue.add(QUEUE_NAMES.EXTRACTION_JOB, job.data, {
+  const { workflowExecutionId } = job.data;
+  await extractionQueue.add(workflowExecutionId, job.data, {
     parent: {
       id: job.id,
       queue: job.queueQualifiedName,

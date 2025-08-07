@@ -103,11 +103,19 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export const documentData = pgTable("document_data", {
+  id: text("id").primaryKey(),
+  rawMarkdown: text("raw_markdown"),
+  workflowExecutionId: text("workflow_execution_id").references(() => workflowExecution.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull(),
+});
+
 export const documentPage = pgTable("document_page", {
   id: text("id").primaryKey(),
-  workflowExecutionId: text("workflow_execution_id")
+  documentDataId: text("document_data_id")
     .notNull()
-    .references(() => workflowExecution.id, { onDelete: "cascade" }),
+    .references(() => documentData.id, { onDelete: "cascade" }),
+  workflowExecutionId: text("workflow_execution_id").references(() => workflowExecution.id, { onDelete: "set null" }),
   pageNumber: integer("page_number").notNull(),
   rawMarkdown: text("raw_markdown"),
 });

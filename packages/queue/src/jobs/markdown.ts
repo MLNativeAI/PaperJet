@@ -1,3 +1,4 @@
+import { convertPageToMarkdown } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
@@ -14,8 +15,8 @@ export const markdownQueue = new Queue(QUEUE_NAMES.MARKDOWN_JOB, {
 });
 
 const markdownJobSchema = z.object({
-  workflowId: z.uuid(),
-  workflowExecutionId: z.uuid(),
+  workflowExecutionId: z.string(),
+  documentPageId: z.string(),
 });
 
 export type MarkdownJobData = z.infer<typeof markdownJobSchema>;
@@ -24,7 +25,8 @@ export const markdownWorker = new Worker(
   QUEUE_NAMES.MARKDOWN_JOB,
   async (job: Job<MarkdownJobData>) => {
     logger.info({ job: job.data }, "Starting markdown job");
-    await extractMarkdownFromImages();
+    const { workflowExecutionId, documentPageId } = job.data;
+    await convertPageToMarkdown(workflowExecutionId, documentPageId);
   },
   {
     connection: redisConnection,
@@ -32,7 +34,3 @@ export const markdownWorker = new Worker(
     name: "markdown-worker",
   },
 );
-
-async function extractMarkdownFromImages() {
-  throw new Error("Function not implemented.");
-}

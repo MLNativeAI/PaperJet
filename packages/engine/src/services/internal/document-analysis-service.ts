@@ -3,7 +3,7 @@ import { z } from "zod";
 import { generateObject } from "../../lib/ai-sdk-wrapper";
 import type { CategoriesConfiguration, FieldsConfiguration, TableConfiguration } from "../../types";
 import { generateId, ID_PREFIXES } from "../../utils/id";
-import type { MarkdownDocument } from "./markdown-service";
+import type { MarkdownDocument } from "../markdown-service";
 
 export type AnalysisResult = {
   workflowName: string;

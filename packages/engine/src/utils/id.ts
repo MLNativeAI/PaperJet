@@ -5,13 +5,13 @@ export function generateId(prefix: string): string {
 }
 
 export const ID_PREFIXES = {
-  file: "fil",
+  file: "file",
   workflow: "wkf",
   workflowExecution: "exe",
   workflowFile: "wfl",
-  WORKFLOW_SAMPLE: "wsp",
   user: "usr",
   page: "page",
+  documentData: "data",
   session: "ses",
   account: "acc",
   verification: "ver",
