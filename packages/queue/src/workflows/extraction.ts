@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db";
-import { documentPage, workflow, workflowExecution } from "@paperjet/db/schema";
+import { documentData, documentPage, workflowExecution } from "@paperjet/db/schema";
 import { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
@@ -44,42 +44,49 @@ export const extractionWorkflowWorker = new Worker(
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
-          step = await handleDocumentSplit(job);
+          await addDocumentSplitJob(job);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
+          step = workflowSteps.enum.WAITING_FOR_SPLIT;
           break;
         }
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
-          step = workflowSteps.enum.MARKDOWN;
           await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
+          step = workflowSteps.enum.MARKDOWN;
           break;
         }
         case workflowSteps.enum.MARKDOWN: {
-          step = await handleMarkdown(job);
+          await addMarkdownJobs(job);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
+          step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
           break;
         }
         case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
+          await assembleFullDocument(job);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
           step = workflowSteps.enum.EXTRACTION;
           break;
         }
         case workflowSteps.enum.EXTRACTION: {
-          await handleExtraction(job);
+          await addExtractionJob(job);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_EXTRACTION });
           step = workflowSteps.enum.WAITING_FOR_EXTRACTION;
           break;
         }
         case workflowSteps.enum.WAITING_FOR_EXTRACTION: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_EXTRACTION, token);
-          await finalizeWorkflow();
+          await finalizeWorkflow(job);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.FINISHED });
           step = workflowSteps.enum.FINISHED;
           break;
         }
       }
     }
-    logger.info("Extraction workflow completed");
   },
 );
 
-async function handleDocumentSplit(job: Job<WorkflowExtractionData>) {
+async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
   const { workflowExecutionId } = job.data;
   await db
     .update(workflowExecution)
@@ -96,12 +103,9 @@ async function handleDocumentSplit(job: Job<WorkflowExtractionData>) {
       queue: job.queueQualifiedName,
     },
   });
-
-  await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
-  return workflowSteps.enum.WAITING_FOR_SPLIT;
 }
 
-async function handleMarkdown(job: Job<WorkflowExtractionData>) {
+async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
     throw new Error("Fatal error, job ID missing");
   }
@@ -124,11 +128,9 @@ async function handleMarkdown(job: Job<WorkflowExtractionData>) {
     };
   });
   await markdownQueue.addBulk(bulkJobData);
-  await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
-  return workflowSteps.enum.MARKDOWN;
 }
 
-async function handleExtraction(job: Job<WorkflowExtractionData>) {
+async function addExtractionJob(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
     throw new Error("Fatal error, job ID missing");
   }
@@ -140,13 +142,18 @@ async function handleExtraction(job: Job<WorkflowExtractionData>) {
       queue: job.queueQualifiedName,
     },
   });
-
-  await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_EXTRACTION });
-  return workflowSteps.enum.WAITING_FOR_EXTRACTION;
 }
 
-async function finalizeWorkflow() {
+async function finalizeWorkflow(job: Job<WorkflowExtractionData>) {
   logger.info("Workflow execution completed");
+  const { workflowExecutionId } = job.data;
+  await db
+    .update(workflowExecution)
+    .set({
+      completedAt: new Date(),
+      status: WorkflowExecutionStatus.enum.Completed,
+    })
+    .where(eq(workflowExecution.id, workflowExecutionId));
 }
 
 async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionData>, jobName: string, token?: string) {
@@ -165,4 +172,19 @@ async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionDa
     logger.error(`${jobName} failed`);
     throw new Error(`${jobName} failed`);
   }
+}
+async function assembleFullDocument(job: Job<WorkflowExtractionData>) {
+  const { workflowExecutionId } = job.data;
+  const allPageData = await db.query.documentPage.findMany({
+    where: eq(documentPage.workflowExecutionId, workflowExecutionId),
+    orderBy: [asc(documentPage.pageNumber)],
+  });
+  const fullMarkdownDocument = allPageData.map((pageData) => pageData.rawMarkdown).join("\n");
+  await db
+    .update(documentData)
+    .set({
+      rawMarkdown: fullMarkdownDocument,
+    })
+    .where(eq(documentData.workflowExecutionId, workflowExecutionId));
+  logger.info(`Updated document with ${allPageData.length} page markdown content`);
 }

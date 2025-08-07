@@ -27,6 +27,7 @@
     "@opentelemetry/sdk-node": "^0.202.0",
     "@paperjet/shared": "workspace:*",
     "@paperjet/db": "workspace:*",
+    "@paperjet/queue": "workspace:*",
     "@paperjet/email": "workspace:*",
     "@paperjet/engine": "workspace:*",
     "@tanstack/react-router-devtools": "^1.117.1",

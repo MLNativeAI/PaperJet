@@ -1,6 +1,5 @@
 import { db } from "@paperjet/db";
 import { file, workflow, workflowExecution } from "@paperjet/db/schema";
-import { workflowExecutionQueue } from "@paperjet/queue";
 import { and, desc, eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import { type CategoriesConfiguration, WorkflowExecutionStatus, type WorkflowRun } from "../types";

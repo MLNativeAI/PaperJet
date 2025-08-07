@@ -5,4 +5,5 @@ export * from "./src/services/workflow-analysis-service.ts";
 export * from "./src/services/workflow-execution-service.ts";
 export * from "./src/services/pdf-image-service.ts";
 export * from "./src/services/markdown-service.ts";
+export * from "./src/services/document-extraction-service.ts";
 export * from "./src/utils/id";

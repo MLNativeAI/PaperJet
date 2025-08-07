@@ -14,13 +14,13 @@ import {
 import { generateId, ID_PREFIXES } from "../utils/id";
 import { createExecutionAndEnqueue } from "./workflow-execution-service";
 
-async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration> {
+export async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration | null> {
   const parsed = JSON.parse(configuration);
   const parsedConfig = workflowConfigurationSchema.safeParse(parsed);
   if (!parsedConfig.success) {
     logger.warn(parsedConfig.error, `Invalid workflow configuration: ${configuration}`);
   }
-  return parsedConfig.data ?? { fields: [], tables: [] };
+  return parsedConfig.data || null;
 }
 
 export async function createWorkflow(

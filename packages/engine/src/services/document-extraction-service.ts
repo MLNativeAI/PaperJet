@@ -1,11 +1,35 @@
+import { db } from "@paperjet/db";
+import { documentData, workflow } from "@paperjet/db/schema";
 import { logger } from "@paperjet/shared";
-import { generateObject } from "../../lib/ai-sdk-wrapper";
-import type { ExtractionResult, WorkflowConfiguration } from "../../types";
-import { buildExtractionSchema } from "../../utils/build-extraction-schema";
-import type { MarkdownDocument } from "./markdown-service";
+import { eq } from "drizzle-orm";
+import { generateObject } from "../lib/ai-sdk-wrapper";
+import type { ExtractionResult, WorkflowConfiguration } from "../types";
+import { buildExtractionSchema } from "../utils/build-extraction-schema";
+import { parseWorkflowConfiguration } from "./workflow-admin-service";
+
+export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
+  const dataDoc = await db.query.documentData.findFirst({
+    where: eq(documentData.workflowExecutionId, workflowExecutionId),
+  });
+  if (!dataDoc || !dataDoc.rawMarkdown) {
+    throw new Error("Fatal error, document data not found");
+  }
+  const workflowData = await db.query.workflow.findFirst({
+    where: eq(workflow.id, workflowId),
+  });
+  if (!workflowData) {
+    throw new Error("Fatal error, workflow not found");
+  }
+  const validConfig = await parseWorkflowConfiguration(workflowData.configuration);
+  if (!validConfig) {
+    throw new Error("Fatal error, invalid config");
+  }
+  const extractionResult = await runDocumentExtraction(dataDoc.rawMarkdown, validConfig);
+  logger.info(`Extraction result: ${JSON.stringify(extractionResult, null, 2)}`);
+}
 
 export async function runDocumentExtraction(
-  markdownDocument: MarkdownDocument,
+  markdownDocument: string,
   configuration: WorkflowConfiguration,
 ): Promise<ExtractionResult> {
   // Build dynamic schema object based on provided fields and tables
@@ -50,7 +74,7 @@ Instructions:
           },
           {
             type: "text",
-            text: markdownDocument.fullDocument,
+            text: markdownDocument,
           },
         ],
       },

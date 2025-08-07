@@ -1,6 +1,7 @@
 {
   "name": "@paperjet/queue",
-  "version": "0.0.0",
+  "module": "index.ts",
+  "type": "module",
   "private": true,
   "exports": {
     ".": "./src/index.ts",

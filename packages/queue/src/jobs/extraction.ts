@@ -1,3 +1,4 @@
+import { extractDataFromMarkdown } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
@@ -24,7 +25,8 @@ export const extractWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_JOB,
   async (job: Job<ExtractionJobData>) => {
     logger.info({ job: job.data }, "Starting extraction job");
-    await extractData();
+    const { workflowId, workflowExecutionId } = job.data;
+    await extractDataFromMarkdown(workflowId, workflowExecutionId);
   },
   {
     connection: redisConnection,
@@ -32,7 +34,3 @@ export const extractWorker = new Worker(
     name: "extract-worker",
   },
 );
-
-async function extractData() {
-  throw new Error("Function not implemented.");
-}
