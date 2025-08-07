@@ -68,6 +68,7 @@ const server = Bun.serve({
 });
 
 import { allWorkers } from "@paperjet/queue";
+
 logger.info(`Started ${allWorkers.length} job workers`);
 
 logger.info(

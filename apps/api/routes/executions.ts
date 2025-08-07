@@ -70,6 +70,7 @@ const router = app
         workflowId: execution.workflowId,
         workflowExecutionId: execution.workflowExecutionId,
       });
+      logger.info(job, "Job enqueued");
       const jobId = job.data.jobId;
       await updateExecutionJobId(execution.workflowExecutionId, jobId);
 
@@ -108,11 +109,12 @@ const router = app
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
           });
-          const jobId = job.data.jobId;
-          await updateExecutionJobId(execution.workflowExecutionId, jobId);
+          logger.info(job.data, "Job data");
+          logger.info(job.id);
+          await updateExecutionJobId(execution.workflowExecutionId, job.id || "");
           return {
             ...execution,
-            jobId,
+            jobId: job.id,
           };
         }),
       );

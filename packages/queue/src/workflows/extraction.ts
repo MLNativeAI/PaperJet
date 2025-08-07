@@ -84,6 +84,7 @@ export const extractionWorkflowWorker = new Worker(
       }
     }
   },
+  baseQueueOptions,
 );
 
 async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
