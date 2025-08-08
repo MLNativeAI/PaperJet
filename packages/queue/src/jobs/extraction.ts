@@ -24,7 +24,6 @@ export type ExtractionJobData = z.infer<typeof extractionJobSchema>;
 export const extractWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_JOB,
   async (job: Job<ExtractionJobData>) => {
-    logger.info({ job: job.data }, "Starting extraction job");
     const { workflowId, workflowExecutionId } = job.data;
     const result = await extractDataFromMarkdown(workflowId, workflowExecutionId);
     return { success: true, extractedData: result };

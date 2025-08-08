@@ -7,6 +7,7 @@ const createLogger = () => {
   if (process.env.AXIOM_TOKEN && process.env.AXIOM_DATASET) {
     transports.push({
       target: "@axiomhq/pino",
+      level: process.env.LOG_LEVEL || "debug",
       options: {
         dataset: process.env.AXIOM_DATASET,
         token: process.env.AXIOM_TOKEN,
@@ -17,6 +18,7 @@ const createLogger = () => {
   if (process.env.ENVIRONMENT === "dev") {
     transports.push({
       target: "pino-pretty",
+      level: process.env.LOG_LEVEL || "debug",
       options: {
         colorize: true,
         ignore: "pid,hostname,env",

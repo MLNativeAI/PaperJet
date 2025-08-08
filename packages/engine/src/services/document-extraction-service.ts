@@ -8,6 +8,13 @@ import { buildExtractionSchema } from "../utils/build-extraction-schema";
 import { parseWorkflowConfiguration } from "./workflow-admin-service";
 
 export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
+  logger.debug(
+    {
+      workflowId,
+      workflowExecutionId,
+    },
+    "Extracting data from markdown",
+  );
   const dataDoc = await db.query.documentData.findFirst({
     where: eq(documentData.workflowExecutionId, workflowExecutionId),
   });
@@ -25,7 +32,7 @@ export async function extractDataFromMarkdown(workflowId: string, workflowExecut
     throw new Error("Fatal error, invalid config");
   }
   const extractionResult = await runDocumentExtraction(dataDoc.rawMarkdown, validConfig);
-  logger.info(`Extraction result: ${JSON.stringify(extractionResult, null, 2)}`);
+  logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
 
 export async function runDocumentExtraction(
