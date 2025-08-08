@@ -45,7 +45,7 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
   });
 
   for (const page of splitResult.pages) {
-    const pageId = generateId(ID_PREFIXES.user);
+    const pageId = generateId(ID_PREFIXES.page);
     const pageFileName = `executions/${workflowExecutionId}/pages/page-${page.page_number}.png`;
 
     await s3Client.write(pageFileName, Buffer.from(page.image_data, "base64"));

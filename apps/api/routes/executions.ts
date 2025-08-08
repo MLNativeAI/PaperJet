@@ -69,10 +69,11 @@ const router = app
       const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
         workflowId: execution.workflowId,
         workflowExecutionId: execution.workflowExecutionId,
+        step: "INIT",
       });
       logger.info(job, "Job enqueued");
-      const jobId = job.data.jobId;
-      await updateExecutionJobId(execution.workflowExecutionId, jobId);
+      const jobId = job.id;
+      await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
 
       return c.json({
         ...execution,
@@ -108,6 +109,7 @@ const router = app
           const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
+            step: "INIT",
           });
           logger.info(job.data, "Job data");
           logger.info(job.id);

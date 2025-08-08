@@ -30,8 +30,8 @@ const workflowSteps = z.enum([
 ]);
 
 const WorkflowExtractionDataSchema = z.object({
-  workflowId: z.uuid(),
-  workflowExecutionId: z.uuid(),
+  workflowId: z.string(),
+  workflowExecutionId: z.string(),
   step: workflowSteps,
 });
 
@@ -40,7 +40,7 @@ export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema
 export const extractionWorkflowWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_WORKFLOW,
   async (job: Job<WorkflowExtractionData>, token?: string) => {
-    let step = job.data.step;
+    let step = job.data.step || workflowSteps.enum.INIT;
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
@@ -51,18 +51,19 @@ export const extractionWorkflowWorker = new Worker(
         }
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
-          await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
-          step = workflowSteps.enum.MARKDOWN;
-          break;
-        }
-        case workflowSteps.enum.MARKDOWN: {
           await addMarkdownJobs(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
           step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
           break;
         }
+        // case workflowSteps.enum.MARKDOWN: {
+        //   await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
+        //   step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
+        //   break;
+        // }
         case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
+          logger.info("Passed waiting for markdown checkpoint");
           await assembleFullDocument(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
           step = workflowSteps.enum.EXTRACTION;
@@ -108,6 +109,7 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
 
 async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
+    logger.error("Fatal error, job ID missing");
     throw new Error("Fatal error, job ID missing");
   }
   const { workflowExecutionId } = job.data;
@@ -117,18 +119,19 @@ async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
   });
   const bulkJobData = pageData.map((pageEntry) => {
     return {
-      name: workflowExecutionId,
+      name: `${workflowExecutionId}-page-${pageEntry.pageNumber}`,
       data: {
         workflowExecutionId: workflowExecutionId,
         documentPageId: pageEntry.id,
-        parent: {
-          id: job.id,
-          queue: job.queueQualifiedName,
-        },
+      },
+      parent: {
+        id: job.id,
+        queue: job.queueQualifiedName,
       },
     };
   });
   await markdownQueue.addBulk(bulkJobData);
+  logger.debug(`Added ${bulkJobData.length} markdown jobs`);
 }
 
 async function addExtractionJob(job: Job<WorkflowExtractionData>) {
@@ -162,30 +165,66 @@ async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionDa
     logger.error("Invalid token");
     throw new Error("Invalid token");
   }
-  const shouldWaitForSplit = await job.moveToWaitingChildren(token); // weird bullmq "waiting" logic
-  if (shouldWaitForSplit) {
+
+  const shouldWait = await job.moveToWaitingChildren(token);
+
+  if (shouldWait) {
+    // Children are still processing, throw error to pause this job
+    logger.info(`Waiting for ${jobName} children to complete`);
     throw new WaitingChildrenError();
   }
+
+  // All children have completed, check for failures
   const childrenValues = await job.getChildrenValues();
   const failedChildren = Object.entries(childrenValues).filter(([_, result]) => result instanceof Error);
 
   if (failedChildren.length > 0) {
-    logger.error(`${jobName} failed`);
-    throw new Error(`${jobName} failed`);
+    logger.error(`${jobName} failed - ${failedChildren.length} child jobs failed`);
+    throw new Error(`${jobName} failed with ${failedChildren.length} failures`);
   }
+
+  logger.info(`All ${jobName} children completed successfully`);
 }
+
 async function assembleFullDocument(job: Job<WorkflowExtractionData>) {
+  logger.info("Assembling full markdown document");
   const { workflowExecutionId } = job.data;
   const allPageData = await db.query.documentPage.findMany({
     where: eq(documentPage.workflowExecutionId, workflowExecutionId),
     orderBy: [asc(documentPage.pageNumber)],
   });
-  const fullMarkdownDocument = allPageData.map((pageData) => pageData.rawMarkdown).join("\n");
+
+  // Debug logging
+  logger.debug(
+    {
+      pageCount: allPageData.length,
+      pages: allPageData.map((p) => ({
+        pageNumber: p.pageNumber,
+        hasMarkdown: !!p.rawMarkdown,
+        markdownLength: p.rawMarkdown?.length || 0,
+      })),
+    },
+    "Page data before assembling",
+  );
+
+  // Filter out null/undefined values and join with proper page breaks
+  const fullMarkdownDocument = allPageData
+    .map((pageData) => pageData.rawMarkdown)
+    .filter((markdown) => markdown != null && markdown.trim() !== "")
+    .join("\n\n---\n\n"); // Add page separator for clarity
+
   await db
     .update(documentData)
     .set({
       rawMarkdown: fullMarkdownDocument,
     })
     .where(eq(documentData.workflowExecutionId, workflowExecutionId));
-  logger.info(`Updated document with ${allPageData.length} page markdown content`);
+
+  logger.info(
+    {
+      totalLength: fullMarkdownDocument.length,
+      pageCount: allPageData.length,
+    },
+    `Updated document with ${allPageData.length} pages of markdown content`,
+  );
 }

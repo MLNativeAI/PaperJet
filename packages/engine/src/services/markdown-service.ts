@@ -20,6 +20,7 @@ export const convertPageToMarkdown = async (workflowExecutionId: string, documen
   }
   const pageFileName = `executions/${workflowExecutionId}/pages/page-${pageData.pageNumber}.png`;
   const pageBuffer = await s3Client.file(pageFileName).arrayBuffer();
+  logger.info(`Converting page ${pageData.pageNumber} to markdown`);
   const markdownPage = await extractMarkdownFromPageImage(pageBuffer);
 
   await db

@@ -27,6 +27,8 @@ export const markdownWorker = new Worker(
     logger.info({ job: job.data }, "Starting markdown job");
     const { workflowExecutionId, documentPageId } = job.data;
     await convertPageToMarkdown(workflowExecutionId, documentPageId);
+    logger.info("Markdown job completed");
+    return { success: true, documentPageId };
   },
   {
     connection: redisConnection,

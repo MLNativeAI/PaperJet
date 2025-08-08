@@ -15,8 +15,8 @@ export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
 });
 
 const extractionJobSchema = z.object({
-  workflowId: z.uuid(),
-  workflowExecutionId: z.uuid(),
+  workflowId: z.string(),
+  workflowExecutionId: z.string(),
 });
 
 export type ExtractionJobData = z.infer<typeof extractionJobSchema>;
@@ -26,7 +26,8 @@ export const extractWorker = new Worker(
   async (job: Job<ExtractionJobData>) => {
     logger.info({ job: job.data }, "Starting extraction job");
     const { workflowId, workflowExecutionId } = job.data;
-    await extractDataFromMarkdown(workflowId, workflowExecutionId);
+    const result = await extractDataFromMarkdown(workflowId, workflowExecutionId);
+    return { success: true, extractedData: result };
   },
   {
     connection: redisConnection,

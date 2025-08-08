@@ -15,8 +15,8 @@ export const splitPdfQueue = new Queue(QUEUE_NAMES.SPLIT_JOB, {
 });
 
 const splitPdfJobSchema = z.object({
-  workflowId: z.uuid(),
-  workflowExecutionId: z.uuid(),
+  workflowId: z.string(),
+  workflowExecutionId: z.string(),
 });
 
 export type SplitPdfJobData = z.infer<typeof splitPdfJobSchema>;
@@ -25,12 +25,13 @@ export const splitPdfWorker = new Worker(
   QUEUE_NAMES.SPLIT_JOB,
   async (job: Job<SplitPdfJobData>) => {
     logger.info("Starting PDF split job");
-    await splitPdfIntoImages(job.data.workflowExecutionId);
+    const pageCount = await splitPdfIntoImages(job.data.workflowExecutionId);
     logger.info("PDF split job completed");
+    return { success: true, pageCount };
   },
   {
     connection: redisConnection,
-    concurrency: 20,
+    concurrency: 1,
     name: "split-pdf-worker",
   },
 );
