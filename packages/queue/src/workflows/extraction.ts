@@ -51,19 +51,18 @@ export const extractionWorkflowWorker = new Worker(
         }
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
+          step = workflowSteps.enum.MARKDOWN;
+          break;
+        }
+        case workflowSteps.enum.MARKDOWN: {
           await addMarkdownJobs(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
           step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
           break;
         }
-        // case workflowSteps.enum.MARKDOWN: {
-        //   await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
-        //   step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
-        //   break;
-        // }
         case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
-          logger.info("Passed waiting for markdown checkpoint");
           await assembleFullDocument(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
           step = workflowSteps.enum.EXTRACTION;
@@ -118,15 +117,21 @@ async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
     orderBy: [asc(documentPage.pageNumber)],
   });
   const bulkJobData = pageData.map((pageEntry) => {
+    if (!job.id) {
+      logger.error("Fatal error, job ID missing");
+      throw new Error("Fatal error, job ID missing");
+    }
     return {
       name: `${workflowExecutionId}-page-${pageEntry.pageNumber}`,
       data: {
         workflowExecutionId: workflowExecutionId,
         documentPageId: pageEntry.id,
       },
-      parent: {
-        id: job.id,
-        queue: job.queueQualifiedName,
+      opts: {
+        parent: {
+          id: job.id,
+          queue: job.queueQualifiedName,
+        },
       },
     };
   });

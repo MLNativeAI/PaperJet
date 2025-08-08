@@ -71,7 +71,6 @@ const router = app
         workflowExecutionId: execution.workflowExecutionId,
         step: "INIT",
       });
-      logger.info(job, "Job enqueued");
       const jobId = job.id;
       await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
 
@@ -102,17 +101,13 @@ const router = app
         return c.json({ error: "At least one file is required" }, 400);
       }
 
-      // Create individual executions for each file
       const results = await Promise.all(
         uploadedFiles.map(async (file) => {
           const execution = await uploadFileAndCreateExecution(workflowId, user.id, file);
           const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
-            step: "INIT",
           });
-          logger.info(job.data, "Job data");
-          logger.info(job.id);
           await updateExecutionJobId(execution.workflowExecutionId, job.id || "");
           return {
             ...execution,

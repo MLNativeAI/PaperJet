@@ -56,9 +56,6 @@ const calculateCost = (
 
 export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
   const context = getExecutionContext();
-
-  console.log("context", context);
-
   const modelPrice = await getModelPrice(model);
 
   const inputCost = usage.promptTokens && modelPrice ? calculateCost(modelPrice, usage).inputCost : 0;
@@ -69,11 +66,11 @@ export async function trackUsage(name: string, model: string, usage: LanguageMod
     name,
     model,
     inputTokens: usage.promptTokens || 0,
-    inputCost,
+    inputCost: inputCost.toFixed(2),
     outputTokens: usage.completionTokens || 0,
-    outputCost,
+    outputCost: outputCost.toFixed(2),
     totalTokens: usage.totalTokens || 0,
-    totalCost,
+    totalCost: totalCost.toFixed(2),
     durationMs,
     userId: context?.userId,
     workflowId: context?.workflowId,

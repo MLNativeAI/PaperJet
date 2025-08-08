@@ -9,20 +9,23 @@ export const allWorkers = [extractionWorkflowWorker, markdownWorker, splitPdfWor
 
 allWorkers.forEach((worker) => {
   worker.on("completed", (job: any, result: any) => {
-    logger.trace("Worker job completed", {
-      jobId: job.id,
-      jobName: job.name,
-      specId: job.data.specId,
-      result,
-    });
+    logger.trace(
+      {
+        jobId: job.id,
+        jobName: job.name,
+        specId: job.data.specId,
+        result,
+      },
+      "Worker job completed",
+    );
   });
   worker.on("failed", (job: any, err: any) => {
     logger.error({ err, job }, "Worker job failed");
   });
   worker.on("stalled", (jobId: any) => {
-    logger.warn("Worker job stalled", { jobId });
+    logger.warn({ jobId }, "Worker job stalled");
   });
   worker.on("error", (err: any) => {
-    logger.error("Worker worker error", { error: err.message });
+    logger.error(err, "Worker error");
   });
 });
