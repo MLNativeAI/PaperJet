@@ -9,7 +9,10 @@
     "test:e2e": "turbo test:e2e",
     "test:e2e:smoke": "turbo test:e2e:smoke",
     "test:e2e:acc": "turbo test:e2e:acc",
-    "db:migrate": "cd packages/db && bunx drizzle-kit migrate",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:push": "turbo db:push",
+    "db:studio": "turbo db:studio",
     "commit": "cz",
     "prepare": "husky"
   },
