@@ -6,6 +6,10 @@
     "build": "turbo build",
     "dev": "turbo dev --parallel",
     "lint": "biome check --write",
+    "test:e2e": "turbo test:e2e",
+    "test:e2e:smoke": "turbo test:e2e:smoke",
+    "test:e2e:acc": "turbo test:e2e:acc",
+    "db:migrate": "cd packages/db && bunx drizzle-kit migrate",
     "commit": "cz",
     "prepare": "husky"
   },
