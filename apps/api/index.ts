@@ -23,7 +23,11 @@ const app = new Hono<{
 
 app.use("*", otel());
 app.use(poweredBy({ serverName: "mlnative.com" }));
-app.use(honoLogger());
+app.use(
+  honoLogger((message) => {
+    logger.trace(message);
+  }),
+);
 // Cors middleware for local development
 app.use("/api/*", corsMiddleware);
 // Require authentication for all API routes

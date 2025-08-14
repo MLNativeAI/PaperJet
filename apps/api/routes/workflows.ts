@@ -183,6 +183,7 @@ const router = app
   )
   .post("/", zValidator("form", createWorkflowFormSchema), async (c) => {
     try {
+      logger.info("Creating a new workflow");
       const user = await getUser(c);
       const { file } = c.req.valid("form");
 

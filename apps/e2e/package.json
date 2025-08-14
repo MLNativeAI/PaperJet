@@ -14,7 +14,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@paperjet/shared": "workspace:*",
+    "@paperjet/api": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"
