@@ -119,7 +119,7 @@ jobs:
     environment: development
     
     steps:
-      - name: Extract image tag
+      - name: Extract image tags
         id: image
         run: |
           # Extract the short SHA (first 7 characters)
@@ -127,9 +127,11 @@ jobs:
           IMAGE_TAG="develop-${SHORT_SHA}"
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "name=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
-          echo "Deploying image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+          echo "ml_name=${{ env.ML_IMAGE_NAME }}" >> $GITHUB_OUTPUT
+          echo "Deploying main app: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+          echo "Deploying ML service: ${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}:${IMAGE_TAG}"
 
-      - name: Update Coolify application image
+      - name: Update Coolify main application image
         run: |
           curl -X PATCH \
             "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_APP_UUID }}" \
@@ -140,9 +142,27 @@ jobs:
               "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
             }'
 
-      - name: Deploy to Coolify
+      - name: Deploy main app to Coolify
         run: |
           curl -X GET \
             "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_APP_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+            -H "Content-Type: application/json"
+
+      - name: Update Coolify ML service image
+        run: |
+          curl -X PATCH \
+            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "docker_registry_image_name": "${{ steps.image.outputs.ml_name }}",
+              "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
+            }'
+
+      - name: Deploy ML service to Coolify
+        run: |
+          curl -X GET \
+            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
             -H "Content-Type: application/json"
