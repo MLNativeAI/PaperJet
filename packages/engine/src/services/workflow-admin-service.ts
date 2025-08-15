@@ -14,9 +14,8 @@ import {
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
 
-export async function parseWorkflowConfiguration(configuration: string): Promise<WorkflowConfiguration | null> {
-  const parsed = JSON.parse(configuration);
-  const parsedConfig = workflowConfigurationSchema.safeParse(parsed);
+export async function parseWorkflowConfiguration(configuration: object): Promise<WorkflowConfiguration | null> {
+  const parsedConfig = workflowConfigurationSchema.safeParse(configuration);
   if (!parsedConfig.success) {
     logger.warn(parsedConfig.error, `Invalid workflow configuration: ${configuration}`);
   }
@@ -549,6 +548,7 @@ export async function createWorkflowFromApi(
   };
 
   await db.insert(workflow).values(newWorkflowData);
+
   return {
     workflowId,
   };

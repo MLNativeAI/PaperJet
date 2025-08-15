@@ -1,11 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { ApiRoutes } from "@api/index";
-import { test } from "@playwright/test";
-import { hc } from "hono/client";
+import { expect, test } from "@playwright/test";
 import { LoginPage } from "../page-objects/login-page";
-
-const client = hc<ApiRoutes>("/");
 
 test.setTimeout(180000); // 3 minutes
 
@@ -17,66 +13,100 @@ test.describe("Extract energy invoice for Energa", () => {
 
     const file = path.join(process.cwd(), "tests/fixtures/energa/Energa.pdf");
 
-    const response = await page.request.post("/api/workflows", {
-      multipart: {
-        file: {
-          name: "Energa.pdf",
-          mimeType: "application/pdf",
-          buffer: fs.readFileSync(file),
+    const newWorkflow = await page.request.post("/api/v1/workflows", {
+      data: {
+        name: "Energa invoice parser",
+        description: "Extracts core invoice information",
+        configuration: {
+          objects: [
+            {
+              name: "Seller details",
+              fields: [
+                {
+                  name: "Seller name",
+                  type: "string",
+                },
+                {
+                  name: "Seller address",
+                  type: "string",
+                },
+                {
+                  name: "Seller NIP",
+                  type: "string",
+                },
+              ],
+            },
+            {
+              name: "Buyer details",
+              fields: [
+                {
+                  name: "Buyer name",
+                  type: "string",
+                },
+                {
+                  name: "Buyer address",
+                  type: "string",
+                },
+                {
+                  name: "Buyer NIP",
+                  type: "string",
+                },
+                {
+                  name: "Customer number",
+                  type: "string",
+                },
+              ],
+            },
+            {
+              name: "Invoice Data",
+              fields: [
+                {
+                  name: "Invoice Number",
+                  type: "string",
+                },
+                {
+                  name: "Billing period start",
+                  type: "date",
+                },
+                {
+                  name: "Billing period end",
+                  type: "date",
+                },
+                {
+                  name: "PPE Number",
+                  type: "string",
+                },
+                {
+                  name: "Total amount",
+                  type: "number",
+                },
+                {
+                  name: "Invoice Currency",
+                  type: "string",
+                  description: "3-letter currency code",
+                },
+                {
+                  name: "Invoice due date",
+                  type: "date",
+                },
+                {
+                  name: "Invoice issue date",
+                  type: "date",
+                },
+              ],
+            },
+          ],
         },
       },
     });
 
-    if (!response.ok) {
-      console.log(response.status);
-      throw new Error("Failed to create workflow from file");
-    }
+    console.log(JSON.stringify(await newWorkflow.json(), null, 2));
+    expect(newWorkflow.ok()).toBeTruthy();
 
-    const createResult = await response.json();
+    const createResult = await newWorkflow.json();
     const workflowId = createResult.workflowId;
 
-    // 2nd request: Update workflow with schema
-    const schemaResponse = await page.request.put(`/api/workflows/${workflowId}`, {
-      data: {
-        fields: [
-          {
-            name: "invoice_number",
-            description: "Invoice number from Energa",
-            type: "string"
-          },
-          {
-            name: "total_amount",
-            description: "Total amount to pay",
-            type: "number"
-          },
-          {
-            name: "due_date",
-            description: "Payment due date",
-            type: "date"
-          }
-        ]
-      }
-    });
-
-    if (!schemaResponse.ok) {
-      console.log("Schema update failed:", schemaResponse.status);
-      throw new Error("Failed to update workflow schema");
-    }
-
-    // 3rd request: Set workflow name and description
-    const nameResponse = await page.request.patch(`/api/workflows/${workflowId}/basic-data`, {
-      data: {
-        slug: "Energa Invoice Extraction",
-        description: "Extract key fields from Energa energy invoices including invoice number, amount, and due date"
-      }
-    });
-
-    if (!nameResponse.ok) {
-      console.log("Name update failed:", nameResponse.status);
-      throw new Error("Failed to update workflow name and description");
-    }
-
-    console.log("Workflow created and configured successfully:", workflowId);
+    console.log(`New workflow ID: ${workflowId}`);
 
     // 4th request: Execute the workflow with the same file
     const executionResponse = await page.request.post("/api/executions", {

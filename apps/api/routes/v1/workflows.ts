@@ -10,24 +10,46 @@ const app = new Hono();
 const createWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
-  configuration: z.string(),
+  configuration: z.object({
+    fields: z.array(
+      z.object({
+        slug: z.string(),
+        description: z.string(),
+        type: z.enum(["text", "number", "date", "boolean"]),
+      }),
+    ),
+    tables: z.array(
+      z.object({
+        columns: z.array(
+          z.object({
+            id: z.string(),
+            slug: z.string(),
+            description: z.string(),
+            type: z.enum(["text", "number", "date", "boolean"]),
+          }),
+        ),
+        slug: z.string(),
+        description: z.string(),
+      }),
+    ),
+  }),
 });
 
-const router = app.post("/", zValidator("form", createWorkflowApiSchema), async (c) => {
+const router = app.post("/", zValidator("json", createWorkflowApiSchema), async (c) => {
   try {
-    const validForm = c.req.valid("form");
+    const createWorkflowData = c.req.valid("json");
     const user = await getUser(c);
-    logger.info({ form: validForm }, `Creating new workflow via API`);
+    logger.info({ data: createWorkflowData }, `Creating new workflow via API`);
     const workflowId = await createWorkflowFromApi(
-      validForm.name,
-      validForm.description,
-      validForm.configuration,
+      createWorkflowData.name,
+      createWorkflowData.description,
+      createWorkflowData.configuration,
       user.id,
     );
-    logger.info({ workflowId, name: validForm.name }, "Workflow created");
+    logger.info({ workflowId, name: createWorkflowData.name }, "Workflow created");
     return c.json({ workflowId: workflowId, message: "Workflow created" }, 201);
   } catch (error) {
-    logger.error(error, "Create workflow from template error:");
+    logger.error(error, "Create workflow error:");
     if (error instanceof Error) {
       return c.json(
         {

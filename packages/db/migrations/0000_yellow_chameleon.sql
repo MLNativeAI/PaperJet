@@ -26,6 +26,21 @@ CREATE TABLE "configuration" (
 	"structuredOutputMode" "structuredOutputMode" DEFAULT 'tool' NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "document_data" (
+	"id" text PRIMARY KEY NOT NULL,
+	"raw_markdown" text,
+	"workflow_execution_id" text,
+	"created_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "document_page" (
+	"id" text PRIMARY KEY NOT NULL,
+	"document_data_id" text NOT NULL,
+	"workflow_execution_id" text,
+	"page_number" integer NOT NULL,
+	"raw_markdown" text
+);
+--> statement-breakpoint
 CREATE TABLE "file" (
 	"id" text PRIMARY KEY NOT NULL,
 	"filename" text NOT NULL,
@@ -98,23 +113,19 @@ CREATE TABLE "verification" (
 --> statement-breakpoint
 CREATE TABLE "workflow" (
 	"id" text PRIMARY KEY NOT NULL,
-	"slug" text NOT NULL,
+	"name" text NOT NULL,
 	"description" text DEFAULT '' NOT NULL,
-	"categories" text NOT NULL,
-	"configuration" text NOT NULL,
-	"status" text DEFAULT 'draft' NOT NULL,
+	"configuration" jsonb NOT NULL,
 	"owner_id" text NOT NULL,
-	"file_id" text NOT NULL,
-	"sample_data" text NOT NULL,
-	"sample_data_extracted_at" timestamp,
-	"created_at" timestamp NOT NULL,
-	"updated_at" timestamp NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "workflow_execution" (
 	"id" text PRIMARY KEY NOT NULL,
 	"workflow_id" text NOT NULL,
 	"file_id" text NOT NULL,
+	"jobId" text,
 	"status" text NOT NULL,
 	"extraction_result" text,
 	"error_message" text,
@@ -125,13 +136,12 @@ CREATE TABLE "workflow_execution" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_data" ADD CONSTRAINT "document_data_workflow_execution_id_workflow_execution_id_fk" FOREIGN KEY ("workflow_execution_id") REFERENCES "public"."workflow_execution"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_page" ADD CONSTRAINT "document_page_document_data_id_document_data_id_fk" FOREIGN KEY ("document_data_id") REFERENCES "public"."document_data"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_page" ADD CONSTRAINT "document_page_workflow_execution_id_workflow_execution_id_fk" FOREIGN KEY ("workflow_execution_id") REFERENCES "public"."workflow_execution"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "file" ADD CONSTRAINT "file_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "workflow" ADD CONSTRAINT "workflow_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "workflow" ADD CONSTRAINT "workflow_file_id_file_id_fk" FOREIGN KEY ("file_id") REFERENCES "public"."file"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "workflow_execution" ADD CONSTRAINT "workflow_execution_workflow_id_workflow_id_fk" FOREIGN KEY ("workflow_id") REFERENCES "public"."workflow"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "workflow_execution" ADD CONSTRAINT "workflow_execution_file_id_file_id_fk" FOREIGN KEY ("file_id") REFERENCES "public"."file"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "workflow_execution" ADD CONSTRAINT "workflow_execution_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
-
-
-INSERT INTO configuration VALUES (gen_random_uuid(), 'cloud');
