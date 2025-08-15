@@ -25,7 +25,6 @@ import { fileIdSchema, workflowIdSchema } from "@/lib/validation";
 
 const app = new Hono();
 
-// Validation schemas
 const updateWorkflowSchema = z.object({
   slug: z.string().min(1).optional(),
   description: z.string().optional(),

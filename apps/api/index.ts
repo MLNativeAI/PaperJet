@@ -13,6 +13,7 @@ import { withContext } from "./lib/with-context";
 import admin from "./routes/admin";
 import executions from "./routes/executions";
 import workflows from "./routes/workflows";
+import v1Workflows from "./routes/v1/workflows";
 
 const app = new Hono<{
   Variables: {
@@ -46,11 +47,13 @@ app.get("/api/health", async (c) => {
   });
 });
 
-export const apiRoutes = app
+export const internalApiRoutes = app
   .basePath("/api")
   .route("/workflows", workflows)
   .route("/executions", executions)
   .route("/admin", admin);
+
+export const publicApiRoutes = app.basePath("/api/v1/").route("/workflows", v1Workflows);
 
 if (process.env.NODE_ENV === "production") {
   // Serve all static files from the dist directory
@@ -84,4 +87,4 @@ logger.info(
   `🚀 Server running on port ${server.port} in ${envVars.ENVIRONMENT} mode`,
 );
 
-export type ApiRoutes = typeof apiRoutes;
+export type ApiRoutes = typeof internalApiRoutes;

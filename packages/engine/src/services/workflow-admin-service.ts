@@ -9,8 +9,8 @@ import {
   type ExtractionResult,
   type Workflow,
   type WorkflowConfiguration,
-  workflowConfigurationSchema,
   WorkflowExecutionStatus,
+  workflowConfigurationSchema,
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
 
@@ -526,5 +526,30 @@ export async function createWorkflowFromTemplateData(
   return {
     workflowId,
     fileId,
+  };
+}
+
+export async function createWorkflowFromApi(
+  name: string,
+  description: string,
+  configuration: string,
+  userId: string,
+): Promise<{
+  workflowId: string;
+  fileId?: string;
+}> {
+  const validConfiguration = await parseWorkflowConfiguration(configuration);
+  const workflowId = generateId(ID_PREFIXES.workflow);
+  const newWorkflowData = {
+    id: workflowId,
+    name: name,
+    description: description || "",
+    configuration: JSON.stringify(validConfiguration),
+    ownerId: userId,
+  };
+
+  await db.insert(workflow).values(newWorkflowData);
+  return {
+    workflowId,
   };
 }

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -66,21 +66,14 @@ export const file = pgTable("file", {
 
 export const workflow = pgTable("workflow", {
   id: text("id").primaryKey(),
-  slug: text("slug").notNull(),
+  name: text("name").notNull(),
   description: text("description").notNull().default(""),
-  categories: text("categories").notNull(), // JSON string
-  configuration: text("configuration").notNull(), // JSON string
-  status: text("status").notNull().default("draft"), // 'draft' | 'analyzing' | 'extracting' | 'configuring' | 'active' | 'error'
+  configuration: jsonb("configuration").notNull(),
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  fileId: text("file_id")
-    .notNull()
-    .references(() => file.id, { onDelete: "cascade" }),
-  sampleData: text("sample_data").notNull(), // JSON string
-  sampleDataExtractedAt: timestamp("sample_data_extracted_at"), // When sample data was last extracted
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const workflowExecution = pgTable("workflow_execution", {
