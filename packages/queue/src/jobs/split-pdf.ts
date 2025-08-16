@@ -8,7 +8,8 @@ import { QUEUE_NAMES } from "../types";
 export const splitPdfQueue = new Queue(QUEUE_NAMES.SPLIT_JOB, {
   connection: redisConnection,
   defaultJobOptions: {
-    attempts: 1,
+    removeOnComplete: 10,
+    removeOnFail: 5,
   },
 });
 

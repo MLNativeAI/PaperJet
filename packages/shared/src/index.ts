@@ -17,5 +17,5 @@ export type ApiResponse<T> = {
 
 export { withExecutionContext } from "./context";
 export * from "./env";
-export { envSchema, type BunEnvModule, type EnvVars } from "./env-schema";
+export { type BunEnvModule, type EnvVars, envSchema } from "./env-schema";
 export { logger } from "./logger";

@@ -3,14 +3,18 @@ import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
 import { redisConnection } from "../redis";
-import { baseQueueOptions } from "../shared";
 import { QUEUE_NAMES } from "../types";
 
 export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
-  ...baseQueueOptions,
+  connection: redisConnection,
   defaultJobOptions: {
-    ...baseQueueOptions.defaultJobOptions,
-    attempts: 1,
+    removeOnComplete: 10,
+    removeOnFail: 5,
+    attempts: 2, // Expensive AI operations, limited retries
+    backoff: {
+      type: "exponential" as const,
+      delay: 2000,
+    },
   },
 });
 

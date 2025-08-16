@@ -8,14 +8,19 @@ import z from "zod";
 import { extractionQueue } from "../jobs/extraction";
 import { markdownQueue } from "../jobs/markdown";
 import { splitPdfQueue } from "../jobs/split-pdf";
-import { baseQueueOptions } from "../shared";
+import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
 
 export const workflowExecutionQueue = new Queue(QUEUE_NAMES.EXTRACTION_WORKFLOW, {
-  ...baseQueueOptions,
+  connection: redisConnection,
   defaultJobOptions: {
-    ...baseQueueOptions.defaultJobOptions,
-    attempts: 1,
+    removeOnComplete: 10,
+    removeOnFail: 5,
+    attempts: 1, // Workflow orchestration, child failures handled explicitly
+    backoff: {
+      type: "exponential" as const,
+      delay: 2000,
+    },
   },
 });
 
@@ -84,7 +89,11 @@ export const extractionWorkflowWorker = new Worker(
       }
     }
   },
-  baseQueueOptions,
+  {
+    connection: redisConnection,
+    concurrency: 5,
+    name: "extraction-workflow-worker",
+  },
 );
 
 async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
@@ -103,6 +112,7 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
       id: job.id,
       queue: job.queueQualifiedName,
     },
+    ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
   });
 }
 
@@ -132,6 +142,7 @@ async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
           id: job.id,
           queue: job.queueQualifiedName,
         },
+        ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
       },
     };
   });
@@ -150,6 +161,7 @@ async function addExtractionJob(job: Job<WorkflowExtractionData>) {
       id: job.id,
       queue: job.queueQualifiedName,
     },
+    ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
   });
 }
 
@@ -170,6 +182,8 @@ async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionDa
     logger.error("Invalid token");
     throw new Error("Invalid token");
   }
+
+  logger.info("Waiting");
 
   const shouldWait = await job.moveToWaitingChildren(token);
 

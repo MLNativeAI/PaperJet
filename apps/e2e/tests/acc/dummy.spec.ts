@@ -7,4 +7,3 @@ test.describe("Acceptance Tests - Placeholder", () => {
     expect(true).toBe(true);
   });
 });
-

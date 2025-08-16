@@ -37,20 +37,40 @@ export async function runDocumentExtraction(
 ): Promise<any> {
   // Build dynamic schema object based on provided fields and tables
   const schemaObj = buildExtractionSchema(configuration);
-  //
-  // // Build extraction prompt with field descriptions
-  // const fieldDescriptions = configuration.fields
-  //   .map((field) => `- ${field.slug} (${field.type}): ${field.description}`)
-  //   .join("\n");
-  //
-  // const tableDescriptions = configuration.tables
-  //   .map((table) => {
-  //     const columnDescs = table.columns.map((col) => `    - ${col.slug} (${col.type}): ${col.description}`).join("\n");
-  //     return `- ${table.slug}: ${table.description}\n${columnDescs}`;
-  //   })
-  //   .join("\n");
-  //
-  const prompt = `Extract the following information from this document. Maintain data accuracy and completeness`;
+
+  // Build extraction prompt with field descriptions
+  const fieldDescriptions: string[] = [];
+  const tableDescriptions: string[] = [];
+
+  configuration.objects.forEach((obj) => {
+    if ('fields' in obj) {
+      obj.fields.forEach((field) => {
+        fieldDescriptions.push(`- ${field.name} (${field.type})`);
+      });
+    }
+    if ('tables' in obj) {
+      obj.tables.forEach((table) => {
+        const columnDescs = table.columns.map((col) => `    - ${col.name} (${col.type})`).join("\n");
+        tableDescriptions.push(`- ${table.name}: ${table.description || ''}\n${columnDescs}`);
+      });
+    }
+  });
+
+  const prompt = `Extract the following information from this document:
+
+FIELDS TO EXTRACT:
+${fieldDescriptions.join("\n")}
+
+${tableDescriptions.length > 0 ? `TABLES TO EXTRACT:\n${tableDescriptions.join("\n")}` : ""}
+
+Instructions:
+- Extract exact values as they appear in the document
+- For currency fields, extract as numbers (remove currency symbols)
+- For date fields, use ISO format (YYYY-MM-DD)
+- For boolean fields, return true/false based on presence or checkmarks
+- If a field is not found or unclear, return null
+- For tables, extract all rows found
+- Maintain data accuracy and completeness`;
   const result = await generateObject("document-extraction", {
     schema: schemaObj,
     messages: [

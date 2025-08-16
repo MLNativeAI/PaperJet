@@ -12,8 +12,8 @@ import { corsMiddleware } from "./lib/cors";
 import { withContext } from "./lib/with-context";
 import admin from "./routes/admin";
 import executions from "./routes/executions";
-import workflows from "./routes/workflows";
 import v1Workflows from "./routes/v1/workflows";
+import workflows from "./routes/workflows";
 
 const app = new Hono<{
   Variables: {
