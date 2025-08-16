@@ -3,13 +3,11 @@ import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
 import { redisConnection } from "../redis";
-import { baseQueueOptions } from "../shared";
 import { QUEUE_NAMES } from "../types";
 
 export const splitPdfQueue = new Queue(QUEUE_NAMES.SPLIT_JOB, {
-  ...baseQueueOptions,
+  connection: redisConnection,
   defaultJobOptions: {
-    ...baseQueueOptions.defaultJobOptions,
     attempts: 1,
   },
 });

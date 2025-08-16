@@ -114,37 +114,9 @@ export const zodWorkflowObject = z.object({
   name: z.string(),
   fields: z.array(zodWorkflowField),
 });
-export type Workflow = Omit<DbWorkflow, "configuration" | "sampleData" | "categories"> & {
+export type Workflow = Omit<DbWorkflow, "configuration"> & {
   configuration: WorkflowConfiguration;
-  categories: CategoriesConfiguration;
-  sampleData?: ExtractionResult | null;
-  sampleDataExtractedAt?: Date | null;
 };
-
-// Data extraction schemas
-export const extractedValueSchema = z.object({
-  fieldName: z.string(),
-  value: z.union([z.string(), z.number(), z.boolean(), z.date()]).nullable(),
-});
-
-export const extractedTableRowSchema = z.record(
-  z.string(),
-  z.union([z.string(), z.number(), z.boolean(), z.date()]).nullable(),
-);
-
-export const extractedTableSchema = z.object({
-  slug: z.string(),
-  rows: z.array(extractedTableRowSchema),
-});
-
-export const extractionResultSchema = z.object({
-  fields: z.array(extractedValueSchema),
-  tables: z.array(extractedTableSchema),
-});
-
-export type ExtractedValue = z.infer<typeof extractedValueSchema>;
-export type ExtractedTable = z.infer<typeof extractedTableSchema>;
-export type ExtractionResult = z.infer<typeof extractionResultSchema>;
 
 // Workflow runs / execution types
 export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);

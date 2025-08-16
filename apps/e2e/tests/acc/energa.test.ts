@@ -148,7 +148,7 @@ test.describe("Extract energy invoice for Energa", () => {
     console.log(`New workflow ID: ${workflowId}`);
 
     // 4th request: Execute the workflow with the same file
-    const executionResponse = await page.request.post("/api/executions", {
+    const executionResponse = await page.request.post(`/api/v1/workflows/${workflowId}/execute`, {
       multipart: {
         workflowId: workflowId,
         file: {
