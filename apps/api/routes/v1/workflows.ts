@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { createWorkflowFromApi } from "@paperjet/engine";
+import { WorkflowConfigurationSchema } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
@@ -10,29 +11,7 @@ const app = new Hono();
 const createWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
-  configuration: z.object({
-    fields: z.array(
-      z.object({
-        slug: z.string(),
-        description: z.string(),
-        type: z.enum(["text", "number", "date", "boolean"]),
-      }),
-    ),
-    tables: z.array(
-      z.object({
-        columns: z.array(
-          z.object({
-            id: z.string(),
-            slug: z.string(),
-            description: z.string(),
-            type: z.enum(["text", "number", "date", "boolean"]),
-          }),
-        ),
-        slug: z.string(),
-        description: z.string(),
-      }),
-    ),
-  }),
+  configuration: WorkflowConfigurationSchema,
 });
 
 const router = app.post("/", zValidator("json", createWorkflowApiSchema), async (c) => {
@@ -40,7 +19,7 @@ const router = app.post("/", zValidator("json", createWorkflowApiSchema), async 
     const createWorkflowData = c.req.valid("json");
     const user = await getUser(c);
     logger.info({ data: createWorkflowData }, `Creating new workflow via API`);
-    const workflowId = await createWorkflowFromApi(
+    const { workflowId } = await createWorkflowFromApi(
       createWorkflowData.name,
       createWorkflowData.description,
       createWorkflowData.configuration,

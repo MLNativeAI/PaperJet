@@ -1,5 +1,6 @@
 import type { DbWorkflow, DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
+import type { WorkflowConfiguration } from "./types/workflow-config";
 
 export type ConnectionValidationResult = {
   isValid: boolean;
@@ -103,13 +104,16 @@ export const tableConfigurationSchema = z.array(
 
 export type TableConfiguration = z.infer<typeof tableConfigurationSchema>;
 
-export const workflowConfigurationSchema = z.object({
-  fields: fieldsConfigurationSchema,
-  tables: tableConfigurationSchema,
+export const zodWorkflowField = z.object({
+  name: z.string(),
+  type: z.enum(["string", "date", "number", "boolean"]),
+  description: z.string().optional(),
 });
 
-export type WorkflowConfiguration = z.infer<typeof workflowConfigurationSchema>;
-
+export const zodWorkflowObject = z.object({
+  name: z.string(),
+  fields: z.array(zodWorkflowField),
+});
 export type Workflow = Omit<DbWorkflow, "configuration" | "sampleData" | "categories"> & {
   configuration: WorkflowConfiguration;
   categories: CategoriesConfiguration;
@@ -172,3 +176,5 @@ export type UsageStats = {
   users: number;
   executions: number;
 };
+
+export * from "./types/workflow-config";

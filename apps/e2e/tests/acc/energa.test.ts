@@ -95,6 +95,45 @@ test.describe("Extract energy invoice for Energa", () => {
                 },
               ],
             },
+            {
+              name: "Energy usage data",
+              tables: [
+                {
+                  name: "Sales and distribution",
+                  description: "Refererred to as 'Sprzedaż/dystrybucja energii elektrycznej'.",
+                  columns: [
+                    {
+                      name: "Entry name",
+                      type: "string",
+                    },
+                    {
+                      name: "Net amount",
+                      type: "number",
+                    },
+                    {
+                      name: "VAT rate",
+                      type: "number",
+                    },
+                    {
+                      name: "Tax amount",
+                      type: "number",
+                    },
+                    {
+                      name: "Total amount",
+                      type: "number",
+                    },
+                    {
+                      name: "Period from",
+                      type: "date",
+                    },
+                    {
+                      name: "Period to",
+                      type: "date",
+                    },
+                  ],
+                },
+              ],
+            },
           ],
         },
       },

@@ -10,7 +10,6 @@ import {
   type Workflow,
   type WorkflowConfiguration,
   WorkflowExecutionStatus,
-  workflowConfigurationSchema,
 } from "../types";
 import { generateId, ID_PREFIXES } from "../utils/id";
 
@@ -500,26 +499,26 @@ export async function createWorkflowFromTemplateData(
 
   // Generate new workflow ID
   const workflowId = generateId(ID_PREFIXES.workflow);
-
-  // Prepare the new workflow data - skip analysis and go straight to active
-  const newWorkflowData = {
-    id: workflowId,
-    slug: slug,
-    description: description || "",
-    categories: JSON.stringify(categories),
-    configuration: JSON.stringify(configuration),
-    sampleData: JSON.stringify(sampleData),
-    sampleDataExtractedAt: sampleData ? new Date() : null,
-    fileId: fileId, // Reference uploaded template file
-    status: "active" as const, // Skip analysis and go straight to active
-    ownerId: userId,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  // Insert the new workflow
-  await db.insert(workflow).values(newWorkflowData);
-
+  //
+  // // Prepare the new workflow data - skip analysis and go straight to active
+  // const newWorkflowData = {
+  //   id: workflowId,
+  //   slug: slug,
+  //   description: description || "",
+  //   categories: JSON.stringify(categories),
+  //   configuration: JSON.stringify(configuration),
+  //   sampleData: JSON.stringify(sampleData),
+  //   sampleDataExtractedAt: sampleData ? new Date() : null,
+  //   fileId: fileId, // Reference uploaded template file
+  //   status: "active" as const, // Skip analysis and go straight to active
+  //   ownerId: userId,
+  //   createdAt: new Date(),
+  //   updatedAt: new Date(),
+  // };
+  //
+  // // Insert the new workflow
+  // await db.insert(workflow).values(newWorkflowData);
+  //
   logger.info("Workflow created successfully from template data");
 
   return {
@@ -531,25 +530,20 @@ export async function createWorkflowFromTemplateData(
 export async function createWorkflowFromApi(
   name: string,
   description: string,
-  configuration: string,
+  configuration: WorkflowConfiguration,
   userId: string,
 ): Promise<{
   workflowId: string;
-  fileId?: string;
 }> {
-  const validConfiguration = await parseWorkflowConfiguration(configuration);
   const workflowId = generateId(ID_PREFIXES.workflow);
   const newWorkflowData = {
     id: workflowId,
     name: name,
     description: description || "",
-    configuration: JSON.stringify(validConfiguration),
+    configuration: configuration,
     ownerId: userId,
   };
 
   await db.insert(workflow).values(newWorkflowData);
-
-  return {
-    workflowId,
-  };
+  return { workflowId };
 }
