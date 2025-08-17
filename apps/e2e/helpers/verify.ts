@@ -1,9 +1,8 @@
 import fs from "node:fs";
-import path from "node:path";
-import { z } from "zod";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { expect, type Page } from "@playwright/test";
 import { generateObject } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { z } from "zod";
 
 const AccuracyResultSchema = z.object({
   accuracyScore: z.number().min(0).max(100),
@@ -26,35 +25,25 @@ export async function verifyExtractionAccuracy(
   workflowExecutionId: string,
   expectedResultFilePath: string,
   page: Page,
-  inputFilePath?: string,
 ) {
-  // Load the expected result from JSON file
+  console.log("Verifying extraction accuracy...");
   const expectedResult = JSON.parse(fs.readFileSync(expectedResultFilePath, "utf-8"));
-
-  // Fetch the actual extraction result from the API
   const response = await page.request.fetch(`/api/v1/workflows/${workflowId}/executions/${workflowExecutionId}`);
 
   if (!response.ok()) {
     throw new Error(`Failed to fetch execution data: ${response.status()}`);
   }
 
-  const executionData = await response.json();
+  const { documentData } = await response.json();
 
-  console.log(executionData);
-  const actualResult = executionData.documentData;
-
-  if (!actualResult) {
+  if (!documentData) {
     throw new Error("No extracted data found in execution result");
   }
-
-  // Read the original PDF for context
-  const pdfPath = inputFilePath || path.join(process.cwd(), "/fixtures/energa/Energa.pdf");
-  const pdfContent = fs.readFileSync(pdfPath);
 
   // Create a detailed comparison prompt
   const prompt = `You are an expert at verifying data extraction accuracy. 
   
-I have an original PDF document (an energy invoice from Energa) and two JSON objects:
+I have two JSON objects:
 1. Expected extraction result (what should have been extracted)
 2. Actual extraction result (what was actually extracted)
 
@@ -64,9 +53,7 @@ Expected Result:
 ${JSON.stringify(expectedResult, null, 2)}
 
 Actual Result:
-${JSON.stringify(actualResult, null, 2)}
-
-Important: The PDF contains an energy invoice with details like invoice number, amounts, dates, customer information, and a detailed table of energy usage and charges.
+${JSON.stringify(documentData, null, 2)}
 
 Please:
 1. Compare each field in the expected result with the actual result
@@ -77,7 +64,6 @@ Please:
 
 Return a JSON object with accuracyScore (number 0-100), passed (boolean), feedback (string), and optionally mismatches array.`;
 
-  // Initialize Gemini model
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   });

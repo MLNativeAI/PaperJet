@@ -104,7 +104,8 @@ export const energaWorkflowConfig: WorkflowConfiguration = {
       ],
       tables: [
         {
-          name: "Sales and distribution table",
+          name: "Energia czynna",
+          description: "Extract only rows that match this category",
           columns: [
             {
               name: "Nazwa towaru lub usługi",
@@ -121,6 +122,10 @@ export const energaWorkflowConfig: WorkflowConfiguration = {
             {
               name: "Jedn. Miary",
               type: "string",
+            },
+            {
+              name: "Stawka VAT",
+              type: "number",
             },
             {
               name: "Cena jedn. netto",
