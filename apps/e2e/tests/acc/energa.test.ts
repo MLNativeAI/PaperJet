@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { WorkflowExecutionStatus, type WorkflowConfiguration } from "@paperjet/engine/types";
 import { expect, test } from "@playwright/test";
 import { LoginPage } from "../page-objects/login-page";
 
@@ -13,130 +14,151 @@ test.describe("Extract energy invoice for Energa", () => {
 
     const file = path.join(process.cwd(), "tests/fixtures/energa/Energa.pdf");
 
-    const newWorkflow = await page.request.post("/api/v1/workflows", {
-      data: {
-        name: "Energa invoice parser",
-        description: "Extracts core invoice information",
-        configuration: {
-          objects: [
+    const configuration: WorkflowConfiguration = {
+      objects: [
+        {
+          name: "Seller details",
+          fields: [
             {
-              name: "Seller details",
-              fields: [
-                {
-                  name: "Seller name",
-                  type: "string",
-                },
-                {
-                  name: "Seller address",
-                  type: "string",
-                },
-                {
-                  name: "Seller NIP",
-                  type: "string",
-                },
-              ],
+              name: "Seller name",
+              type: "string",
             },
             {
-              name: "Buyer details",
-              fields: [
-                {
-                  name: "Buyer name",
-                  type: "string",
-                },
-                {
-                  name: "Buyer address",
-                  type: "string",
-                },
-                {
-                  name: "Buyer NIP",
-                  type: "string",
-                },
-                {
-                  name: "Customer number",
-                  type: "string",
-                },
-              ],
+              name: "Seller address",
+              type: "string",
             },
             {
-              name: "Invoice Data",
-              fields: [
+              name: "Seller NIP",
+              type: "string",
+            },
+          ],
+        },
+        {
+          name: "Buyer details",
+          fields: [
+            {
+              name: "Buyer name",
+              type: "string",
+            },
+            {
+              name: "Buyer address",
+              type: "string",
+            },
+            {
+              name: "Buyer NIP",
+              type: "string",
+            },
+            {
+              name: "Customer number",
+              type: "string",
+            },
+          ],
+        },
+        {
+          name: "Invoice Data",
+          fields: [
+            {
+              name: "Invoice Number",
+              type: "string",
+            },
+            {
+              name: "Billing period start",
+              type: "date",
+            },
+            {
+              name: "Billing period end",
+              type: "date",
+            },
+            {
+              name: "PPE Number",
+              type: "string",
+            },
+            {
+              name: "Total amount",
+              type: "number",
+            },
+            {
+              name: "Invoice Currency",
+              type: "string",
+              description: "3-letter currency code",
+            },
+            {
+              name: "Invoice due date",
+              type: "date",
+            },
+            {
+              name: "Invoice issue date",
+              type: "date",
+            },
+          ],
+        },
+        {
+          name: "Energy usage data",
+          fields: [
+            {
+              name: "Period from",
+              type: "date",
+            },
+            {
+              name: "Period to",
+              type: "date",
+            },
+            {
+              name: "Total MWh",
+              type: "number",
+            },
+            {
+              name: "Należność",
+              type: "number",
+            },
+            {
+              name: "Średnia cenna netto",
+              type: "string",
+            },
+          ],
+          tables: [
+            {
+              name: "Sales and distribution table",
+              columns: [
                 {
-                  name: "Invoice Number",
+                  name: "Nazwa towaru lub usługi",
                   type: "string",
                 },
                 {
-                  name: "Billing period start",
-                  type: "date",
-                },
-                {
-                  name: "Billing period end",
-                  type: "date",
-                },
-                {
-                  name: "PPE Number",
+                  name: "Współczynnik",
                   type: "string",
                 },
                 {
-                  name: "Total amount",
+                  name: "Ilość / Zużycie",
+                  type: "string",
+                },
+                {
+                  name: "Jedn. Miary",
+                  type: "string",
+                },
+                {
+                  name: "Cena jedn. netto",
                   type: "number",
                 },
                 {
-                  name: "Invoice Currency",
-                  type: "string",
-                  description: "3-letter currency code",
-                },
-                {
-                  name: "Invoice due date",
-                  type: "date",
-                },
-                {
-                  name: "Invoice issue date",
-                  type: "date",
-                },
-              ],
-            },
-            {
-              name: "Energy usage data",
-              tables: [
-                {
-                  name: "Sales and distribution",
-                  description: "Refererred to as 'Sprzedaż/dystrybucja energii elektrycznej'.",
-                  columns: [
-                    {
-                      name: "Entry name",
-                      type: "string",
-                    },
-                    {
-                      name: "Net amount",
-                      type: "number",
-                    },
-                    {
-                      name: "VAT rate",
-                      type: "number",
-                    },
-                    {
-                      name: "Tax amount",
-                      type: "number",
-                    },
-                    {
-                      name: "Total amount",
-                      type: "number",
-                    },
-                    {
-                      name: "Period from",
-                      type: "date",
-                    },
-                    {
-                      name: "Period to",
-                      type: "date",
-                    },
-                  ],
+                  name: "Wartość netto",
+                  type: "number",
                 },
               ],
             },
           ],
         },
-      },
+      ],
+    };
+
+    const payload = {
+      name: "Energa invoice parser",
+      description: "Extracts core invoice information",
+      configuration: configuration,
+    };
+
+    const newWorkflow = await page.request.post("/api/v1/workflows", {
+      data: payload,
     });
 
     console.log(JSON.stringify(await newWorkflow.json(), null, 2));
@@ -147,7 +169,6 @@ test.describe("Extract energy invoice for Energa", () => {
 
     console.log(`New workflow ID: ${workflowId}`);
 
-    // 4th request: Execute the workflow with the same file
     const executionResponse = await page.request.post(`/api/v1/workflows/${workflowId}/execute`, {
       multipart: {
         workflowId: workflowId,
@@ -159,12 +180,29 @@ test.describe("Extract energy invoice for Energa", () => {
       },
     });
 
+    expect(executionResponse.ok()).toBeTruthy();
     if (!executionResponse.ok) {
       console.log("Execution failed:", executionResponse.status);
       throw new Error("Failed to execute workflow");
     }
 
-    const executionResult = await executionResponse.json();
-    console.log("Workflow execution started:", executionResult.workflowExecutionId);
+    const { workflowExecutionId } = await executionResponse.json();
+    console.log(`Workflow executionId: ${workflowExecutionId}`);
+
+    let currentStatus = null;
+    while (currentStatus !== WorkflowExecutionStatus.enum.Completed) {
+      const statusResponse = await page.request.fetch(
+        `/api/v1/workflows/${workflowId}/executions/${workflowExecutionId}`,
+      );
+      expect(statusResponse.ok()).toBeTruthy();
+      if (!statusResponse.ok) {
+        console.log("Failed to get status", executionResponse.status);
+        throw new Error("Failed to get status ");
+      }
+      const { status } = await statusResponse.json();
+      console.log(status);
+      await page.waitForTimeout(3000);
+      currentStatus = status;
+    }
   });
 });

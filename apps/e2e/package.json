@@ -16,6 +16,7 @@
     "@playwright/test": "^1.49.0",
     "@types/bun": "latest",
     "@paperjet/shared": "workspace:*",
+    "@paperjet/engine": "workspace:*",
     "@paperjet/api": "workspace:*"
   },
   "peerDependencies": {

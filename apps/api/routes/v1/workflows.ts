@@ -1,12 +1,17 @@
 import { zValidator } from "@hono/zod-validator";
-import { createWorkflowFromApi, updateExecutionJobId, uploadFileAndCreateExecution } from "@paperjet/engine";
+import {
+  createWorkflowFromApi,
+  getWorkflowExecutionById,
+  updateExecutionJobId,
+  uploadFileAndCreateExecution,
+} from "@paperjet/engine";
 import { WorkflowConfigurationSchema } from "@paperjet/engine/types";
 import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
 import { getUser } from "@/lib/auth";
-import { workflowIdSchema } from "@/lib/validation";
+import { workflowExecutionIdSchema, workflowIdSchema } from "@/lib/validation";
 
 const app = new Hono();
 
@@ -31,6 +36,7 @@ const router = app
       logger.info({ workflowId, name: createWorkflowData.name }, "Workflow created");
       return c.json({ workflowId: workflowId, message: "Workflow created" }, 201);
     } catch (error) {
+      // TODO unified error handling for API requests & shared error types
       logger.error(error, "Create workflow error:");
       if (error instanceof Error) {
         return c.json(
@@ -81,7 +87,6 @@ const router = app
         await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
         return c.json({
           ...execution,
-          jobId: jobId,
         });
       } catch (error) {
         logger.error(error, "Re-extract data error:");
@@ -90,6 +95,22 @@ const router = app
         }
         return c.json({ error: "Internal server error" }, 500);
       }
+    },
+  )
+  .get(
+    "/:workflowId/executions/:workflowExecutionId",
+    zValidator(
+      "param",
+      z.object({
+        workflowId: workflowIdSchema,
+        workflowExecutionId: workflowExecutionIdSchema,
+      }),
+    ),
+    async (c) => {
+      const user = await getUser(c);
+      const { workflowExecutionId } = c.req.valid("param");
+      const execution = await getWorkflowExecutionById(workflowExecutionId, user.id);
+      return c.json(execution);
     },
   );
 

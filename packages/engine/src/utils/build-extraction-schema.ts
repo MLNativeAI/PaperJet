@@ -2,27 +2,34 @@ import { z } from "zod";
 import type { WorkflowConfiguration } from "../types";
 
 export function buildExtractionSchema(configuration: WorkflowConfiguration) {
-  const fieldSchemas: Record<string, any> = {};
-  const tableSchemas: Record<string, any> = {};
+  const objectSchemas: Record<string, any> = {};
 
   configuration.objects.forEach((obj) => {
-    if ('fields' in obj) {
-      obj.fields.forEach((field) => {
+    const objectProperties: Record<string, any> = {};
+
+    if ("fields" in obj) {
+      const fieldsSchema: Record<string, any> = {};
+
+      obj.fields?.forEach((field) => {
         switch (field.type) {
           case "number":
-            fieldSchemas[field.name] = z.number().nullable();
+            fieldsSchema[field.name] = z.number().nullable();
             break;
           case "date":
-            fieldSchemas[field.name] = z.string().nullable(); // Date as ISO string
+            fieldsSchema[field.name] = z.string().nullable(); // Date as ISO string
             break;
           default:
-            fieldSchemas[field.name] = z.string().nullable();
+            fieldsSchema[field.name] = z.string().nullable();
         }
       });
+
+      objectProperties.fields = z.object(fieldsSchema);
     }
 
-    if ('tables' in obj) {
-      obj.tables.forEach((table) => {
+    if ("tables" in obj) {
+      const tablesSchema: Record<string, any> = {};
+
+      obj.tables?.forEach((table) => {
         const columnSchemas: Record<string, any> = {};
 
         table.columns.forEach((col) => {
@@ -38,10 +45,14 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
           }
         });
 
-        tableSchemas[table.name] = z.array(z.object(columnSchemas));
+        tablesSchema[table.name] = z.array(z.object(columnSchemas));
       });
+
+      objectProperties.tables = z.object(tablesSchema);
     }
+
+    objectSchemas[obj.name] = z.object(objectProperties);
   });
 
-  return z.object({ ...fieldSchemas, ...tableSchemas });
+  return z.object(objectSchemas);
 }

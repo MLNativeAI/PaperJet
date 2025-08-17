@@ -11,7 +11,7 @@ export const prefixedIdSchema = (prefix: string) =>
 
 export const workflowIdSchema = prefixedIdSchema("wkf");
 export const fileIdSchema = prefixedIdSchema("fil");
-export const executionIdSchema = prefixedIdSchema("run");
+export const workflowExecutionIdSchema = prefixedIdSchema("exe");
 export const userIdSchema = prefixedIdSchema("usr");
 
 // Flexible ID schema that accepts either UUID or prefixed format for backward compatibility

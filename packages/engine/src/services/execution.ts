@@ -1,6 +1,6 @@
 import { db } from "@paperjet/db";
 import { workflowExecution } from "@paperjet/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
   await db
@@ -9,4 +9,14 @@ export async function updateExecutionJobId(executionId: string, jobId: string) {
       jobId,
     })
     .where(eq(workflowExecution.id, executionId));
+}
+
+export async function getWorkflowExecutionById(workflowExecutionId: string, userId: string) {
+  const exeuction = await db.query.workflowExecution.findFirst({
+    where: and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)),
+  });
+  if (!exeuction) {
+    throw new Error("not found");
+  }
+  return exeuction;
 }

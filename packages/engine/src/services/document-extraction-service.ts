@@ -38,39 +38,45 @@ export async function runDocumentExtraction(
   // Build dynamic schema object based on provided fields and tables
   const schemaObj = buildExtractionSchema(configuration);
 
-  // Build extraction prompt with field descriptions
-  const fieldDescriptions: string[] = [];
-  const tableDescriptions: string[] = [];
+  // Build extraction prompt with structured object descriptions
+  const objectDescriptions: string[] = [];
 
   configuration.objects.forEach((obj) => {
-    if ('fields' in obj) {
-      obj.fields.forEach((field) => {
-        fieldDescriptions.push(`- ${field.name} (${field.type})`);
+    let objDesc = `\n${obj.name.toUpperCase()}:`;
+
+    if ("fields" in obj) {
+      objDesc += `\n  Fields:`;
+      obj.fields?.forEach((field) => {
+        objDesc += `\n    - ${field.name} (${field.type})`;
       });
     }
-    if ('tables' in obj) {
-      obj.tables.forEach((table) => {
-        const columnDescs = table.columns.map((col) => `    - ${col.name} (${col.type})`).join("\n");
-        tableDescriptions.push(`- ${table.name}: ${table.description || ''}\n${columnDescs}`);
+
+    if ("tables" in obj) {
+      objDesc += `\n  Tables:`;
+      obj.tables?.forEach((table) => {
+        objDesc += `\n    - ${table.name}: ${table.description || ""}`;
+        table.columns.forEach((col) => {
+          objDesc += `\n      - ${col.name} (${col.type})`;
+        });
       });
     }
+
+    objectDescriptions.push(objDesc);
   });
 
   const prompt = `Extract the following information from this document:
 
-FIELDS TO EXTRACT:
-${fieldDescriptions.join("\n")}
-
-${tableDescriptions.length > 0 ? `TABLES TO EXTRACT:\n${tableDescriptions.join("\n")}` : ""}
+EXTRACTION STRUCTURE:
+${objectDescriptions.join("\n")}
 
 Instructions:
 - Extract exact values as they appear in the document
-- For currency fields, extract as numbers (remove currency symbols)
+- For number fields, extract as numbers (remove currency symbols for currency)
 - For date fields, use ISO format (YYYY-MM-DD)
-- For boolean fields, return true/false based on presence or checkmarks
 - If a field is not found or unclear, return null
 - For tables, extract all rows found
-- Maintain data accuracy and completeness`;
+- Maintain data accuracy and completeness
+- Structure the output to match the object hierarchy shown above`;
   const result = await generateObject("document-extraction", {
     schema: schemaObj,
     messages: [

@@ -86,7 +86,7 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => file.id, { onDelete: "cascade" }),
   jobId: text(),
   status: text("status").notNull(), // 'pending', 'processing', 'completed', 'failed'
-  extractionResult: text("extraction_result"), // JSON result for the file
+  extractionResult: jsonb("extraction_result"), // JSON result for the file
   errorMessage: text("error_message"),
   startedAt: timestamp("started_at").notNull(),
   completedAt: timestamp("completed_at"),
