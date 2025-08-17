@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -76,6 +77,7 @@ export const workflow = pgTable("workflow", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// represent the job execution of a given worklow. Does not store any result data
 export const workflowExecution = pgTable("workflow_execution", {
   id: text("id").primaryKey(),
   workflowId: text("workflow_id")
@@ -86,7 +88,6 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => file.id, { onDelete: "cascade" }),
   jobId: text(),
   status: text("status").notNull(), // 'pending', 'processing', 'completed', 'failed'
-  extractionResult: jsonb("extraction_result"), // JSON result for the file
   errorMessage: text("error_message"),
   startedAt: timestamp("started_at").notNull(),
   completedAt: timestamp("completed_at"),
@@ -96,11 +97,15 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+// stores the input and output of a given workflow
 export const documentData = pgTable("document_data", {
   id: text("id").primaryKey(),
   rawMarkdown: text("raw_markdown"),
+  extractedData: jsonb(),
+  workflowId: text("workflow_id").references(() => workflow.id, { onDelete: "set null" }),
   workflowExecutionId: text("workflow_execution_id").references(() => workflowExecution.id, { onDelete: "set null" }),
-  createdAt: timestamp("created_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const documentPage = pgTable("document_page", {

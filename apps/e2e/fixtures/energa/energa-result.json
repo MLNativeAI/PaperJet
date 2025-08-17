@@ -1,0 +1,218 @@
+{
+  "Invoice Data": {
+    "fields": {
+      "PPE Number": "720155902438567149",
+      "Total amount": 399061.41,
+      "Invoice Number": "501016067/69/W/2024",
+      "Invoice Currency": "zł",
+      "Invoice due date": "2024-09-19",
+      "Billing period end": "2024-08-31",
+      "Invoice issue date": "2024-09-05",
+      "Billing period start": "2024-07-31"
+    }
+  },
+  "Buyer details": {
+    "fields": {
+      "Buyer NIP": "4436526255",
+      "Buyer name": "Gumiś Industries",
+      "Buyer address": "Olejowa 5 45-666 Stumilowy Las",
+      "Customer number": "6922960434"
+    }
+  },
+  "Seller details": {
+    "fields": {
+      "Seller NIP": "957-096-83-70",
+      "Seller name": "ENERGA - OBRÓT SA",
+      "Seller address": "Al. Grunwaldzka 472, 80-309 Gdańsk"
+    }
+  },
+  "Energy usage data": {
+    "fields": {
+      "Period to": "2024-08-31",
+      "Total MWh": 430.947,
+      "Period from": "2024-07-31",
+      "Należność": 324440.17,
+      "Średnia cenna netto": "752,85 zł/MWh"
+    },
+    "tables": {
+      "Sales and distribution table": [
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 42516.75,
+          "Cena jedn. netto": 546.79,
+          "Ilość / Zużycie": "77,757",
+          "Nazwa towaru lub usługi": "Energia czynna szczyt przedpołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 23623.52,
+          "Cena jedn. netto": 546.79,
+          "Ilość / Zużycie": "43,204",
+          "Nazwa towaru lub usługi": "Energia czynna szczyt popołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 169497.24,
+          "Cena jedn. netto": 546.79,
+          "Ilość / Zużycie": "309,986",
+          "Nazwa towaru lub usługi": "Energia czynna reszta doby"
+        },
+        {
+          "Jedn. Miary": "zł/mc",
+          "Współczynnik": null,
+          "Wartość netto": 205,
+          "Cena jedn. netto": 205,
+          "Ilość / Zużycie": "1,00",
+          "Nazwa towaru lub usługi": "Opłata handlowa"
+        },
+        {
+          "Jedn. Miary": "kW",
+          "Współczynnik": null,
+          "Wartość netto": 25630,
+          "Cena jedn. netto": 23.3,
+          "Ilość / Zużycie": "1.100",
+          "Nazwa towaru lub usługi": "Składnik stały stawki sieciowej"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 6107.81,
+          "Cena jedn. netto": 78.55,
+          "Ilość / Zużycie": "77,757",
+          "Nazwa towaru lub usługi": "Składnik zmienny stawki sieciowej szczyt przedpołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 4217.14,
+          "Cena jedn. netto": 97.61,
+          "Ilość / Zużycie": "43,204",
+          "Nazwa towaru lub usługi": "Składnik zmienny stawki sieciowej szczyt popołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 9116.69,
+          "Cena jedn. netto": 29.41,
+          "Ilość / Zużycie": "309,986",
+          "Nazwa towaru lub usługi": "Składnik zmienny stawki sieciowej reszta doby"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 13536.05,
+          "Cena jedn. netto": 31.41,
+          "Ilość / Zużycie": "430,947",
+          "Nazwa towaru lub usługi": "Stawka jakościowa"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 0,
+          "Cena jedn. netto": 0,
+          "Ilość / Zużycie": "430,947",
+          "Nazwa towaru lub usługi": "Opłata OZE"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 2663.25,
+          "Cena jedn. netto": 6.18,
+          "Ilość / Zużycie": "430,947",
+          "Nazwa towaru lub usługi": "Opłata kogeneracyjna"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 9029.4,
+          "Cena jedn. netto": 126.7,
+          "Ilość / Zużycie": "71,266",
+          "Nazwa towaru lub usługi": "Opłata mocowa"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 7305.9,
+          "Cena jedn. netto": 126.7,
+          "Ilość / Zużycie": "57,663",
+          "Nazwa towaru lub usługi": "Opłata mocowa"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 10271.44,
+          "Cena jedn. netto": 126.7,
+          "Ilość / Zużycie": "81,069",
+          "Nazwa towaru lub usługi": "Opłata mocowa"
+        },
+        {
+          "Jedn. Miary": "kW",
+          "Współczynnik": null,
+          "Wartość netto": 209,
+          "Cena jedn. netto": 0.19,
+          "Ilość / Zużycie": "1.100",
+          "Nazwa towaru lub usługi": "Stawka opłaty przejściowej"
+        },
+        {
+          "Jedn. Miary": "zł/mc",
+          "Współczynnik": "1,00",
+          "Wartość netto": 14.5,
+          "Cena jedn. netto": 14.5,
+          "Ilość / Zużycie": null,
+          "Nazwa towaru lub usługi": "Abonament"
+        },
+        {
+          "Jedn. Miary": "Mvarh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 16.76,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "0,032",
+          "Nazwa towaru lub usługi": "Energia bierna pojemnościowa szczyt przedpołudniowy"
+        },
+        {
+          "Jedn. Miary": "Mvarh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 1.05,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "0,002",
+          "Nazwa towaru lub usługi": "Energia bierna pojemnościowa szczyt popołudniowy"
+        },
+        {
+          "Jedn. Miary": "Mvarh",
+          "Współczynnik": "1,00",
+          "Wartość netto": 478.67,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "0,914",
+          "Nazwa towaru lub usługi": "Energia bierna pojemnościowa reszta doby"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 0,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "77,757",
+          "Nazwa towaru lub usługi": "Energia bierna indukcyjna szczyt przedpołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 0,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "43,204",
+          "Nazwa towaru lub usługi": "Energia bierna indukcyjna szczyt popołudniowy"
+        },
+        {
+          "Jedn. Miary": "MWh",
+          "Współczynnik": null,
+          "Wartość netto": 0,
+          "Cena jedn. netto": 523.71,
+          "Ilość / Zużycie": "309,986",
+          "Nazwa towaru lub usługi": "Energia bierna indukcyjna reszta doby"
+        }
+      ]
+    }
+  }
+}

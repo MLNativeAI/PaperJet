@@ -28,6 +28,12 @@ export async function extractDataFromMarkdown(workflowId: string, workflowExecut
   }
   const validConfig = workflowData.configuration as WorkflowConfiguration;
   const extractionResult = await runDocumentExtraction(dataDoc.rawMarkdown, validConfig);
+  await db
+    .update(documentData)
+    .set({
+      extractedData: extractionResult,
+    })
+    .where(eq(documentData.id, dataDoc.id));
   logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
 
