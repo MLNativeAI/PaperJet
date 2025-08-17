@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import {
   createWorkflowFromApi,
   getWorkflowExecutionById,
+  getWorkflowExecutionWithExtractedData,
   updateExecutionJobId,
   uploadFileAndCreateExecution,
 } from "@paperjet/engine";
@@ -109,7 +110,7 @@ const router = app
     async (c) => {
       const user = await getUser(c);
       const { workflowExecutionId } = c.req.valid("param");
-      const execution = await getWorkflowExecutionById(workflowExecutionId, user.id);
+      const execution = await getWorkflowExecutionWithExtractedData(workflowExecutionId, user.id);
       return c.json(execution);
     },
   );

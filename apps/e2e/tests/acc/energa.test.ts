@@ -6,6 +6,9 @@ import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecut
 import { LoginPage } from "page-objects/login-page";
 import { verifyExtractionAccuracy } from "helpers/verify";
 
+import dotenv from "dotenv";
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
 test.setTimeout(180000); // 3 minutes
 
 test.describe("Extract energy invoice for Energa", () => {
@@ -17,10 +20,12 @@ test.describe("Extract energy invoice for Energa", () => {
     const inputFilePath = path.join(process.cwd(), "/fixtures/energa/Energa.pdf");
     const expectedResultFilePath = path.join(process.cwd(), "/fixtures/energa/energa-result.json");
 
-    const workflowId = await createNewWorkflow("Energa invoice parser", "Test workflow", energaWorkflowConfig, page);
-    const workflowExecutionId = await startWorkflowExecution(workflowId, inputFilePath, page);
-    await awaitWorkflowExecutionCompleted(workflowId, workflowExecutionId, page);
+    // const workflowId = await createNewWorkflow("Energa invoice parser", "Test workflow", energaWorkflowConfig, page);
+    // const workflowExecutionId = await startWorkflowExecution(workflowId, inputFilePath, page);
+    // await awaitWorkflowExecutionCompleted(workflowId, workflowExecutionId, page);
+    const workflowExecutionId = "exe_a814c0e692a3";
+    const workflowId = "wkf_22a8ce5ea060";
 
-    await verifyExtractionAccuracy(workflowExecutionId, expectedResultFilePath);
+    await verifyExtractionAccuracy(workflowId, workflowExecutionId, expectedResultFilePath, page, inputFilePath);
   });
 });

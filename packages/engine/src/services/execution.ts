@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db";
-import { workflowExecution } from "@paperjet/db/schema";
+import { documentData, workflowExecution } from "@paperjet/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
@@ -19,4 +19,22 @@ export async function getWorkflowExecutionById(workflowExecutionId: string, user
     throw new Error("not found");
   }
   return exeuction;
+}
+
+export async function getWorkflowExecutionWithExtractedData(workflowExecutionId: string, userId: string) {
+  const execution = await db.query.workflowExecution.findFirst({
+    where: and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)),
+  });
+  if (!execution) {
+    throw new Error("not found");
+  }
+
+  const docData = await db.query.documentData.findFirst({
+    where: eq(documentData.workflowExecutionId, workflowExecutionId),
+  });
+
+  return {
+    ...execution,
+    documentData: docData ? docData.extractedData : null,
+  };
 }
