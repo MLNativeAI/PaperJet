@@ -23,14 +23,14 @@ const createWorkflowApiSchema = z.object({
 
 function validateFiles(body: any): { success: true; files: File[] } | { success: false; error: string } {
   const files = body.files;
-  
+
   // Convert to array if single file or already array
   const fileArray = Array.isArray(files) ? files : [files].filter(Boolean);
-  
+
   if (fileArray.length === 0) {
     return { success: false, error: "At least one file is required" };
   }
-  
+
   // Validate each file
   for (const file of fileArray) {
     if (!(file instanceof File) || file.size === 0) {
@@ -40,7 +40,7 @@ function validateFiles(body: any): { success: true; files: File[] } | { success:
       return { success: false, error: "All files must be PDFs" };
     }
   }
-  
+
   return { success: true, files: fileArray };
 }
 
@@ -131,15 +131,15 @@ const router = app
       try {
         const user = await getUser(c);
         const { workflowId } = c.req.valid("param");
-        
+
         // Parse and validate files
         const body = await c.req.parseBody();
         const validation = validateFiles(body);
-        
+
         if (!validation.success) {
           return c.json({ error: validation.error }, 400);
         }
-        
+
         const fileArray = validation.files;
 
         const executions = [];

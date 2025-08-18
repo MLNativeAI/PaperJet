@@ -11,8 +11,8 @@ import { type auth, authHandler, requireAuth } from "./lib/auth";
 import { corsMiddleware } from "./lib/cors";
 import { withContext } from "./lib/with-context";
 import admin from "./routes/admin";
-import v1Workflows from "./routes/v1/workflows";
 import v1Executions from "./routes/v1/executions";
+import v1Workflows from "./routes/v1/workflows";
 import workflows from "./routes/workflows";
 
 const app = new Hono<{

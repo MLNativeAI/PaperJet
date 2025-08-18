@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { toast } from "sonner";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
+import { ExtractedDataRenderer } from "@/components/extracted-data-renderer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getExecutionById } from "@/lib/api/executions";
+import { useExecution } from "@/hooks/use-execution";
 import { formatDuration } from "@/lib/utils/date";
 
 function exportResults() {
@@ -15,14 +15,7 @@ export default function ExecutionPage() {
   const { executionId } = useParams({ from: "/_app/executions/$executionId" });
   const navigate = useNavigate();
 
-  const {
-    data: execution,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["execution", executionId],
-    queryFn: () => getExecutionById(executionId),
-  });
+  const { execution, isLoading, error } = useExecution(executionId);
 
   if (isLoading) {
     return <div className="w-full px-4 py-8">Loading execution...</div>;
@@ -89,6 +82,10 @@ export default function ExecutionPage() {
           </div>
         </CardContent>
       </Card>
+
+      {execution.status === "Completed" && execution.extractedData && (
+        <ExtractedDataRenderer data={execution.extractedData} />
+      )}
     </div>
   );
 }

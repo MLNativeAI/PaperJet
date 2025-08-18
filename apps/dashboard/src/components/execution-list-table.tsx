@@ -23,7 +23,6 @@ import {
 } from "@tanstack/react-table";
 import { Calendar, FileText } from "lucide-react";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
-import { formatDuration } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,6 +34,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatDuration } from "@/lib/utils/date";
 
 function onExportRun(execution: WorkflowExecutionRow) {
   // TODO: Implement export functionality

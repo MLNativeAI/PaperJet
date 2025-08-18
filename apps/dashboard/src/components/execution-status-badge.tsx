@@ -1,6 +1,6 @@
+import { CheckCircle, Clock, Loader, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Clock, CheckCircle, XCircle, Loader } from "lucide-react";
 
 type ExecutionStatus = "Queued" | "Processing" | "Completed" | "Failed";
 
@@ -43,7 +43,7 @@ export function ExecutionStatusBadge({ status, className }: ExecutionStatusBadge
         "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium",
         config.className,
         status === "Processing" && "animate-pulse",
-        className
+        className,
       )}
     >
       <Icon className={cn("h-3 w-3", status === "Processing" && "animate-spin")} />

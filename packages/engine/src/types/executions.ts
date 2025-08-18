@@ -15,6 +15,25 @@ export type WorkflowExecutionRow = {
   completedAt: string | null;
 };
 
+export type ExtractedFieldData = {
+  [fieldName: string]: string | number | Date | null;
+};
+
+export type ExtractedTableData = {
+  [tableName: string]: Array<{
+    [columnName: string]: string | number | Date | null;
+  }>;
+};
+
+export type ExtractedObjectData = {
+  fields?: ExtractedFieldData;
+  tables?: ExtractedTableData;
+};
+
+export type ExtractedDataType = {
+  [objectName: string]: ExtractedObjectData;
+} | null;
+
 export type WorkflowExecutionData = {
   status: WorkflowExecutionStatus;
   id: string;
@@ -28,5 +47,5 @@ export type WorkflowExecutionData = {
   errorMessage: string | null;
   startedAt: string;
   completedAt: string | null;
-  extractedData: any;
+  extractedData: ExtractedDataType;
 };
