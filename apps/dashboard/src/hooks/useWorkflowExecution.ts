@@ -1,8 +1,6 @@
-import { executeWorkflowBulk } from "@/lib/api/workflow";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-type ExecutionStatus = "pending" | "processing" | "completed" | "failed";
+import { executeWorkflowBulk } from "@/lib/api/workflow";
 
 export function useWorkflowExecution(workflowId: string) {
   const executeWorkflow = useMutation({

@@ -1,9 +1,5 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Plus } from "lucide-react";
 import { FileUpload } from "@/components/file-upload";
-import { Button } from "@/components/ui/button";
-import { WorkflowHeader } from "@/components/workflow-header";
-import { useWorkflow } from "@/hooks/useWorkflow";
 import { useWorkflowExecution } from "@/hooks/useWorkflowExecution";
 
 export default function WorkflowExecutorPage() {

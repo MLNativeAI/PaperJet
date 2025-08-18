@@ -21,6 +21,29 @@ const createWorkflowApiSchema = z.object({
   configuration: WorkflowConfigurationSchema,
 });
 
+function validateFiles(body: any): { success: true; files: File[] } | { success: false; error: string } {
+  const files = body.files;
+  
+  // Convert to array if single file or already array
+  const fileArray = Array.isArray(files) ? files : [files].filter(Boolean);
+  
+  if (fileArray.length === 0) {
+    return { success: false, error: "At least one file is required" };
+  }
+  
+  // Validate each file
+  for (const file of fileArray) {
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, error: "Invalid file" };
+    }
+    if (file.type !== "application/pdf") {
+      return { success: false, error: "All files must be PDFs" };
+    }
+  }
+  
+  return { success: true, files: fileArray };
+}
+
 const router = app
   .post("/", zValidator("json", createWorkflowApiSchema), async (c) => {
     try {
@@ -104,25 +127,25 @@ const router = app
         workflowId: workflowIdSchema,
       }),
     ),
-    zValidator(
-      "form",
-      z.object({
-        files: z
-          .array(z.instanceof(File))
-          .min(1, "At least one file is required")
-          .refine((files) => files.every((file) => file.size > 0), "Files cannot be empty")
-          .refine((files) => files.every((file) => file.type === "application/pdf"), "All files must be PDFs"),
-      }),
-    ),
     async (c) => {
       try {
         const user = await getUser(c);
         const { workflowId } = c.req.valid("param");
-        const { files } = c.req.valid("form");
+        
+        // Parse and validate files
+        const body = await c.req.parseBody();
+        const validation = validateFiles(body);
+        
+        if (!validation.success) {
+          return c.json({ error: validation.error }, 400);
+        }
+        
+        const fileArray = validation.files;
 
         const executions = [];
 
-        for (const file of files) {
+        // Process each file and create executions
+        for (const file of fileArray) {
           const execution = await uploadFileAndCreateExecution(workflowId, user.id, file);
           const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
             workflowId: execution.workflowId,
