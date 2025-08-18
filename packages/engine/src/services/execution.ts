@@ -95,3 +95,7 @@ export async function getWorkflowExecutionWithExtractedData(
     extractedData: execution.extractedData || null,
   };
 }
+
+export function exportExecution(executionId: string, mode: "csv" | "json", userId: string) {
+  throw new Error("Function not implemented.");
+}

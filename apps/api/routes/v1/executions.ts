@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { getAllWorkflowExecutions, getWorkflowExecutionWithExtractedData } from "@paperjet/engine";
+import { exportExecution, getAllWorkflowExecutions, getWorkflowExecutionWithExtractedData } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
@@ -39,6 +39,34 @@ const router = app
           return c.json({ error: "Execution not found" }, 404);
         }
         return c.json({ error: "Failed to get execution" }, 500);
+      }
+    },
+  )
+  .get(
+    "/:executionId/export",
+    zValidator(
+      "param",
+      z.object({
+        executionId: workflowExecutionIdSchema,
+      }),
+    ),
+    zValidator(
+      "query",
+      z.object({
+        mode: z.enum(["csv", "json"]),
+      }),
+    ),
+    async (c) => {
+      try {
+        const user = await getUser(c);
+        const { executionId } = c.req.valid("param");
+        const { mode } = c.req.valid("query");
+        await exportExecution(executionId, mode, user.id);
+
+        return c.json([]);
+      } catch (error) {
+        logger.error("export failed");
+        return c.json({ error: "Failed to export execution" }, 500);
       }
     },
   );

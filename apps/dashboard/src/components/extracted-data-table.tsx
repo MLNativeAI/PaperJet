@@ -9,26 +9,6 @@ interface ExtractedDataTableProps {
 }
 
 export function ExtractedDataTable({ name, data }: ExtractedDataTableProps) {
-  const formatTableName = (name: string) => {
-    return name
-      .replace(/([A-Z])/g, " $1")
-      .replace(/_/g, " ")
-      .trim()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-
-  const formatColumnName = (name: string) => {
-    return name
-      .replace(/([A-Z])/g, " $1")
-      .replace(/_/g, " ")
-      .trim()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-
   const formatCellValue = (value: string | number | Date | null) => {
     if (value === null || value === undefined) {
       return <span className="text-muted-foreground italic">-</span>;
@@ -78,7 +58,7 @@ export function ExtractedDataTable({ name, data }: ExtractedDataTableProps) {
     return (
       <div className="border rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
-          <h5 className="font-medium">{formatTableName(name)}</h5>
+          <h5 className="font-medium">{name}</h5>
           <Badge variant="outline" className="text-xs">
             Empty
           </Badge>
@@ -93,7 +73,7 @@ export function ExtractedDataTable({ name, data }: ExtractedDataTableProps) {
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="flex items-center justify-between p-3 border-b bg-muted/30">
-        <h5 className="font-medium">{formatTableName(name)}</h5>
+        <h5 className="font-medium">{name}</h5>
         <Badge variant="outline" className="text-xs">
           {data.length} {data.length === 1 ? "row" : "rows"}
         </Badge>
@@ -104,13 +84,14 @@ export function ExtractedDataTable({ name, data }: ExtractedDataTableProps) {
             <TableRow>
               {columns.map((column) => (
                 <TableHead key={column} className="whitespace-nowrap">
-                  {formatColumnName(column)}
+                  {column}
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((row, rowIndex) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: good enough
               <TableRow key={rowIndex}>
                 {columns.map((column) => (
                   <TableCell key={column} className="whitespace-nowrap">

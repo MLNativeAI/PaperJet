@@ -31,7 +31,6 @@ export default function ExecutionPage() {
 
   return (
     <div className="w-full px-4 py-8 space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <Button variant="ghost" onClick={() => navigate({ to: "/executions" })} className="mb-4">

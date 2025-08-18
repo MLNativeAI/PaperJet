@@ -7,16 +7,6 @@ interface ExtractedDataFieldProps {
 }
 
 export function ExtractedDataField({ name, value }: ExtractedDataFieldProps) {
-  const formatFieldName = (name: string) => {
-    return name
-      .replace(/([A-Z])/g, " $1")
-      .replace(/_/g, " ")
-      .trim()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-
   const getFieldType = (value: string | number | Date | null) => {
     if (value === null || value === undefined) return "empty";
     if (typeof value === "number") return "number";
