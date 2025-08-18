@@ -19,7 +19,7 @@ export async function analyzeWorkflowDocument(workflowId: string): Promise<void>
       workflowId: workflow.id,
       workflowName: workflow.slug,
       fileId: workflow.fileId,
-      filename: file.filename,
+      filename: file.fileName,
       ownerId: workflow.ownerId,
     })
     .from(workflow)

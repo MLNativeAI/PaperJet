@@ -9,7 +9,7 @@ import { generateId, ID_PREFIXES } from "../utils/id";
 export async function splitPdfIntoImages(workflowExecutionId: string) {
   const result = await db
     .select({
-      filename: file.filename,
+      filename: file.fileName,
     })
     .from(file)
     .leftJoin(workflowExecution, eq(workflowExecution.fileId, file.id))

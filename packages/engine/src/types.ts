@@ -150,3 +150,4 @@ export type UsageStats = {
 };
 
 export * from "./types/workflow-config";
+export * from "./types/executions";

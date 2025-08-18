@@ -1,5 +1,5 @@
 import { db } from "@paperjet/db";
-import { configuration, file, workflow, workflowExecution } from "@paperjet/db/schema";
+import { file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import { type Workflow, type WorkflowConfiguration, WorkflowExecutionStatus } from "../types";
@@ -37,11 +37,11 @@ export async function getDocumentForFile(fileId: string, userId: string) {
   }
 
   // Get presigned URL for the file
-  const presignedUrl = s3Client.presign(fileRecord.filename);
+  const presignedUrl = s3Client.presign(fileRecord.fileName);
 
   const result = {
     fileId,
-    filename: fileRecord.filename,
+    filename: fileRecord.fileName,
     presignedUrl,
   };
 
@@ -65,7 +65,7 @@ export async function uploadFileAndCreateExecution(workflowId: string, userId: s
   await s3Client.file(filename).write(await uploadedFile.arrayBuffer());
   await db.insert(file).values({
     id: fileId,
-    filename,
+    fileName: uploadedFile.name,
     ownerId: userId,
     createdAt: new Date(),
   });

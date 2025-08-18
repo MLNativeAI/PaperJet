@@ -11,8 +11,8 @@ import { type auth, authHandler, requireAuth } from "./lib/auth";
 import { corsMiddleware } from "./lib/cors";
 import { withContext } from "./lib/with-context";
 import admin from "./routes/admin";
-import executions from "./routes/executions";
 import v1Workflows from "./routes/v1/workflows";
+import v1Executions from "./routes/v1/executions";
 import workflows from "./routes/workflows";
 
 const app = new Hono<{
@@ -47,20 +47,16 @@ app.get("/api/health", async (c) => {
   });
 });
 
-export const internalApiRoutes = app
-  .basePath("/api")
-  .route("/workflows", workflows)
-  .route("/executions", executions)
-  .route("/admin", admin);
+export const internalApiRoutes = app.basePath("/api").route("/workflows", workflows).route("/admin", admin);
 
 export const publicApiRoutes = app.basePath("/api/v1").route("/workflows", v1Workflows);
 
 export const combinedApiRoutes = app
   .basePath("/api")
   .route("/workflows", workflows)
-  .route("/executions", executions)
   .route("/admin", admin)
-  .route("/v1/workflows", v1Workflows);
+  .route("/v1/workflows", v1Workflows)
+  .route("/v1/executions", v1Executions);
 
 if (process.env.NODE_ENV === "production") {
   // Serve all static files from the dist directory

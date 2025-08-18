@@ -26,8 +26,8 @@ const data = {
       icon: FileText,
     },
     {
-      title: "Runs",
-      url: "/runs",
+      title: "Executions",
+      url: "/executions",
       icon: Play,
     },
     {

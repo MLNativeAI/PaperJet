@@ -1,3 +1,4 @@
+import type { WorkflowExecutionRow } from "@paperjet/engine/types";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -11,7 +12,6 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import {
   type ColumnDef,
-  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -19,14 +19,11 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type SortingState,
   useReactTable,
-  type VisibilityState,
 } from "@tanstack/react-table";
-import { Calendar, CheckCircle, Clock, FileText, XCircle } from "lucide-react";
-import * as React from "react";
-
-import { Badge } from "@/components/ui/badge";
+import { Calendar, FileText } from "lucide-react";
+import { ExecutionStatusBadge } from "@/components/execution-status-badge";
+import { formatDuration } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -39,64 +36,20 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-type ExecutionStatus = "pending" | "processing" | "completed" | "failed";
-
-interface RunData {
-  id: string;
-  workflowName: string;
-  filename: string | null;
-  status: ExecutionStatus;
-  startedAt: string;
-  completedAt: string | null;
-  errorMessage?: string;
-  extractionResult?: any;
+function onExportRun(execution: WorkflowExecutionRow) {
+  // TODO: Implement export functionality
+  console.log("Export execution:", execution.id);
 }
 
-interface RunsDataTableProps {
-  data: RunData[];
-  onExportRun: (run: RunData) => void;
-  onDeleteRun: (run: RunData) => void;
-  formatDuration: (startedAt: string, completedAt: string | null) => string;
+function onDeleteRun(execution: WorkflowExecutionRow) {
+  // TODO: Implement delete functionality
+  console.log("Delete execution:", execution.id);
 }
 
-const getStatusIcon = (status: ExecutionStatus) => {
-  switch (status) {
-    case "pending":
-      return <Clock className="h-4 w-4 text-muted-foreground" />;
-    case "processing":
-      return <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />;
-    case "completed":
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
-    case "failed":
-      return <XCircle className="h-4 w-4 text-red-600" />;
-  }
-};
-
-const getStatusColor = (status: ExecutionStatus): "secondary" | "default" | "destructive" => {
-  switch (status) {
-    case "pending":
-      return "secondary";
-    case "processing":
-      return "default";
-    case "completed":
-      return "default";
-    case "failed":
-      return "destructive";
-  }
-};
-
-export function RunsDataTable({ data, onExportRun, onDeleteRun, formatDuration }: RunsDataTableProps) {
+export function ExecutionListTable({ data }: { data: WorkflowExecutionRow[] }) {
   const navigate = useNavigate();
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
 
-  const columns: ColumnDef<RunData>[] = [
+  const columns: ColumnDef<WorkflowExecutionRow>[] = [
     {
       accessorKey: "workflowName",
       header: "Workflow Name",
@@ -109,19 +62,14 @@ export function RunsDataTable({ data, onExportRun, onDeleteRun, formatDuration }
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4 text-muted-foreground" />
-          <span>{row.original.filename || "N/A"}</span>
+          <span>{row.original.fileName || "N/A"}</span>
         </div>
       ),
     },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          {getStatusIcon(row.original.status)}
-          <Badge variant={getStatusColor(row.original.status)}>{row.original.status}</Badge>
-        </div>
-      ),
+      cell: ({ row }) => <ExecutionStatusBadge status={row.original.status} />,
     },
     {
       accessorKey: "startedAt",
@@ -149,7 +97,7 @@ export function RunsDataTable({ data, onExportRun, onDeleteRun, formatDuration }
             <IconEye className="h-4 w-4 mr-2" />
             View
           </Button>
-          {row.original.status === "completed" && row.original.extractionResult && (
+          {row.original.status === "Completed" && (
             <Button variant="outline" size="sm" onClick={() => onExportRun(row.original)}>
               <IconDownload className="h-4 w-4 mr-2" />
               Export
@@ -171,14 +119,14 @@ export function RunsDataTable({ data, onExportRun, onDeleteRun, formatDuration }
                 <IconEye className="h-4 w-4 mr-2" />
                 View Details
               </DropdownMenuItem>
-              {row.original.status === "completed" && row.original.extractionResult && (
+              {row.original.status === "Completed" && (
                 <DropdownMenuItem onClick={() => onExportRun(row.original)}>
                   <IconDownload className="h-4 w-4 mr-2" />
                   Download Result
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => onDeleteRun(row.original)}>
+              <DropdownMenuItem onClick={() => onDeleteRun(row.original)} className="text-destructive">
                 <IconTrash className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -192,20 +140,7 @@ export function RunsDataTable({ data, onExportRun, onDeleteRun, formatDuration }
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-      pagination,
-    },
     getRowId: (row) => row.id,
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

@@ -1,6 +1,17 @@
 import { sql } from "drizzle-orm";
 import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
+
+export const structuredOutputModeEnum = pgEnum("structuredOutputMode", ["json", "tool"]);
+
+export const workflowExecutionStatusEnum = pgEnum("workflowExecutionStatus", [
+  "Queued",
+  "Processing",
+  "Completed",
+  "Failed",
+]);
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -58,7 +69,7 @@ export const verification = pgTable("verification", {
 
 export const file = pgTable("file", {
   id: text("id").primaryKey(),
-  filename: text("filename").notNull(),
+  fileName: text("filename").notNull(),
   createdAt: timestamp("created_at").notNull(),
   ownerId: text("owner_id")
     .notNull()
@@ -87,7 +98,7 @@ export const workflowExecution = pgTable("workflow_execution", {
     .notNull()
     .references(() => file.id, { onDelete: "cascade" }),
   jobId: text(),
-  status: text("status").notNull(), // 'pending', 'processing', 'completed', 'failed'
+  status: workflowExecutionStatusEnum("status").notNull().default("Queued"),
   errorMessage: text("error_message"),
   startedAt: timestamp("started_at").notNull(),
   completedAt: timestamp("completed_at"),
@@ -143,10 +154,6 @@ export const usageData = pgTable("usage_data", {
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
-
-export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
-
-export const structuredOutputModeEnum = pgEnum("structuredOutputMode", ["json", "tool"]);
 
 export const configuration = pgTable("configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),

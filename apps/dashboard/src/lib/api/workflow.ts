@@ -6,6 +6,7 @@ const apiClient = hc<ApiRoutes>("/");
 const bulkExecute = apiClient.api.v1.workflows[":workflowId"]["execute-bulk"].$post;
 
 export type BulkExecuteResponse = InferResponseType<typeof bulkExecute>;
+
 export const executeWorkflowBulk = async (workflowId: string, files: File[]): Promise<any> => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));

@@ -17,7 +17,7 @@ import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppRunsRouteImport } from './routes/_app.runs'
+import { Route as AppExecutionsRouteImport } from './routes/_app.executions'
 import { Route as AppWorkflowsNewRouteImport } from './routes/_app.workflows.new'
 import { Route as AppExecutionsExecutionIdRouteImport } from './routes/_app.executions.$executionId'
 import { Route as AppAdminUsageRouteImport } from './routes/_app.admin.usage'
@@ -66,9 +66,9 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRunsRoute = AppRunsRouteImport.update({
-  id: '/runs',
-  path: '/runs',
+const AppExecutionsRoute = AppExecutionsRouteImport.update({
+  id: '/executions',
+  path: '/executions',
   getParentRoute: () => AppRoute,
 } as any)
 const AppWorkflowsNewRoute = AppWorkflowsNewRouteImport.update({
@@ -78,9 +78,9 @@ const AppWorkflowsNewRoute = AppWorkflowsNewRouteImport.update({
 } as any)
 const AppExecutionsExecutionIdRoute =
   AppExecutionsExecutionIdRouteImport.update({
-    id: '/executions/$executionId',
-    path: '/executions/$executionId',
-    getParentRoute: () => AppRoute,
+    id: '/$executionId',
+    path: '/$executionId',
+    getParentRoute: () => AppExecutionsRoute,
   } as any)
 const AppAdminUsageRoute = AppAdminUsageRouteImport.update({
   id: '/admin/usage',
@@ -119,7 +119,7 @@ const AppWorkflowsWorkflowIdExecuteRoute =
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
-  '/runs': typeof AppRunsRoute
+  '/executions': typeof AppExecutionsRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -137,7 +137,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
-  '/runs': typeof AppRunsRoute
+  '/executions': typeof AppExecutionsRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -157,7 +157,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/auth': typeof AuthRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
-  '/_app/runs': typeof AppRunsRoute
+  '/_app/executions': typeof AppExecutionsRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -177,7 +177,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
-    | '/runs'
+    | '/executions'
     | '/settings'
     | '/admin/setup'
     | '/auth/sign-in'
@@ -195,7 +195,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
-    | '/runs'
+    | '/executions'
     | '/settings'
     | '/admin/setup'
     | '/auth/sign-in'
@@ -214,7 +214,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/auth'
     | '/_app'
-    | '/_app/runs'
+    | '/_app/executions'
     | '/_app/settings'
     | '/admin/setup'
     | '/auth/sign-in'
@@ -295,11 +295,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/runs': {
-      id: '/_app/runs'
-      path: '/runs'
-      fullPath: '/runs'
-      preLoaderRoute: typeof AppRunsRouteImport
+    '/_app/executions': {
+      id: '/_app/executions'
+      path: '/executions'
+      fullPath: '/executions'
+      preLoaderRoute: typeof AppExecutionsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/workflows/new': {
@@ -311,10 +311,10 @@ declare module '@tanstack/react-router' {
     }
     '/_app/executions/$executionId': {
       id: '/_app/executions/$executionId'
-      path: '/executions/$executionId'
+      path: '/$executionId'
       fullPath: '/executions/$executionId'
       preLoaderRoute: typeof AppExecutionsExecutionIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppExecutionsRoute
     }
     '/_app/admin/usage': {
       id: '/_app/admin/usage'
@@ -377,13 +377,24 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface AppExecutionsRouteChildren {
+  AppExecutionsExecutionIdRoute: typeof AppExecutionsExecutionIdRoute
+}
+
+const AppExecutionsRouteChildren: AppExecutionsRouteChildren = {
+  AppExecutionsExecutionIdRoute: AppExecutionsExecutionIdRoute,
+}
+
+const AppExecutionsRouteWithChildren = AppExecutionsRoute._addFileChildren(
+  AppExecutionsRouteChildren,
+)
+
 interface AppRouteChildren {
-  AppRunsRoute: typeof AppRunsRoute
+  AppExecutionsRoute: typeof AppExecutionsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppAdminConfigRoute: typeof AppAdminConfigRoute
   AppAdminUsageRoute: typeof AppAdminUsageRoute
-  AppExecutionsExecutionIdRoute: typeof AppExecutionsExecutionIdRoute
   AppWorkflowsNewRoute: typeof AppWorkflowsNewRoute
   AppWorkflowsWorkflowIdExecuteRoute: typeof AppWorkflowsWorkflowIdExecuteRoute
   AppWorkflowsWorkflowIdFinalizeRoute: typeof AppWorkflowsWorkflowIdFinalizeRoute
@@ -392,12 +403,11 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppRunsRoute: AppRunsRoute,
+  AppExecutionsRoute: AppExecutionsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
   AppAdminConfigRoute: AppAdminConfigRoute,
   AppAdminUsageRoute: AppAdminUsageRoute,
-  AppExecutionsExecutionIdRoute: AppExecutionsExecutionIdRoute,
   AppWorkflowsNewRoute: AppWorkflowsNewRoute,
   AppWorkflowsWorkflowIdExecuteRoute: AppWorkflowsWorkflowIdExecuteRoute,
   AppWorkflowsWorkflowIdFinalizeRoute: AppWorkflowsWorkflowIdFinalizeRoute,

@@ -64,16 +64,6 @@ export const deleteWorkflow = async (workflowId: string) => {
 
   return response.json();
 };
-
-// Execution API functions
-export const getAllExecutions = async () => {
-  const response = await api.executions.$get();
-  if (!response.ok) {
-    throw new Error("Failed to fetch executions");
-  }
-  return response.json();
-};
-
 export const getWorkflowExecutions = async (workflowId: string) => {
   const response = await api.executions.workflow[":workflowId"].$get({
     param: { workflowId },
