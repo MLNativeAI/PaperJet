@@ -1,7 +1,7 @@
 import { db } from "@paperjet/db";
 import { documentData, file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import type { WorkflowExecutionRow } from "../types";
+import type { WorkflowExecutionData, WorkflowExecutionRow } from "../types";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
   await db
@@ -54,20 +54,44 @@ export async function getAllWorkflowExecutions(userId: string): Promise<Workflow
   }));
 }
 
-export async function getWorkflowExecutionWithExtractedData(workflowExecutionId: string, userId: string) {
-  const execution = await db.query.workflowExecution.findFirst({
-    where: and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)),
-  });
+export async function getWorkflowExecutionWithExtractedData(
+  workflowExecutionId: string,
+  userId: string,
+): Promise<WorkflowExecutionData> {
+  const result = await db
+    .select({
+      id: workflowExecution.id,
+      workflowId: workflowExecution.workflowId,
+      workflowName: workflow.name,
+      fileId: workflowExecution.fileId,
+      fileName: file.fileName,
+      jobId: workflowExecution.jobId,
+      status: workflowExecution.status,
+      errorMessage: workflowExecution.errorMessage,
+      startedAt: workflowExecution.startedAt,
+      completedAt: workflowExecution.completedAt,
+      createdAt: workflowExecution.createdAt,
+      ownerId: workflowExecution.ownerId,
+      extractedData: documentData.extractedData,
+    })
+    .from(workflowExecution)
+    .leftJoin(workflow, eq(workflowExecution.workflowId, workflow.id))
+    .leftJoin(file, eq(workflowExecution.fileId, file.id))
+    .leftJoin(documentData, eq(documentData.workflowExecutionId, workflowExecution.id))
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)));
+
+  const execution = result[0];
   if (!execution) {
     throw new Error("not found");
   }
 
-  const docData = await db.query.documentData.findFirst({
-    where: eq(documentData.workflowExecutionId, workflowExecutionId),
-  });
-
   return {
     ...execution,
-    documentData: docData ? docData.extractedData : null,
+    workflowName: execution.workflowName || "Unknown Workflow",
+    fileName: execution.fileName || "Unknown File",
+    startedAt: execution.startedAt.toISOString(),
+    completedAt: execution.completedAt?.toISOString() || null,
+    createdAt: execution.createdAt.toISOString(),
+    extractedData: execution.extractedData || null,
   };
 }

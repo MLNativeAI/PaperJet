@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ExecutionListPage from "@/pages/execution-list-page";
+import { Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/executions")({
-  component: ExecutionListPage,
+  component: () => <Outlet />,
 });

@@ -1,5 +1,5 @@
 import type { ApiRoutes } from "@api/index";
-import type { WorkflowExecutionRow } from "@paperjet/engine/types";
+import type { WorkflowExecutionData, WorkflowExecutionRow } from "@paperjet/engine/types";
 import { hc, type InferResponseType } from "hono/client";
 
 const apiClient = hc<ApiRoutes>("/");
@@ -16,7 +16,7 @@ export const getAllExecutions = async (): Promise<WorkflowExecutionRow[]> => {
   return data;
 };
 
-export const getExecutionById = async (executionId: string) => {
+export const getExecutionById = async (executionId: string): Promise<WorkflowExecutionData> => {
   const response = await apiClient.api.v1.executions[":executionId"].$get({
     param: { executionId },
   });

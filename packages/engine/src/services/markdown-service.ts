@@ -18,8 +18,8 @@ export const convertPageToMarkdown = async (workflowExecutionId: string, documen
   if (!pageData) {
     throw new Error(`Page ID ${documentPageId} not found`);
   }
-  const pageFileName = `executions/${workflowExecutionId}/pages/page-${pageData.pageNumber}.png`;
-  const pageBuffer = await s3Client.file(pageFileName).arrayBuffer();
+  const pageFilePath = `executions/${workflowExecutionId}/pages/page-${pageData.pageNumber}.png`;
+  const pageBuffer = await s3Client.file(pageFilePath).arrayBuffer();
   logger.info(`Converting page ${pageData.pageNumber} to markdown`);
   const markdownPage = await extractMarkdownFromPageImage(pageBuffer);
 

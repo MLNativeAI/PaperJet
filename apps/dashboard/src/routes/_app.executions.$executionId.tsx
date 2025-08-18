@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ExecutionDetailPage from "@/pages/execution-detail-page";
+import ExecutionPage from "@/pages/execution-page";
 
 export const Route = createFileRoute("/_app/executions/$executionId")({
-  component: ExecutionDetailPage,
+  component: ExecutionPage,
 });

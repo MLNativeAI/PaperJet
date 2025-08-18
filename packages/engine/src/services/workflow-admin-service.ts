@@ -60,12 +60,13 @@ export async function uploadFileAndCreateExecution(workflowId: string, userId: s
 
   const executionId = generateId(ID_PREFIXES.workflowExecution);
   const fileId = generateId(ID_PREFIXES.file);
-  const filename = `executions/${executionId}/${uploadedFile.name}`;
+  const filePath = `executions/${executionId}/${uploadedFile.name}`;
 
-  await s3Client.file(filename).write(await uploadedFile.arrayBuffer());
+  await s3Client.file(filePath).write(await uploadedFile.arrayBuffer());
   await db.insert(file).values({
     id: fileId,
     fileName: uploadedFile.name,
+    filePath: filePath,
     ownerId: userId,
     createdAt: new Date(),
   });

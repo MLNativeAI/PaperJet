@@ -70,6 +70,7 @@ export const verification = pgTable("verification", {
 export const file = pgTable("file", {
   id: text("id").primaryKey(),
   fileName: text("filename").notNull(),
+  filePath: text("filepath").notNull(),
   createdAt: timestamp("created_at").notNull(),
   ownerId: text("owner_id")
     .notNull()

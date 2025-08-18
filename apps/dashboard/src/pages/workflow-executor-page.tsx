@@ -55,7 +55,7 @@ export default function WorkflowExecutorPage() {
     const fileArray = Array.from(files);
     try {
       const result = await executeWorkflow.mutateAsync(fileArray);
-      
+
       // Add executions to local state
       if (result?.executions) {
         const newExecutions: ExecutionResult[] = result.executions.map((execution: any, index: number) => ({
@@ -66,38 +66,13 @@ export default function WorkflowExecutorPage() {
           status: "pending",
           createdAt: new Date().toISOString(),
         }));
-        setExecutions(prev => [...newExecutions, ...prev]);
+        setExecutions((prev) => [...newExecutions, ...prev]);
       }
     } catch (error) {
       console.error("Upload failed:", error);
     }
   };
-  //
-  // if (workflowLoading) {
-  //   return (
-  //     <div className="w-full px-4 py-8">
-  //       <div className="flex items-center justify-center">
-  //         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-  //         <span className="ml-2">Loading workflow...</span>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-  //
-  // if (!workflow) {
-  //   return (
-  //     <div className="w-full px-4 py-8">
-  //       <div className="text-center">
-  //         <h1 className="text-2xl font-bold mb-4">Workflow not found</h1>
-  //         <Button onClick={() => navigate({ to: "/" })}>
-  //           <ArrowLeft className="h-4 w-4 mr-2" />
-  //           Back to Workflows
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-  //
+
   return (
     <div className="w-full px-4 py-8 space-y-8">
       {/* Header */}
@@ -109,16 +84,7 @@ export default function WorkflowExecutorPage() {
           </p>
         </div>
       </div>
-      {/* <WorkflowHeader */}
-      {/*   workflowName={workflow.name} */}
-      {/*   showActions={true} */}
-      {/*   onBack={() => navigate({ to: "/" })} */}
-      {/*   onExportResults={() => {}} */}
-      {/*   onViewHistory={() => navigate({ to: `/workflows/${workflowId}/history` })} */}
-      {/* /> */}
       <FileUpload onFileUpload={handleFileUpload} />
-      
-      {/* Execution Results */}
       {executions.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Processing Status</h2>
@@ -133,20 +99,14 @@ export default function WorkflowExecutorPage() {
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       {getStatusIcon(execution.status)}
-                      <span className="text-sm font-medium">
-                        {getStatusText(execution.status)}
-                      </span>
+                      <span className="text-sm font-medium">{getStatusText(execution.status)}</span>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Execution ID: {execution.workflowExecutionId}</span>
-                    {execution.createdAt && (
-                      <span>
-                        Started: {new Date(execution.createdAt).toLocaleTimeString()}
-                      </span>
-                    )}
+                    {execution.createdAt && <span>Started: {new Date(execution.createdAt).toLocaleTimeString()}</span>}
                   </div>
                 </CardContent>
               </Card>

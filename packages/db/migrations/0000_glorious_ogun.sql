@@ -1,5 +1,6 @@
 CREATE TYPE "public"."modelType" AS ENUM('cloud', 'custom');--> statement-breakpoint
 CREATE TYPE "public"."structuredOutputMode" AS ENUM('json', 'tool');--> statement-breakpoint
+CREATE TYPE "public"."workflowExecutionStatus" AS ENUM('Queued', 'Processing', 'Completed', 'Failed');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -29,8 +30,11 @@ CREATE TABLE "configuration" (
 CREATE TABLE "document_data" (
 	"id" text PRIMARY KEY NOT NULL,
 	"raw_markdown" text,
+	"extractedData" jsonb,
+	"workflow_id" text,
 	"workflow_execution_id" text,
-	"created_at" timestamp NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "document_page" (
@@ -44,6 +48,7 @@ CREATE TABLE "document_page" (
 CREATE TABLE "file" (
 	"id" text PRIMARY KEY NOT NULL,
 	"filename" text NOT NULL,
+	"filepath" text NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"owner_id" text NOT NULL
 );
@@ -126,8 +131,7 @@ CREATE TABLE "workflow_execution" (
 	"workflow_id" text NOT NULL,
 	"file_id" text NOT NULL,
 	"jobId" text,
-	"status" text NOT NULL,
-	"extraction_result" text,
+	"status" "workflowExecutionStatus" DEFAULT 'Queued' NOT NULL,
 	"error_message" text,
 	"started_at" timestamp NOT NULL,
 	"completed_at" timestamp,
@@ -136,6 +140,7 @@ CREATE TABLE "workflow_execution" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_data" ADD CONSTRAINT "document_data_workflow_id_workflow_id_fk" FOREIGN KEY ("workflow_id") REFERENCES "public"."workflow"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "document_data" ADD CONSTRAINT "document_data_workflow_execution_id_workflow_execution_id_fk" FOREIGN KEY ("workflow_execution_id") REFERENCES "public"."workflow_execution"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "document_page" ADD CONSTRAINT "document_page_document_data_id_document_data_id_fk" FOREIGN KEY ("document_data_id") REFERENCES "public"."document_data"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "document_page" ADD CONSTRAINT "document_page_workflow_execution_id_workflow_execution_id_fk" FOREIGN KEY ("workflow_execution_id") REFERENCES "public"."workflow_execution"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
