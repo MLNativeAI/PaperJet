@@ -58,13 +58,6 @@ export function ExtractedDataField({ name, value }: ExtractedDataFieldProps) {
         } catch {
           return String(value);
         }
-      case "number": {
-        const num = typeof value === "number" ? value : parseFloat(String(value));
-        if (Number.isInteger(num)) {
-          return num.toLocaleString();
-        }
-        return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
       default:
         return String(value);
     }
@@ -82,20 +75,13 @@ export function ExtractedDataField({ name, value }: ExtractedDataFieldProps) {
     }
   };
 
-  const fieldType = getFieldType(value);
-
   return (
     <div className="flex flex-col space-y-1 p-3 bg-muted/30 rounded-lg border">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
           {getFieldIcon(value)}
-          {formatFieldName(name)}
+          {name}
         </span>
-        {fieldType !== "empty" && (
-          <Badge variant="outline" className="text-xs px-1.5 py-0">
-            {fieldType}
-          </Badge>
-        )}
       </div>
       <div className="text-sm font-medium">{formatValue(value)}</div>
     </div>

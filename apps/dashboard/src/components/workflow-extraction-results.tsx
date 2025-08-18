@@ -14,7 +14,6 @@ export function WorkflowExtractionResults({ result }: WorkflowExtractionResultsP
 
     return (
       <div className="space-y-4">
-        {/* Fields */}
         {fields.length > 0 && (
           <div>
             <h4 className="font-medium mb-2">Extracted Fields</h4>
@@ -37,7 +36,6 @@ export function WorkflowExtractionResults({ result }: WorkflowExtractionResultsP
           </div>
         )}
 
-        {/* Tables */}
         {tables.length > 0 && (
           <div>
             <h4 className="font-medium mb-2">Extracted Tables</h4>

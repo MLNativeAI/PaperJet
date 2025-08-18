@@ -34,9 +34,9 @@ export async function verifyExtractionAccuracy(
     throw new Error(`Failed to fetch execution data: ${response.status()}`);
   }
 
-  const { documentData } = await response.json();
+  const { extractedData } = await response.json();
 
-  if (!documentData) {
+  if (!extractedData) {
     throw new Error("No extracted data found in execution result");
   }
 
@@ -53,7 +53,7 @@ Expected Result:
 ${JSON.stringify(expectedResult, null, 2)}
 
 Actual Result:
-${JSON.stringify(documentData, null, 2)}
+${JSON.stringify(extractedData, null, 2)}
 
 Please:
 1. Compare each field in the expected result with the actual result
