@@ -118,8 +118,8 @@ export type Workflow = Omit<DbWorkflow, "configuration"> & {
   configuration: WorkflowConfiguration;
 };
 
-// Workflow runs / execution types
 export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);
+export type WorkflowExecutionStatus = z.infer<typeof WorkflowExecutionStatus>;
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {
   filename: string;

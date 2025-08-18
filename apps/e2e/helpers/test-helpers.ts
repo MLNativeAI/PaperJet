@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { WorkflowExecutionStatus, type WorkflowConfiguration } from "@paperjet/engine/types";
+import { type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { expect, type Page } from "@playwright/test";
 
 export async function createNewWorkflow(name: string, description: string, config: WorkflowConfiguration, page: Page) {

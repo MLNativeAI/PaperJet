@@ -1,7 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import {
   createWorkflowFromApi,
-  getWorkflowExecutionById,
   getWorkflowExecutionWithExtractedData,
   updateExecutionJobId,
   uploadFileAndCreateExecution,
@@ -82,7 +81,6 @@ const router = app
         const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
           workflowId: execution.workflowId,
           workflowExecutionId: execution.workflowExecutionId,
-          step: "INIT",
         });
         const jobId = job.id;
         await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
@@ -91,6 +89,56 @@ const router = app
         });
       } catch (error) {
         logger.error(error, "Re-extract data error:");
+        if (error instanceof Error && error.message === "Workflow not found") {
+          return c.json({ error: "Workflow not found" }, 404);
+        }
+        return c.json({ error: "Internal server error" }, 500);
+      }
+    },
+  )
+  .post(
+    "/:workflowId/execute-bulk",
+    zValidator(
+      "param",
+      z.object({
+        workflowId: workflowIdSchema,
+      }),
+    ),
+    zValidator(
+      "form",
+      z.object({
+        files: z
+          .array(z.instanceof(File))
+          .min(1, "At least one file is required")
+          .refine((files) => files.every((file) => file.size > 0), "Files cannot be empty")
+          .refine((files) => files.every((file) => file.type === "application/pdf"), "All files must be PDFs"),
+      }),
+    ),
+    async (c) => {
+      try {
+        const user = await getUser(c);
+        const { workflowId } = c.req.valid("param");
+        const { files } = c.req.valid("form");
+
+        const executions = [];
+
+        for (const file of files) {
+          const execution = await uploadFileAndCreateExecution(workflowId, user.id, file);
+          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+            workflowId: execution.workflowId,
+            workflowExecutionId: execution.workflowExecutionId,
+          });
+          const jobId = job.id;
+          await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
+          executions.push(execution);
+        }
+
+        return c.json({
+          executions,
+          message: `Successfully created ${executions.length} workflow executions`,
+        });
+      } catch (error) {
+        logger.error(error, "Bulk execute error:");
         if (error instanceof Error && error.message === "Workflow not found") {
           return c.json({ error: "Workflow not found" }, 404);
         }

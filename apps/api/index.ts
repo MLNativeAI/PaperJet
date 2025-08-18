@@ -53,7 +53,14 @@ export const internalApiRoutes = app
   .route("/executions", executions)
   .route("/admin", admin);
 
-export const publicApiRoutes = app.basePath("/api/v1/").route("/workflows", v1Workflows);
+export const publicApiRoutes = app.basePath("/api/v1").route("/workflows", v1Workflows);
+
+export const combinedApiRoutes = app
+  .basePath("/api")
+  .route("/workflows", workflows)
+  .route("/executions", executions)
+  .route("/admin", admin)
+  .route("/v1/workflows", v1Workflows);
 
 if (process.env.NODE_ENV === "production") {
   // Serve all static files from the dist directory
@@ -87,4 +94,4 @@ logger.info(
   `🚀 Server running on port ${server.port} in ${envVars.ENVIRONMENT} mode`,
 );
 
-export type ApiRoutes = typeof internalApiRoutes;
+export type ApiRoutes = typeof combinedApiRoutes;
