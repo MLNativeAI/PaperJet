@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { BookOpen, FileText, Play, Settings, Shield } from "lucide-react";
+import { useMemo } from "react";
 import type * as React from "react";
 import {
   Sidebar,
@@ -63,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = useMemo(() => user?.role === "admin", [user?.role]);
 
   return (
     <Sidebar {...props}>
@@ -76,48 +78,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton hidden={item.adminOnly && !isAdmin} asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
-                </SidebarMenuButton>
-                {item.items?.length ? (
-                  <SidebarMenuSub>
-                    {item.items.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild>
-                          <a href={item.url}>{item.title}</a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
-            ))}
+            {data.navMain.map((item) => {
+              const isExternal = item.url.startsWith("http");
+              const Icon = item.icon;
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton hidden={item.adminOnly && !isAdmin} asChild>
+                    {isExternal ? (
+                      <a href={item.url} className="font-medium flex items-center gap-2" target="_blank" rel="noreferrer">
+                        <Icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    ) : (
+                      <Link to={item.url} className="font-medium flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    )}
+                  </SidebarMenuButton>
+                  {item.items?.length ? (
+                    <SidebarMenuSub>
+                      {item.items.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <Link to={subItem.url}>{subItem.title}</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  ) : null}
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
-        {/* <SidebarGroup> */}
-        {/*   <SidebarGroupContent> */}
-        {/*     <SidebarMenu> */}
-        {/*       {data.navMain.map((item) => ( */}
-        {/*         <SidebarMenuItem key={item.title} hidden={item.adminOnly && !isAdmin}> */}
-        {/*           <SidebarMenuButton asChild> */}
-        {/*             <a */}
-        {/*               href={item.url} */}
-        {/*               target={item.url.startsWith("http") ? "_blank" : undefined} */}
-        {/*               rel={item.url.startsWith("http") ? "noopener noreferrer" : undefined} */}
-        {/*             > */}
-        {/*               <item.icon className="h-4 w-4" /> */}
-        {/*               {item.title} */}
-        {/*             </a> */}
-        {/*           </SidebarMenuButton> */}
-        {/*         </SidebarMenuItem> */}
-        {/*       ))} */}
-        {/*     </SidebarMenu> */}
-        {/*   </SidebarGroupContent> */}
-        {/* </SidebarGroup> */}
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>
