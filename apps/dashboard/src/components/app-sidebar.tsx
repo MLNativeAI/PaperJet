@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BookOpen, FileText, Play, Settings, Shield } from "lucide-react";
-import { useMemo } from "react";
 import type * as React from "react";
+import { useMemo } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -85,7 +85,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton hidden={item.adminOnly && !isAdmin} asChild>
                     {isExternal ? (
-                      <a href={item.url} className="font-medium flex items-center gap-2" target="_blank" rel="noreferrer">
+                      <a
+                        href={item.url}
+                        className="font-medium flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         <Icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </a>
