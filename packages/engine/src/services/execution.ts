@@ -1,7 +1,8 @@
 import { db } from "@paperjet/db";
 import { documentData, file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import type { WorkflowExecutionData, WorkflowExecutionRow } from "../types";
+import type { ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
+import { exportData } from "./export";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
   await db
@@ -92,10 +93,18 @@ export async function getWorkflowExecutionWithExtractedData(
     startedAt: execution.startedAt.toISOString(),
     completedAt: execution.completedAt?.toISOString() || null,
     createdAt: execution.createdAt.toISOString(),
-    extractedData: execution.extractedData || null,
+    extractedData: execution.extractedData as unknown as ExtractedDataType,
   };
 }
 
-export function exportExecution(executionId: string, mode: "csv" | "json", userId: string) {
-  throw new Error("Function not implemented.");
+export async function exportExecution(workflowExecutionId: string, mode: "csv" | "json", userId: string) {
+  const executionData = await db.query.documentData.findFirst({
+    where: and(eq(documentData.workflowExecutionId, workflowExecutionId), eq(documentData.ownerId, userId)),
+  });
+
+  if (!executionData) {
+    throw new Error("Workflow execution data not found");
+  }
+  const data: ExtractedDataType = executionData.extractedData as unknown as ExtractedDataType;
+  return exportData(data, mode, workflowExecutionId);
 }

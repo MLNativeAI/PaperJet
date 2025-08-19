@@ -109,13 +109,15 @@ export const workflowExecution = pgTable("workflow_execution", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
-// stores the input and output of a given workflow
 export const documentData = pgTable("document_data", {
   id: text("id").primaryKey(),
   rawMarkdown: text("raw_markdown"),
   extractedData: jsonb(),
   workflowId: text("workflow_id").references(() => workflow.id, { onDelete: "set null" }),
   workflowExecutionId: text("workflow_execution_id").references(() => workflowExecution.id, { onDelete: "set null" }),
+  ownerId: text("owner_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

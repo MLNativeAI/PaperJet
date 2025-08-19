@@ -1,21 +1,39 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, FileJson, FileText } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
 import { ExtractedDataRenderer } from "@/components/extracted-data-renderer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useExecution } from "@/hooks/use-execution";
+import { exportExecution } from "@/lib/api/executions";
 import { formatDuration } from "@/lib/utils/date";
-
-function exportResults() {
-  toast.info("Export functionality coming soon");
-}
 export default function ExecutionPage() {
   const { executionId } = useParams({ from: "/_app/executions/$executionId" });
   const navigate = useNavigate();
+  const [isExporting, setIsExporting] = useState(false);
 
   const { execution, isLoading, error } = useExecution(executionId);
+
+  const handleExport = async (mode: "json" | "csv") => {
+    setIsExporting(true);
+    try {
+      await exportExecution(executionId, mode);
+      toast.success(`Exported as ${mode.toUpperCase()}`);
+    } catch (error) {
+      toast.error("Failed to export execution");
+      console.error(error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (isLoading) {
     return <div className="w-full px-4 py-8">Loading execution...</div>;
@@ -40,16 +58,29 @@ export default function ExecutionPage() {
           <h1 className="text-3xl font-bold">Execution Details</h1>
           <div className="flex items-center gap-4 mt-2">
             <span className="text-muted-foreground">{execution.workflowName}</span>
-            <ExecutionStatusBadge status={execution.status} />
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           {execution.status === "Completed" && execution.extractedData && (
-            <Button onClick={exportResults}>
-              <Download className="h-4 w-4 mr-2" />
-              Export Results
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button disabled={isExporting}>
+                  <Download className="h-4 w-4 mr-2" />
+                  {isExporting ? "Exporting..." : "Export Results"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleExport("json")}>
+                  <FileJson className="h-4 w-4 mr-2" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport("csv")}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

@@ -21,7 +21,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Calendar, FileText } from "lucide-react";
+import { Calendar, FileJson, FileText } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,17 +31,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { exportExecution } from "@/lib/api/executions";
 import { formatDuration } from "@/lib/utils/date";
-
-function onExportRun(execution: WorkflowExecutionRow) {
-  // TODO: Implement export functionality
-  console.log("Export execution:", execution.id);
-}
 
 function onDeleteRun(execution: WorkflowExecutionRow) {
   // TODO: Implement delete functionality
@@ -48,6 +49,24 @@ function onDeleteRun(execution: WorkflowExecutionRow) {
 
 export function ExecutionListTable({ data }: { data: WorkflowExecutionRow[] }) {
   const navigate = useNavigate();
+  const [exportingIds, setExportingIds] = useState<Set<string>>(new Set());
+
+  const handleExport = async (executionId: string, mode: "json" | "csv") => {
+    setExportingIds((prev) => new Set([...prev, executionId]));
+    try {
+      await exportExecution(executionId, mode);
+      toast.success(`Exported as ${mode.toUpperCase()}`);
+    } catch (error) {
+      toast.error("Failed to export execution");
+      console.error(error);
+    } finally {
+      setExportingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(executionId);
+        return newSet;
+      });
+    }
+  };
 
   const columns: ColumnDef<WorkflowExecutionRow>[] = [
     {
@@ -98,10 +117,24 @@ export function ExecutionListTable({ data }: { data: WorkflowExecutionRow[] }) {
             View
           </Button>
           {row.original.status === "Completed" && (
-            <Button variant="outline" size="sm" onClick={() => onExportRun(row.original)}>
-              <IconDownload className="h-4 w-4 mr-2" />
-              Export
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" disabled={exportingIds.has(row.original.id)}>
+                  <IconDownload className="h-4 w-4 mr-2" />
+                  {exportingIds.has(row.original.id) ? "Exporting..." : "Export"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleExport(row.original.id, "json")}>
+                  <FileJson className="h-4 w-4 mr-2" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport(row.original.id, "csv")}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -120,10 +153,22 @@ export function ExecutionListTable({ data }: { data: WorkflowExecutionRow[] }) {
                 View Details
               </DropdownMenuItem>
               {row.original.status === "Completed" && (
-                <DropdownMenuItem onClick={() => onExportRun(row.original)}>
-                  <IconDownload className="h-4 w-4 mr-2" />
-                  Download Result
-                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <IconDownload className="h-4 w-4 mr-2" />
+                    Download Result
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onClick={() => handleExport(row.original.id, "json")}>
+                      <FileJson className="h-4 w-4 mr-2" />
+                      Export as JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport(row.original.id, "csv")}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onDeleteRun(row.original)} className="text-destructive">

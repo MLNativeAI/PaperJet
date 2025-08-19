@@ -10,13 +10,14 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
   const result = await db
     .select({
       filePath: file.filePath,
+      ownerId: file.ownerId,
     })
     .from(file)
     .leftJoin(workflowExecution, eq(workflowExecution.fileId, file.id))
     .where(eq(workflowExecution.id, workflowExecutionId))
     .limit(1);
 
-  if (result.length === 0 || !result[0]?.filePath) {
+  if (result.length === 0 || !result[0]?.filePath || !result[0]?.ownerId) {
     throw new Error("File is missing");
   }
 
@@ -41,6 +42,7 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
   await db.insert(documentData).values({
     id: documentDataId,
     workflowExecutionId: workflowExecutionId,
+    ownerId: result[0].ownerId,
     createdAt: new Date(),
   });
 

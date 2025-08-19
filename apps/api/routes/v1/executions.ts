@@ -61,11 +61,16 @@ const router = app
         const user = await getUser(c);
         const { executionId } = c.req.valid("param");
         const { mode } = c.req.valid("query");
-        await exportExecution(executionId, mode, user.id);
+        const result = await exportExecution(executionId, mode, user.id);
 
-        return c.json([]);
+        c.header("Content-Type", result.contentType);
+        c.header("Content-Disposition", `attachment; filename="${result.filename}"`);
+        return c.body(result.content);
       } catch (error) {
-        logger.error("export failed");
+        logger.error(error, "Export execution failed:");
+        if (error instanceof Error && error.message === "Workflow execution data not found") {
+          return c.json({ error: "Execution data not found" }, 404);
+        }
         return c.json({ error: "Failed to export execution" }, 500);
       }
     },
