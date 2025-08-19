@@ -1,12 +1,13 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
 import { MagicLinkEmail, render } from "@paperjet/email";
-import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
+import { generateId, ID_PREFIXES, isSetupRequired, validateApiKey } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
 import { betterAuth, type User } from "better-auth";
 
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, magicLink } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
 import { Resend } from "resend";
 
@@ -142,7 +143,6 @@ export const auth = betterAuth({
   trustedOrigins: [envVars.BASE_URL],
 });
 
-// Helper function to check if a path matches a pattern with wildcards
 const matchesPattern = (path: string, pattern: string): boolean => {
   if (pattern.endsWith("/**")) {
     const prefix = pattern.slice(0, -2); // Remove /** from the end
@@ -151,22 +151,75 @@ const matchesPattern = (path: string, pattern: string): boolean => {
   return path === pattern;
 };
 
-// Authentication middleware
-export const requireAuth = async (c: Context, next: Next) => {
-  // Skip auth check for public routes
+export const authMiddleware = async (c: Context, next: Next) => {
   if (publicRoutes.some((pattern) => matchesPattern(c.req.path, pattern))) {
     return next();
   }
 
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  if (!session) {
+  const authHeader = c.req.header("Authorization");
+  if (authHeader?.startsWith("Bearer pk_")) {
+    const apiKey = authHeader.slice(7); // Remove "Bearer " prefix
+    const authResult = await validateApiKeyAuth(c, apiKey);
+
+    if (authResult) {
+      c.set("user", authResult.user);
+      c.set("session", authResult.session);
+      c.set("apiKeyId", authResult.apiKeyId);
+      return next();
+    }
+
+    return c.json({ message: "Invalid API key" }, 401);
+  }
+
+  const authResult = await validateSessionAuth(c);
+  if (!authResult) {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  c.set("user", session.user);
-  c.set("session", session.session);
+  c.set("user", authResult.user);
+  c.set("session", authResult.session);
   return next();
 };
+
+async function validateApiKeyAuth(c: Context, apiKey: string) {
+  const keyValidation = await validateApiKey(apiKey);
+
+  if (!keyValidation) {
+    return null;
+  }
+
+  const user = await db.query.user.findFirst({
+    where: eq(schema.user.id, keyValidation.userId),
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  const apiKeySession = {
+    id: keyValidation.keyId,
+    userId: user.id,
+    expiresAt: null,
+    token: `api_key_${keyValidation.keyId}`, // Synthetic token
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ipAddress: c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || null,
+    userAgent: c.req.header("user-agent") || null,
+    impersonatedBy: null,
+  };
+
+  return { user, session: apiKeySession, apiKeyId: keyValidation.keyId };
+}
+
+async function validateSessionAuth(c: Context) {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session) {
+    return null;
+  }
+
+  return { user: session.user, session: session.session };
+}
 
 export const authHandler = async (c: Context) => {
   return auth.handler(c.req.raw);

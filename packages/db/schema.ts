@@ -67,6 +67,18 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
+export const apiKey = pgTable("api_key", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  key: text("key").notNull().unique(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  revokedAt: timestamp("revoked_at"),
+});
+
 export const file = pgTable("file", {
   id: text("id").primaryKey(),
   fileName: text("filename").notNull(),

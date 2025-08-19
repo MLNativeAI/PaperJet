@@ -18,4 +18,5 @@ export const ID_PREFIXES = {
   field: "fld",
   table: "tbl",
   column: "col",
+  apiKey: "api",
 } as const;

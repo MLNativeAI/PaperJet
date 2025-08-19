@@ -1,4 +1,5 @@
 export * from "./src/services/admin-service.ts";
+export * from "./src/services/api-key-service.ts";
 export * from "./src/services/execution.ts";
 export * from "./src/services/extraction.ts";
 export * from "./src/services/markdown-service.ts";
