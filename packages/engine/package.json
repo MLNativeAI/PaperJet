@@ -18,7 +18,6 @@
     "@ai-sdk/openai-compatible": "^0.2.16",
     "@paperjet/db": "workspace:*",
     "ai": "^4.3.16",
-    "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.43.1",
     "fastest-levenshtein": "^1.0.16",

@@ -7,11 +7,10 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
-import { type auth, authHandler, authMiddleware } from "./lib/auth";
+import { type auth, authHandler, requireAuth } from "./lib/auth";
 import { corsMiddleware } from "./lib/cors";
 import { withContext } from "./lib/with-context";
 import admin from "./routes/admin";
-import apiKeys from "./routes/api-keys";
 import v1Executions from "./routes/v1/executions";
 import v1Workflows from "./routes/v1/workflows";
 import workflows from "./routes/workflows";
@@ -30,9 +29,14 @@ app.use(
     logger.trace(message);
   }),
 );
+// Cors middleware for local development
 app.use("/api/*", corsMiddleware);
-app.use("/api/*", authMiddleware);
+// Require authentication for all API routes
+app.use("/api/workflows", requireAuth);
+app.use("/api/executions", requireAuth);
+// Inject context into the request
 app.use("/api/*", withContext);
+// BetterAuth handler
 app.on(["POST", "GET"], "/api/auth/*", authHandler);
 
 // Health check
@@ -43,11 +47,14 @@ app.get("/api/health", async (c) => {
   });
 });
 
+export const internalApiRoutes = app.basePath("/api").route("/workflows", workflows).route("/admin", admin);
+
+export const publicApiRoutes = app.basePath("/api/v1").route("/workflows", v1Workflows);
+
 export const combinedApiRoutes = app
   .basePath("/api")
   .route("/workflows", workflows)
   .route("/admin", admin)
-  .route("/api-keys", apiKeys)
   .route("/v1/workflows", v1Workflows)
   .route("/v1/executions", v1Executions);
 
