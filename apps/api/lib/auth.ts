@@ -6,7 +6,7 @@ import { envVars, logger } from "@paperjet/shared";
 import { betterAuth, type User } from "better-auth";
 
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, magicLink } from "better-auth/plugins";
+import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
 import type { Context, Next } from "hono";
 import { Resend } from "resend";
 
@@ -100,6 +100,8 @@ export const auth = betterAuth({
   },
   plugins: [
     admin(),
+    apiKey(),
+    organization(),
     magicLink({
       sendMagicLink: async ({ email, token, url }, _request) => {
         if (!resend) {
