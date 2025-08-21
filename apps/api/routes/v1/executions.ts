@@ -76,4 +76,6 @@ const router = app
     },
   );
 
-export default router;
+export { router as v1ExecutionRouter };
+
+export type ExecutionRoutes = typeof router;

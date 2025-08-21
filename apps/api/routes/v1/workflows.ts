@@ -186,6 +186,6 @@ const router = app
     },
   );
 
-export default router;
+export { router as v1WorkflowRouter };
 
-export type V1WorkflowRouteType = typeof router;
+export type WorkflowRoutes = typeof router;

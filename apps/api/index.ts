@@ -1,74 +1,7 @@
-// Initialize OpenTelemetry instrumentation first
-import "./instrumentation";
-
-import { otel } from "@hono/otel";
+import { allWorkers } from "@paperjet/queue";
 import { envVars, logger } from "@paperjet/shared";
-import { Hono } from "hono";
-import { serveStatic } from "hono/bun";
-import { logger as honoLogger } from "hono/logger";
-import { poweredBy } from "hono/powered-by";
-import { type auth, authHandler, requireAuth } from "./lib/auth";
-import { corsMiddleware } from "./lib/cors";
-import { withContext } from "./lib/with-context";
-import admin from "./routes/admin";
-import v1Executions from "./routes/v1/executions";
-import v1Workflows from "./routes/v1/workflows";
-import workflows from "./routes/workflows";
-
-const app = new Hono<{
-  Variables: {
-    user: typeof auth.$Infer.Session.user | null;
-    session: typeof auth.$Infer.Session.session | null;
-  };
-}>();
-
-app.use("*", otel());
-app.use(poweredBy({ serverName: "mlnative.com" }));
-app.use(
-  honoLogger((message) => {
-    logger.trace(message);
-  }),
-);
-// Cors middleware for local development
-app.use("/api/*", corsMiddleware);
-// Require authentication for all API routes
-app.use("/api/workflows", requireAuth);
-app.use("/api/executions", requireAuth);
-// Inject context into the request
-app.use("/api/*", withContext);
-// BetterAuth handler
-app.on(["POST", "GET"], "/api/auth/*", authHandler);
-
-// Health check
-app.get("/api/health", async (c) => {
-  logger.info({ endpoint: "/api/health", method: "GET" }, "health check");
-  return c.json({
-    status: "ok",
-  });
-});
-
-export const internalApiRoutes = app.basePath("/api").route("/workflows", workflows).route("/admin", admin);
-
-export const publicApiRoutes = app.basePath("/api/v1").route("/workflows", v1Workflows);
-
-export const combinedApiRoutes = app
-  .basePath("/api")
-  .route("/workflows", workflows)
-  .route("/admin", admin)
-  .route("/v1/workflows", v1Workflows)
-  .route("/v1/executions", v1Executions);
-
-if (process.env.NODE_ENV === "production") {
-  // Serve all static files from the dist directory
-  app.use("*", serveStatic({ root: "./dist" }));
-
-  // Serve index.html for all other routes (SPA fallback)
-  app.get("*", serveStatic({ path: "./dist/index.html" }));
-} else {
-  app.get("*", (c) => {
-    return c.redirect(envVars.BASE_URL);
-  });
-}
+import { app } from "@/routes";
+import "./instrumentation";
 
 const server = Bun.serve({
   port: envVars.PORT,
@@ -76,8 +9,6 @@ const server = Bun.serve({
   fetch: app.fetch,
   idleTimeout: 60,
 });
-
-import { allWorkers } from "@paperjet/queue";
 
 logger.info(`Started ${allWorkers.length} job workers`);
 
@@ -89,5 +20,3 @@ logger.info(
   },
   `🚀 Server running on port ${server.port} in ${envVars.ENVIRONMENT} mode`,
 );
-
-export type ApiRoutes = typeof combinedApiRoutes;

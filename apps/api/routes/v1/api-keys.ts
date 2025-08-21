@@ -21,4 +21,6 @@ const router = app.get("/", async (c) => {
   return c.json(apiKeys);
 });
 
-export default router;
+export { router as v1ApiKeyRouter };
+
+export type ApiKeysRoutes = typeof router;

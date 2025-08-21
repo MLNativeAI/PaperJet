@@ -72,4 +72,5 @@ const router = app
       return c.json({ error: "Internal server error" }, 500);
     }
   });
-export default router;
+export { router as adminRouter };
+export type AdminRoutes = typeof router;
