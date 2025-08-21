@@ -14,24 +14,6 @@ export const getAuthMode = async () => {
   return response.json();
 };
 
-export const getUsageData = async () => {
-  const response = await adminClient["usage-data"].$get({});
-  return response.json();
-};
-
-export const getUsageStats = async () => {
-  const response = await adminClient["usage-stats"].$get({});
-  return response.json();
-};
-
-export const getConfiguration = async () => {
-  const response = await adminClient.config.$get({});
-  if (!response.ok) {
-    throw new Error("Failed to fetch configuration");
-  }
-  return response.json();
-};
-
 export const updateConfiguration = async (config: ConfigurationUpdate) => {
   const response = await adminClient.config.$patch({
     json: config,

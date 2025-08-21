@@ -28,12 +28,11 @@ const router = app
   })
   .get("/usage-data", async (c) => {
     const usageData = await getUsageData();
-    return c.json(usageData);
-  })
-  .get("/usage-stats", async (c) => {
-    const usageData = await getUsageData();
     const usageStats = getUsageStats(usageData);
-    return c.json(usageStats);
+    return c.json({
+      usageData: usageData,
+      usageStats: usageStats,
+    });
   })
   .get("/config", async (c) => {
     const configuration = await getConfiguration();

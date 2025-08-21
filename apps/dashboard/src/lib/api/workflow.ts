@@ -41,8 +41,8 @@ export const getWorkflow = async (workflowId: string) => {
   return response.json();
 };
 export const deleteWorkflowMutation = async (workflowId: string) => {
-  const response = await workflowClient[":id"].$delete({
-    param: { id: workflowId },
+  const response = await workflowClient[":workflowId"].$delete({
+    param: { workflowId: workflowId },
   });
 
   if (!response.ok) {
