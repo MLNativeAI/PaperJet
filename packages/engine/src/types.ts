@@ -149,5 +149,15 @@ export type UsageStats = {
   executions: number;
 };
 
+export type ApiKey = {
+  id: string;
+  name: string | null;
+  key: string;
+  userId: string;
+  enabled: boolean;
+  createdAt: string;
+  lastRequest: string | null;
+};
+
 export * from "./types/executions";
 export * from "./types/workflow-config";

@@ -18,9 +18,7 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your account settings and API keys
-          </p>
+          <p className="text-muted-foreground mt-2">Manage your account settings and API keys</p>
         </div>
       </div>
 
@@ -28,9 +26,7 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold">API Keys</h2>
-          <p className="text-muted-foreground mt-1">
-            Create and manage API keys to access PaperJet programmatically
-          </p>
+          <p className="text-muted-foreground mt-1">Create and manage API keys to access PaperJet programmatically</p>
         </div>
 
         <ApiKeysList apiKeys={apiKeys} onRefresh={refetch} />
@@ -38,3 +34,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

@@ -45,15 +45,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useRevokeApiKey } from "@/hooks/use-api-keys";
 import { formatDate } from "@/lib/utils/date";
-
-export interface ApiKey {
-  id: string;
-  name: string;
-  key: string;
-  createdAt: Date;
-  lastUsedAt: Date | null;
-  status: "active" | "revoked";
-}
+import { ApiKey } from "@paperjet/engine/types";
 
 interface ApiKeysListProps {
   apiKeys: ApiKey[];
@@ -61,37 +53,10 @@ interface ApiKeysListProps {
 }
 
 export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
-  const [showKeys, setShowKeys] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [keyToDelete, setKeyToDelete] = useState<ApiKey | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const { mutate: revokeApiKey, isPending: isRevoking } = useRevokeApiKey();
-
-  const toggleKeyVisibility = (keyId: string) => {
-    setShowKeys((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(keyId)) {
-        newSet.delete(keyId);
-      } else {
-        newSet.add(keyId);
-      }
-      return newSet;
-    });
-  };
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success("API key copied to clipboard");
-    } catch {
-      toast.error("Failed to copy API key");
-    }
-  };
-
-  const maskApiKey = (key: string) => {
-    if (key.length <= 8) return "••••••••";
-    return `${key.slice(0, 4)}••••••••${key.slice(-4)}`;
-  };
 
   const handleDelete = () => {
     if (!keyToDelete) return;
@@ -109,8 +74,6 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
     });
   };
 
-  const activeKeys = apiKeys.filter((key) => key.status === "active");
-
   const columns: ColumnDef<ApiKey>[] = [
     {
       accessorKey: "name",
@@ -123,29 +86,7 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
       header: "API Key",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <code className="text-sm bg-muted px-2 py-1 rounded font-mono">
-            {showKeys.has(row.original.id) ? row.original.key : maskApiKey(row.original.key)}
-          </code>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => toggleKeyVisibility(row.original.id)}
-          >
-            {showKeys.has(row.original.id) ? (
-              <IconEyeOff className="h-4 w-4" />
-            ) : (
-              <IconEye className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => copyToClipboard(row.original.key)}
-          >
-            <IconCopy className="h-4 w-4" />
-          </Button>
+          <code className="text-sm bg-muted px-2 py-1 rounded font-mono">{row.original.key}</code>
         </div>
       ),
     },
@@ -163,9 +104,7 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
       accessorKey: "lastUsedAt",
       header: "Last Used",
       cell: ({ row }) => (
-        <div className="text-sm">
-          {row.original.lastUsedAt ? formatDate(row.original.lastUsedAt) : "Never"}
-        </div>
+        <div className="text-sm">{row.original.lastRequest ? formatDate(row.original.lastRequest) : "Never"}</div>
       ),
     },
     {
@@ -173,14 +112,10 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
       header: "Status",
       cell: ({ row }) => (
         <Badge
-          variant={row.original.status === "active" ? "default" : "secondary"}
-          className={
-            row.original.status === "active"
-              ? "bg-green-100 text-green-800 hover:bg-green-100"
-              : ""
-          }
+          variant={row.original.enabled ? "default" : "secondary"}
+          className={row.original.enabled ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
         >
-          {row.original.status}
+          {row.original.enabled ? "Active" : "Revoked"}
         </Badge>
       ),
     },
@@ -200,18 +135,13 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem onClick={() => copyToClipboard(row.original.key)}>
-              <IconCopy className="h-4 w-4 mr-2" />
-              Copy Key
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive"
               onClick={() => {
                 setKeyToDelete(row.original);
                 setDeleteDialogOpen(true);
               }}
-              disabled={row.original.status === "revoked"}
+              disabled={!row.original.enabled}
             >
               <IconTrash className="h-4 w-4 mr-2" />
               Revoke
@@ -254,11 +184,7 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
           </div>
         </Card>
 
-        <NewApiKeyDialog
-          open={createDialogOpen}
-          onOpenChange={setCreateDialogOpen}
-          onSuccess={onRefresh}
-        />
+        <NewApiKeyDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={onRefresh} />
       </>
     );
   }
@@ -268,7 +194,7 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
       <div className="w-full space-y-4">
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            {activeKeys.length} active {activeKeys.length === 1 ? "key" : "keys"}
+            {apiKeys.length} active {apiKeys.length === 1 ? "key" : "keys"}
           </p>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <IconPlus className="mr-2 h-4 w-4" />
@@ -297,15 +223,9 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-muted/50"
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="hover:bg-muted/50">
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
                   ))
@@ -322,8 +242,8 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
           {apiKeys.length > 10 && (
             <div className="flex items-center justify-between px-4 py-4">
               <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+                selected.
               </div>
               <div className="flex w-full items-center gap-8 lg:w-fit">
                 <div className="hidden items-center gap-2 lg:flex">
@@ -404,8 +324,8 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
           <DialogHeader>
             <DialogTitle>Revoke API Key</DialogTitle>
             <DialogDescription>
-              Are you sure you want to revoke the API key "{keyToDelete?.name}"? This action cannot
-              be undone and any applications using this key will stop working immediately.
+              Are you sure you want to revoke the API key "{keyToDelete?.name}"? This action cannot be undone and any
+              applications using this key will stop working immediately.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -420,11 +340,8 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
       </Dialog>
 
       {/* Create API Key Dialog */}
-      <NewApiKeyDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSuccess={onRefresh}
-      />
+      <NewApiKeyDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={onRefresh} />
     </>
   );
 }
+
