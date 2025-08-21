@@ -1,9 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ApiKeysRoutes } from "@paperjet/api/routes";
 import type { ApiKey } from "@paperjet/engine/types";
-import { api } from "../lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { hc } from "hono/client";
+
+const apiKeyClient = hc<ApiKeysRoutes>("/api/v1/api-keys");
 
 async function fetchApiKeys(): Promise<ApiKey[]> {
-  const response = await api.v1["api-keys"].$get();
+  const response = await apiKeyClient.index.$get();
   if (!response.ok) {
     console.error("API Key fetch failed");
     return [];
@@ -11,37 +14,38 @@ async function fetchApiKeys(): Promise<ApiKey[]> {
   return response.json();
 }
 
-async function createApiKey(data: { name: string }): Promise<{ key: string; id: string }> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Generate a mock API key
-  const randomHex = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  const newKey = `pk_live_${randomHex}${randomHex}`;
-
-  // Add to mock data (in real app, this would be handled by the backend)
-  const newApiKey: ApiKey = {
-    id: String(mockApiKeys.length + 1),
-    name: data.name,
-    key: newKey,
-    createdAt: new Date(),
-    lastUsedAt: null,
-    status: "active",
-  };
-  mockApiKeys.unshift(newApiKey);
-
-  return { key: newKey, id: newApiKey.id };
+async function createApiKey(data: { name: string }) {
+  // // Simulate network delay
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  //
+  // // Generate a mock API key
+  // const randomHex = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  // const newKey = `pk_live_${randomHex}${randomHex}`;
+  //
+  // // Add to mock data (in real app, this would be handled by the backend)
+  // const newApiKey: ApiKey = {
+  //   id: String(mockApiKeys.length + 1),
+  //   name: data.name,
+  //   key: newKey,
+  //   createdAt: new Date(),
+  //   lastUsedAt: null,
+  //   status: "active",
+  // };
+  // mockApiKeys.unshift(newApiKey);
+  //
+  // return { key: newKey, id: newApiKey.id };
+  return {};
 }
 
 async function revokeApiKey(keyId: string): Promise<void> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Update mock data (in real app, this would be handled by the backend)
-  const key = mockApiKeys.find((k) => k.id === keyId);
-  if (key) {
-    key.status = "revoked";
-  }
+  // // Simulate network delay
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  //
+  // // Update mock data (in real app, this would be handled by the backend)
+  // const key = mockApiKeys.find((k) => k.id === keyId);
+  // if (key) {
+  //   key.status = "revoked";
+  // }
 }
 
 // React Query hooks

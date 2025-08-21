@@ -1,7 +1,7 @@
+import { updateConfiguration } from "@/lib/api/admin";
 import type { ConfigurationUpdate } from "@paperjet/engine/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { updateConfiguration } from "@/lib/api";
 
 export function useUpdateConfiguration() {
   const queryClient = useQueryClient();

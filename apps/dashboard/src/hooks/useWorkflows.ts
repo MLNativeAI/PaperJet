@@ -1,6 +1,6 @@
+import { deleteWorkflowMutation, getAllWorkflows } from "@/lib/api/workflow";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { deleteWorkflow as deleteWorkflowApi, getAllWorkflows } from "@/lib/api";
 
 export function useWorkflows() {
   const queryClient = useQueryClient();
@@ -11,11 +11,11 @@ export function useWorkflows() {
     refetch,
   } = useQuery({
     queryKey: ["workflows"],
-    queryFn: getAllWorkflows,
+    queryFn: () => getAllWorkflows(),
   });
 
   const deleteWorkflow = useMutation({
-    mutationFn: ({ workflowId }: { workflowId: string }) => deleteWorkflowApi(workflowId),
+    mutationFn: ({ workflowId }: { workflowId: string }) => deleteWorkflowMutation(workflowId),
     onSuccess: () => {
       toast.success("Workflow deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["workflows"] });

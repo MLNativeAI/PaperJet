@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getConfiguration } from "@/lib/api";
+import { getConfiguration } from "@/lib/api/admin";
 
 export function useConfiguration() {
   const {

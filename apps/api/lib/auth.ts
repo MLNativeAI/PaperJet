@@ -155,13 +155,13 @@ const matchesPattern = (path: string, pattern: string): boolean => {
 
 // Authentication middleware
 export const requireAuth = async (c: Context, next: Next) => {
-  // Skip auth check for public routes
   if (publicRoutes.some((pattern) => matchesPattern(c.req.path, pattern))) {
     return next();
   }
 
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
+    logger.info("missing auth");
     return c.json({ message: "Unauthorized" }, 401);
   }
 

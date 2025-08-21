@@ -1,6 +1,6 @@
 import type { ConfigurationUpdate } from "@paperjet/engine/types";
 import { useMutation } from "@tanstack/react-query";
-import { validateConnection } from "@/lib/api";
+import { validateConnection } from "@/lib/api/admin";
 
 export function useValidateConnection() {
   return useMutation({

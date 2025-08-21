@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAuthMode } from "@/lib/api";
+import { getAuthMode } from "@/lib/api/admin";
 import SignInPage from "@/pages/sign-in-page";
 
 export const Route = createFileRoute("/auth/sign-in")({

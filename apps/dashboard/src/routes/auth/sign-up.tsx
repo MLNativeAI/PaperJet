@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAuthMode } from "@/lib/api";
 import SignUpPage from "@/pages/sign-up-page";
+import { getAuthMode } from "@/lib/api/admin";
 
 export const Route = createFileRoute("/auth/sign-up")({
   beforeLoad: async () => {

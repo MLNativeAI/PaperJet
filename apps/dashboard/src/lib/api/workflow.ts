@@ -1,11 +1,17 @@
-import type { ApiRoutes } from "@api/index";
-import { hc, type InferResponseType } from "hono/client";
+import type { WorkflowRoutes } from "@paperjet/api/routes";
+import { hc } from "hono/client";
 
-const apiClient = hc<ApiRoutes>("/");
+const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
 
-const bulkExecute = apiClient.api.v1.workflows[":workflowId"]["execute-bulk"].$post;
+export async function getAllWorkflows() {
+  const response = await workflowClient.index.$get({});
 
-export type BulkExecuteResponse = InferResponseType<typeof bulkExecute>;
+  if (!response.ok) {
+    throw new Error("Failed to fetch workflow");
+  }
+
+  return response.json();
+}
 
 export const executeWorkflowBulk = async (workflowId: string, files: File[]): Promise<any> => {
   const formData = new FormData();
@@ -21,4 +27,44 @@ export const executeWorkflowBulk = async (workflowId: string, files: File[]): Pr
   }
 
   return executeBulkResponse.json();
+};
+
+export const getWorkflow = async (workflowId: string) => {
+  const response = await workflowClient[":workflowId"].$get({
+    param: { id: workflowId },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch workflow");
+  }
+
+  return response.json();
+};
+export const deleteWorkflowMutation = async (workflowId: string) => {
+  const response = await workflowClient[":id"].$delete({
+    param: { id: workflowId },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete workflow");
+  }
+
+  return response.json();
+};
+
+export const createWorkflowFromFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/workflows", {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create workflow from file");
+  }
+
+  return response.json();
 };

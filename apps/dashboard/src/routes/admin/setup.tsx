@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { isAdminSetupRequired } from "@/lib/api";
-import { authClient } from "@/lib/auth-client";
+import { isAdminSetupRequired } from "@/lib/api/admin";
 import AdminSetupPage from "@/pages/admin-setup-page";
 
 export const Route = createFileRoute("/admin/setup")({

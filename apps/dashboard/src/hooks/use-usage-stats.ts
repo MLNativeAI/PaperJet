@@ -1,5 +1,5 @@
+import { getUsageStats } from "@/lib/api/admin";
 import { useQuery } from "@tanstack/react-query";
-import { getUsageStats } from "@/lib/api";
 
 export function useUsageStats() {
   const {

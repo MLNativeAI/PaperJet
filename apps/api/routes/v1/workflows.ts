@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import {
   createWorkflowFromApi,
   getWorkflowExecutionWithExtractedData,
+  getWorkflows,
   updateExecutionJobId,
   uploadFileAndCreateExecution,
 } from "@paperjet/engine";
@@ -45,6 +46,17 @@ function validateFiles(body: any): { success: true; files: File[] } | { success:
 }
 
 const router = app
+  .get("/", async (c) => {
+    try {
+      logger.info("Getting workflows");
+      const user = await getUser(c);
+      const workflows = await getWorkflows(user.id);
+      return c.json(workflows);
+    } catch (error) {
+      logger.error(error, "Failed to fetch workflows");
+      return c.json({ error: "Internal server error" }, 500);
+    }
+  })
   .post("/", zValidator("json", createWorkflowApiSchema), async (c) => {
     try {
       const createWorkflowData = c.req.valid("json");
