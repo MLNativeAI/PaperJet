@@ -1,12 +1,10 @@
+import type { ApiKey } from "@paperjet/engine/types";
 import {
   IconChevronLeft,
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconCopy,
   IconDotsVertical,
-  IconEye,
-  IconEyeOff,
   IconKey,
   IconPlus,
   IconTrash,
@@ -18,7 +16,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Calendar, Copy, Key, Plus } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { NewApiKeyDialog } from "@/components/new-api-key-dialog";
@@ -37,7 +35,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
@@ -45,7 +42,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useRevokeApiKey } from "@/hooks/use-api-keys";
 import { formatDate } from "@/lib/utils/date";
-import { ApiKey } from "@paperjet/engine/types";
 
 interface ApiKeysListProps {
   apiKeys: ApiKey[];
@@ -344,4 +340,3 @@ export function ApiKeysList({ apiKeys, onRefresh }: ApiKeysListProps) {
     </>
   );
 }
-

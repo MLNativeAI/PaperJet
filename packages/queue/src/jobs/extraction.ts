@@ -1,5 +1,4 @@
 import { extractDataFromMarkdown } from "@paperjet/engine";
-import { logger } from "@paperjet/shared";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
 import { redisConnection } from "../redis";

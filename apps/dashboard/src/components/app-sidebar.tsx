@@ -62,7 +62,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const user = session?.user;
 
   const isAdmin = useMemo(() => user?.role === "admin", [user?.role]);

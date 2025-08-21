@@ -9,10 +9,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useUpdateConfiguration } from "@/hooks/use-update-configuration";
-import { useValidateConnection } from "@/hooks/use-validate-connection";
+import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
-export default function AdminModelConfigForm({ configuration }: { configuration: Configuration }) {
+export default function AdminModelConfigForm({
+  configuration,
+}: {
+  configuration: Configuration;
+}) {
+  const { updateConfiguration, validateConnection } = useModelConfiguration();
   const schema = z.object({
     modelType: z.enum(["cloud", "custom"]),
     geminiApiKey: z.string().optional(),
@@ -31,21 +35,28 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
 
   const watchedModelType = form.watch("modelType");
 
-  const { mutateAsync, isPending } = useUpdateConfiguration();
-  const { mutateAsync: validateConnection, isPending: isValidating } = useValidateConnection();
-
   const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
   const [editModeEnabled, setEditModeEnabled] = useState(false);
 
   const runConnectionValidation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setValidationResult(null);
-    const result = await validateConnection(form.getValues());
-    setValidationResult(result);
+    const values = form.getValues();
+    validateConnection.mutate(values, {
+      onSuccess: (result) => {
+        setValidationResult(result);
+      },
+      onError: (error) => {
+        setValidationResult({
+          isValid: false,
+          error: error.message || "Failed to validate connection",
+        });
+      },
+    });
   };
 
-  const onSubmit = async (_values: z.infer<typeof schema>) => {
-    await mutateAsync(_values);
+  const onSubmit = (values: z.infer<typeof schema>) => {
+    updateConfiguration.mutate(values);
     setEditModeEnabled(false);
   };
 
@@ -218,11 +229,11 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
               <div className="flex gap-2 items-center">
                 <Button
                   variant="outline"
-                  disabled={isValidating || !editModeEnabled}
+                  disabled={validateConnection.isPending || !editModeEnabled}
                   className="flex items-center gap-2 bg-transparent"
                   onClick={runConnectionValidation}
                 >
-                  {isValidating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {validateConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Validate connection
                 </Button>
                 {validationResult?.isValid && <div className="text-green-500 text-sm ">Connection is valid</div>}
@@ -235,7 +246,7 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
                   <Button type="button" variant="outline" onClick={onCancel}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isPending}>
+                  <Button type="submit" disabled={updateConfiguration.isPending}>
                     Save settings
                   </Button>
                 </div>

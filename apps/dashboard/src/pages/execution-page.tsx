@@ -15,6 +15,7 @@ import {
 import { useExecution } from "@/hooks/use-execution";
 import { exportExecution } from "@/lib/api/executions";
 import { formatDuration } from "@/lib/utils/date";
+
 export default function ExecutionPage() {
   const { executionId } = useParams({ from: "/_app/executions/$executionId" });
   const navigate = useNavigate();

@@ -33,21 +33,18 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
       return;
     }
 
-    createApiKey(
-      { name: name.trim() },
-      {
-        onSuccess: (data) => {
-          setNewKey(data.key);
-          setShowKeyDialog(true);
-          setName("");
-          onOpenChange(false);
-          onSuccess();
-        },
-        onError: () => {
-          toast.error("Failed to create API key");
-        },
+    createApiKey(name.trim(), {
+      onSuccess: (data) => {
+        setNewKey(data.key);
+        setShowKeyDialog(true);
+        setName("");
+        onOpenChange(false);
+        onSuccess();
       },
-    );
+      onError: () => {
+        toast.error("Failed to create API key");
+      },
+    });
   };
 
   const copyToClipboard = async () => {
@@ -157,4 +154,3 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
     </>
   );
 }
-

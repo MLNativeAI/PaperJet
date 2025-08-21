@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
 import { isAdminSetupRequired } from "@/lib/api/admin";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,

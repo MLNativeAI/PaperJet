@@ -9,14 +9,17 @@ export function TableBodyWithSkeleton({ isLoading, table }: { isLoading: boolean
       <TableBody>
         {[...Array(5).keys()].map((_, index) => {
           return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: This is a skeleton component where key stability is not important
             <TableRow key={index}>
               {table.getAllColumns().map((_, colId) => {
                 return (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: This is a skeleton component where key stability is not important
                   <TableCell key={colId}>
                     <Skeleton className="h-[20px] w-full opacity-25" />
                   </TableCell>
                 );
               })}
+              {/* biome-ignore lint/suspicious/noArrayIndexKey: This is a skeleton component where key stability is not important */}
               <td key={index} className="p-2"></td>
             </TableRow>
           );

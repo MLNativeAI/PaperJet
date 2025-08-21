@@ -20,7 +20,7 @@ export function WorkflowFilterComboBox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[250px] justify-between">
+        <Button variant="outline" aria-expanded={open} className="w-[250px] justify-between">
           {value ? allWorkflows.find((workflowId) => workflowId === value) : "Select workflow..."}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

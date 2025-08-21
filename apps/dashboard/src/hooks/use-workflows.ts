@@ -1,6 +1,11 @@
-import { deleteWorkflowMutation, getAllWorkflows } from "@/lib/api/workflow";
+import type { WorkflowRoutes } from "@paperjet/api/routes";
+import type { Workflow } from "@paperjet/engine/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { hc } from "hono/client";
 import { toast } from "sonner";
+import { deleteWorkflowMutation } from "@/lib/api/workflow";
+
+const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
 
 export function useWorkflows() {
   const queryClient = useQueryClient();
@@ -11,7 +16,16 @@ export function useWorkflows() {
     refetch,
   } = useQuery({
     queryKey: ["workflows"],
-    queryFn: () => getAllWorkflows(),
+    queryFn: async (): Promise<Workflow[]> => {
+      const response = await workflowClient.index.$get({});
+
+      if (!response.ok) {
+        console.log("Failed to fetch workflow");
+        throw new Error("Failed to fetch workflow");
+      }
+
+      return response.json();
+    },
   });
 
   const deleteWorkflow = useMutation({

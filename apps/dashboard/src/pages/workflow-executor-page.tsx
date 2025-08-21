@@ -1,9 +1,9 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { CheckCircle, Clock, FileText, XCircle } from "lucide-react";
 import { useState } from "react";
 import { FileUpload } from "@/components/file-upload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWorkflowExecution } from "@/hooks/useWorkflowExecution";
+import { useWorkflowExecution } from "@/hooks/use-workflow-execution";
 
 interface ExecutionResult {
   workflowExecutionId: string;
@@ -16,7 +16,6 @@ interface ExecutionResult {
 
 export default function WorkflowExecutorPage() {
   const { workflowId } = useParams({ from: "/_app/workflows/$workflowId/execute" });
-  const navigate = useNavigate();
   const [executions, setExecutions] = useState<ExecutionResult[]>([]);
 
   const { executeWorkflow } = useWorkflowExecution(workflowId);
@@ -75,7 +74,6 @@ export default function WorkflowExecutorPage() {
 
   return (
     <div className="w-full px-4 py-8 space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Execute workflow</h1>

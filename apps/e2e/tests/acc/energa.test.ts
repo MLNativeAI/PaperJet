@@ -12,10 +12,6 @@ test.setTimeout(180000); // 3 minutes
 
 test.describe("Extract energy invoice for Energa", () => {
   test("login, create and run extraction", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login("lukasz@mlnative.com", "lukasz@mlnative.com");
-
     const inputFilePath = path.join(process.cwd(), "/fixtures/energa/Energa.pdf");
     const expectedResultFilePath = path.join(process.cwd(), "/fixtures/energa/energa-result.json");
 

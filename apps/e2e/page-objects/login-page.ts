@@ -35,7 +35,7 @@ export class LoginPage {
       console.log("Login successful, redirected away from sign-in page");
     } catch (error) {
       console.error("Login failed, still on sign-in page or unexpected error");
-      throw new Error("Login failed: " + error);
+      throw new Error(`Login failed: ${error}`);
     }
   }
 
@@ -43,7 +43,7 @@ export class LoginPage {
     try {
       await this.errorMessage.waitFor({ state: "visible", timeout: 3000 });
       return await this.errorMessage.textContent();
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

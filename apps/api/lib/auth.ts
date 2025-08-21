@@ -100,7 +100,11 @@ export const auth = betterAuth({
   },
   plugins: [
     admin(),
-    apiKey(),
+    apiKey({
+      rateLimit: {
+        enabled: false,
+      },
+    }),
     organization(),
     magicLink({
       sendMagicLink: async ({ email, token, url }, _request) => {

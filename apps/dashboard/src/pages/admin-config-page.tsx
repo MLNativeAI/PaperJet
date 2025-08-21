@@ -4,7 +4,7 @@ import { useConfiguration } from "@/hooks/use-configuration";
 export default function AdminConfigPage() {
   const { configuration, isLoading } = useConfiguration();
 
-  if (isLoading) {
+  if (isLoading || !configuration) {
     return <div>Loading...</div>;
   }
 

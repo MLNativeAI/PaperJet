@@ -114,8 +114,14 @@ export const zodWorkflowObject = z.object({
   name: z.string(),
   fields: z.array(zodWorkflowField),
 });
-export type Workflow = Omit<DbWorkflow, "configuration"> & {
+export type Workflow = {
+  id: string;
+  name: string;
+  description: string;
   configuration: WorkflowConfiguration;
+  createdAt: string;
+  updatedAt: string;
+  ownerId: string;
 };
 
 export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);

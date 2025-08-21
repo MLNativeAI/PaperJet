@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import { routeTree } from "./routeTree.gen";
 
-const router = createRouter({ 
+const router = createRouter({
   routeTree,
   defaultStructuralSharing: true, // Enable structural sharing for better performance
 });

@@ -3,16 +3,6 @@ import { hc } from "hono/client";
 
 const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
 
-export async function getAllWorkflows() {
-  const response = await workflowClient.index.$get({});
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch workflow");
-  }
-
-  return response.json();
-}
-
 export const executeWorkflowBulk = async (workflowId: string, files: File[]): Promise<any> => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
@@ -29,29 +19,6 @@ export const executeWorkflowBulk = async (workflowId: string, files: File[]): Pr
   return executeBulkResponse.json();
 };
 
-export const getWorkflow = async (workflowId: string) => {
-  const response = await workflowClient[":workflowId"].$get({
-    param: { id: workflowId },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch workflow");
-  }
-
-  return response.json();
-};
-export const deleteWorkflowMutation = async (workflowId: string) => {
-  const response = await workflowClient[":workflowId"].$delete({
-    param: { workflowId: workflowId },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete workflow");
-  }
-
-  return response.json();
-};
-
 export const createWorkflowFromFile = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -64,6 +31,19 @@ export const createWorkflowFromFile = async (file: File) => {
 
   if (!response.ok) {
     throw new Error("Failed to create workflow from file");
+  }
+
+  return response.json();
+};
+
+export const deleteWorkflowMutation = async (workflowId: string) => {
+  const response = await workflowClient[":workflowId"].$delete({
+    param: { workflowId },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete workflow");
   }
 
   return response.json();

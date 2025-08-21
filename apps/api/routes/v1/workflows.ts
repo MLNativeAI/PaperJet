@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import {
   createWorkflowFromApi,
+  deleteWorkflow,
   getWorkflowExecutionWithExtractedData,
   getWorkflows,
   updateExecutionJobId,
@@ -195,6 +196,31 @@ const router = app
       const { workflowExecutionId } = c.req.valid("param");
       const execution = await getWorkflowExecutionWithExtractedData(workflowExecutionId, user.id);
       return c.json(execution);
+    },
+  )
+  .delete(
+    "/:workflowId",
+    zValidator(
+      "param",
+      z.object({
+        workflowId: workflowIdSchema,
+      }),
+    ),
+    async (c) => {
+      try {
+        const user = await getUser(c);
+        const { workflowId } = c.req.valid("param");
+        
+        await deleteWorkflow(workflowId, user.id);
+        
+        return c.json({ message: "Workflow deleted successfully" });
+      } catch (error) {
+        logger.error(error, "Delete workflow error:");
+        if (error instanceof Error && error.message === "Workflow not found") {
+          return c.json({ error: "Workflow not found" }, 404);
+        }
+        return c.json({ error: "Internal server error" }, 500);
+      }
     },
   );
 

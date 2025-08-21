@@ -20,7 +20,7 @@ export function UserFilterComboBox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[250px] justify-between">
+        <Button variant="outline" aria-expanded={open} className="w-[250px] justify-between">
           {value ? allUserEmails.find((email) => email === value) : "Select user..."}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

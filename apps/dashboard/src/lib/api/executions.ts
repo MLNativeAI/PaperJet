@@ -1,4 +1,4 @@
-import { ExecutionRoutes } from "@paperjet/api/routes";
+import type { ExecutionRoutes } from "@paperjet/api/routes";
 import type { WorkflowExecutionData, WorkflowExecutionRow } from "@paperjet/engine/types";
 import { hc, type InferResponseType } from "hono/client";
 

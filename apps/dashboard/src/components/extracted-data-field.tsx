@@ -1,5 +1,4 @@
 import { Calendar, Hash, Type } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface ExtractedDataFieldProps {
   name: string;
