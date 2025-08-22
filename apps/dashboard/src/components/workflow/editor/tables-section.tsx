@@ -1,51 +1,50 @@
 import type { DraftTable } from "@/types";
-import { TableEditor } from "@/components/table-editor";
-import { TableView } from "@/components/table-view";
+import { TableView } from "@/components/workflow/editor/table-view";
 
 interface TablesSectionProps {
   objectId: string;
   tables: DraftTable[];
-  editingTableId: string | null;
-  onTableEdit: (tableId: string) => void;
-  onTableSave: () => void;
-  onTableCancel: () => void;
+  isEditing: boolean;
+  onTableUpdate: (updatedTable: DraftTable) => void;
   onTableRemove: (tableId: string) => void;
+  onAddTable: () => void;
 }
 
 export function TablesSection({ 
   objectId, 
   tables, 
-  editingTableId, 
-  onTableEdit, 
-  onTableSave, 
-  onTableCancel, 
-  onTableRemove 
+  isEditing, 
+  onTableUpdate, 
+  onTableRemove,
+  onAddTable
 }: TablesSectionProps) {
   if (!tables || tables.length === 0) return null;
 
   return (
     <div className="space-y-2">
-      <h3 className="font-medium">Tables</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium">Tables</h3>
+        {isEditing && (
+          <button 
+            onClick={onAddTable}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            + Add Table
+          </button>
+        )}
+      </div>
       <div className="space-y-2">
         {tables.map((table) => (
-          <div key={table.id}>
-            {editingTableId === table.id ? (
-              <TableEditor 
-                objectId={objectId}
-                table={table} 
-                onSave={onTableSave} 
-                onCancel={onTableCancel} 
-              />
-            ) : (
-              <TableView
-                table={table}
-                onEdit={() => onTableEdit(table.id)}
-                onRemove={() => onTableRemove(table.id)}
-              />
-            )}
-          </div>
+          <TableView
+            key={table.id}
+            table={table}
+            isEditing={isEditing}
+            onUpdate={onTableUpdate}
+            onRemove={() => onTableRemove(table.id)}
+          />
         ))}
       </div>
     </div>
   );
 }
+

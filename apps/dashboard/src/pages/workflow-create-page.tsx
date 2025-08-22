@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { WorkflowObjectForm } from "@/components/workflow-object-form";
+import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
 import { WorkflowConfigProvider, useWorkflowConfig } from "@/contexts/workflow-config-context";
 
 function WorkflowCreatePageContent() {

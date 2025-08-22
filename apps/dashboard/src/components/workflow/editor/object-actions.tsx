@@ -1,25 +1,11 @@
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
 interface ObjectActionsProps {
   isEditing: boolean;
-  onAddField: () => void;
-  onAddTable: () => void;
 }
 
-export function ObjectActions({ isEditing, onAddField, onAddTable }: ObjectActionsProps) {
+export function ObjectActions({ isEditing }: ObjectActionsProps) {
+  // We've moved the Add Field and Add Table buttons to their respective sections
+  // This component is now empty but kept for potential future use
   if (!isEditing) return null;
-
-  return (
-    <div className="flex gap-2">
-      <Button variant="outline" onClick={onAddField}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Field
-      </Button>
-      <Button variant="outline" onClick={onAddTable}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Table
-      </Button>
-    </div>
-  );
+  
+  return null;
 }

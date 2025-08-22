@@ -1,53 +1,50 @@
-import type { DraftField, DraftTable } from "@/types";
-import { FieldEditor } from "@/components/field-editor";
-import { FieldView } from "@/components/field-view";
-import { TableEditor } from "@/components/table-editor";
-import { TableView } from "@/components/table-view";
+import type { DraftField } from "@/types";
+import { FieldView } from "@/components/workflow/editor/field-view";
 
 interface FieldsSectionProps {
   objectId: string;
   fields: DraftField[];
-  editingFieldId: string | null;
-  onFieldEdit: (fieldId: string) => void;
-  onFieldSave: () => void;
-  onFieldCancel: () => void;
+  isEditing: boolean;
+  onFieldUpdate: (updatedField: DraftField) => void;
   onFieldRemove: (fieldId: string) => void;
+  onAddField: () => void;
 }
 
 export function FieldsSection({ 
   objectId, 
   fields, 
-  editingFieldId, 
-  onFieldEdit, 
-  onFieldSave, 
-  onFieldCancel, 
-  onFieldRemove 
+  isEditing, 
+  onFieldUpdate, 
+  onFieldRemove,
+  onAddField
 }: FieldsSectionProps) {
   if (!fields || fields.length === 0) return null;
 
   return (
     <div className="space-y-2">
-      <h3 className="font-medium">Fields</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium">Fields</h3>
+        {isEditing && (
+          <button 
+            onClick={onAddField}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            + Add Field
+          </button>
+        )}
+      </div>
       <div className="space-y-2">
         {fields.map((field) => (
-          <div key={field.id}>
-            {editingFieldId === field.id ? (
-              <FieldEditor 
-                objectId={objectId}
-                field={field} 
-                onSave={onFieldSave} 
-                onCancel={onFieldCancel} 
-              />
-            ) : (
-              <FieldView
-                field={field}
-                onEdit={() => onFieldEdit(field.id)}
-                onRemove={() => onFieldRemove(field.id)}
-              />
-            )}
-          </div>
+          <FieldView
+            key={field.id}
+            field={field}
+            isEditing={isEditing}
+            onUpdate={onFieldUpdate}
+            onRemove={() => onFieldRemove(field.id)}
+          />
         ))}
       </div>
     </div>
   );
 }
+
