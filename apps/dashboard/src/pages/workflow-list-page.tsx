@@ -28,7 +28,13 @@ export default function WorkflowListPage() {
           <h1 className="text-3xl font-bold">My Workflows</h1>
           <p className="text-muted-foreground mt-2">Manage your document processing workflows</p>
         </div>
-        <Button size="lg" className="gap-2" onClick={() => {}}>
+        <Button
+          size="lg"
+          className="gap-2"
+          onClick={() => {
+            navigate({ to: "/workflows/new" });
+          }}
+        >
           <Plus className="h-5 w-5" />
           Create New Workflow
         </Button>
@@ -46,7 +52,11 @@ export default function WorkflowListPage() {
             <p className="text-muted-foreground mb-4">
               You haven't created any workflows yet. Start by creating your first workflow.
             </p>
-            <Button onClick={() => {}}>
+            <Button
+              onClick={() => {
+                navigate({ to: "/workflows/new" });
+              }}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Workflow
             </Button>
