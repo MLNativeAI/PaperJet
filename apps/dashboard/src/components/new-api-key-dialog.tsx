@@ -135,15 +135,6 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
                 </Button>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label>Usage</Label>
-              <div className="p-3 bg-muted rounded-md">
-                <code className="text-sm break-all">
-                  curl -H "Authorization: Bearer {newKey}" https://api.paperjet.com/v1/...
-                </code>
-              </div>
-            </div>
           </div>
 
           <DialogFooter>

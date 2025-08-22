@@ -1,9 +1,9 @@
+import { zValidator } from "@hono/zod-validator";
 import type { ApiKey } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
-import { auth } from "@/lib/auth";
-import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 const app = new Hono();
 
@@ -20,9 +20,9 @@ const router = app
           name: fullKey.name,
           userId: fullKey.userId,
           enabled: fullKey.enabled,
-          key: fullKey.id,
-          lastRequest: fullKey.lastRequest?.toDateString() || null,
-          createdAt: fullKey.createdAt.toDateString(),
+          key: `${fullKey.start}*****`,
+          lastRequest: fullKey.lastRequest ? fullKey.lastRequest.toISOString() : null,
+          createdAt: fullKey.createdAt.toISOString(),
         };
       });
       return c.json(apiKeys);

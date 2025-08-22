@@ -11,11 +11,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
-export default function AdminModelConfigForm({
-  configuration,
-}: {
-  configuration: Configuration;
-}) {
+export default function AdminModelConfigForm({ configuration }: { configuration: Configuration }) {
   const { updateConfiguration, validateConnection } = useModelConfiguration();
   const schema = z.object({
     modelType: z.enum(["cloud", "custom"]),

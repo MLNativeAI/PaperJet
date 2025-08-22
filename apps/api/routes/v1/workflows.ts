@@ -210,9 +210,9 @@ const router = app
       try {
         const user = await getUser(c);
         const { workflowId } = c.req.valid("param");
-        
+
         await deleteWorkflow(workflowId, user.id);
-        
+
         return c.json({ message: "Workflow deleted successfully" });
       } catch (error) {
         logger.error(error, "Delete workflow error:");
