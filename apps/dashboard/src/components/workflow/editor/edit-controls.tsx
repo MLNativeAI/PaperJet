@@ -1,29 +1,32 @@
-import { Edit, Save, X } from "lucide-react";
+import { Edit, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useWorkflowObject } from "@/components/workflow/editor/workflow-object-context";
 
-interface EditControlsProps {
-  isEditing: boolean;
-  onSave: () => void;
-  onCancel: () => void;
-  onEdit: () => void;
-}
-
-export function EditControls({ isEditing, onSave, onCancel, onEdit }: EditControlsProps) {
+export function EditControls() {
+  const { isEditing, cancelEditing, finishEditing, startEditing } = useWorkflowObject();
   return (
-    <div className="flex gap-2 justify-end">
+    <div className="">
       {isEditing ? (
-        <>
-          <Button variant="outline" onClick={onCancel}>
-            <X className="mr-2 h-4 w-4" />
-            Cancel
-          </Button>
-          <Button onClick={onSave}>
-            <Save className="mr-2 h-4 w-4" />
-            Save
-          </Button>
-        </>
+        <div className="flex gap-2 justify-between">
+          <div>
+            <Button variant="outline">
+              <Plus />
+              Add field
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={cancelEditing}>
+              <X className="mr-2 h-4 w-4" />
+              Cancel
+            </Button>
+            <Button onClick={finishEditing}>
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+          </div>
+        </div>
       ) : (
-        <Button variant="outline" onClick={onEdit}>
+        <Button variant="outline" onClick={startEditing}>
           <Edit className="mr-2 h-4 w-4" />
           Edit
         </Button>
@@ -31,3 +34,4 @@ export function EditControls({ isEditing, onSave, onCancel, onEdit }: EditContro
     </div>
   );
 }
+

@@ -1,5 +1,6 @@
 import type { DraftField } from "@/types";
 import { FieldView } from "@/components/workflow/editor/field-view";
+import { Button } from "@/components/ui/button";
 
 interface FieldsSectionProps {
   objectId: string;
@@ -10,13 +11,13 @@ interface FieldsSectionProps {
   onAddField: () => void;
 }
 
-export function FieldsSection({ 
-  objectId, 
-  fields, 
-  isEditing, 
-  onFieldUpdate, 
+export function FieldsSection({
+  objectId,
+  fields,
+  isEditing,
+  onFieldUpdate,
   onFieldRemove,
-  onAddField
+  onAddField,
 }: FieldsSectionProps) {
   if (!fields || fields.length === 0) return null;
 
@@ -25,12 +26,9 @@ export function FieldsSection({
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Fields</h3>
         {isEditing && (
-          <button 
-            onClick={onAddField}
-            className="text-sm text-blue-600 hover:text-blue-800"
-          >
+          <Button onClick={onAddField} className="text-sm text-blue-600 hover:text-blue-800">
             + Add Field
-          </button>
+          </Button>
         )}
       </div>
       <div className="space-y-2">
@@ -47,4 +45,3 @@ export function FieldsSection({
     </div>
   );
 }
-
