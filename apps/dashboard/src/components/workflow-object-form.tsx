@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import type { DraftObject } from "@/types";
 import { useWorkflowConfig } from "@/contexts/workflow-config-context";
-import { ObjectHeader } from "@/components/object-header";
-import { ObjectDescription } from "@/components/object-description";
-import { ObjectActions } from "@/components/object-actions";
-import { EditControls } from "@/components/edit-controls";
-import { FieldsSection } from "@/components/fields-section";
-import { TablesSection } from "@/components/tables-section";
+import { ObjectHeader } from "@/components/workflow/editor/object-header";
+import { ObjectDescription } from "@/components/workflow/editor/object-description";
+import { ObjectActions } from "@/components/workflow/editor/object-actions";
+import { EditControls } from "@/components/workflow/editor/edit-controls";
+import { FieldsSection } from "@/components/workflow/editor/fields-section";
+import { TablesSection } from "@/components/workflow/editor/tables-section";
 import { produce } from "immer";
 
 interface WorkflowObjectFormProps {
