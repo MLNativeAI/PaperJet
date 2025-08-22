@@ -1,12 +1,13 @@
-import { Trash2, Edit, Save, X } from "lucide-react";
-import { produce } from "immer";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import type { DraftObject } from "@/types";
 import { useWorkflowConfig } from "@/contexts/workflow-config-context";
+import { ObjectHeader } from "@/components/object-header";
+import { ObjectDescription } from "@/components/object-description";
+import { ObjectActions } from "@/components/object-actions";
+import { EditControls } from "@/components/edit-controls";
+import { FieldsSection } from "@/components/fields-section";
+import { TablesSection } from "@/components/tables-section";
+import { produce } from "immer";
 
 interface WorkflowObjectFormProps {
   object: DraftObject;
@@ -18,8 +19,15 @@ interface LocalObjectState {
 }
 
 export function WorkflowObjectForm({ object }: WorkflowObjectFormProps) {
-  const { updateObjectName, updateObjectDescription, addObjectField, addObjectTable, removeObject } =
-    useWorkflowConfig();
+  const { 
+    updateObjectName, 
+    updateObjectDescription, 
+    addObjectField, 
+    addObjectTable, 
+    removeObject,
+    removeField,
+    removeTable
+  } = useWorkflowConfig();
 
   const [localObject, setLocalObject] = useState<LocalObjectState>({
     name: object.name,
@@ -27,6 +35,8 @@ export function WorkflowObjectForm({ object }: WorkflowObjectFormProps) {
   });
 
   const [isEditing, setIsEditing] = useState(true);
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+  const [editingTableId, setEditingTableId] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalObject({
@@ -57,89 +67,93 @@ export function WorkflowObjectForm({ object }: WorkflowObjectFormProps) {
     setIsEditing(true);
   };
 
+  const handleFieldEdit = (fieldId: string) => {
+    setEditingFieldId(fieldId);
+    setEditingTableId(null);
+  };
+
+  const handleTableEdit = (tableId: string) => {
+    setEditingTableId(tableId);
+    setEditingFieldId(null);
+  };
+
+  const handleFieldSave = () => {
+    setEditingFieldId(null);
+  };
+
+  const handleTableSave = () => {
+    setEditingTableId(null);
+  };
+
+  const handleFieldCancel = () => {
+    setEditingFieldId(null);
+  };
+
+  const handleTableCancel = () => {
+    setEditingTableId(null);
+  };
+
   return (
     <div className="p-4 border rounded-lg space-y-4">
-      <div className="flex justify-between items-start">
-        <div className="space-y-2 flex-1 pr-2">
-          <Label htmlFor={`object-name-${object.id}`}>Object Name</Label>
-          {isEditing ? (
-            <Input
-              id={`object-name-${object.id}`}
-              value={localObject.name}
-              onChange={(e) =>
-                setLocalObject((prev) =>
-                  produce(prev, (draft) => {
-                    draft.name = e.target.value;
-                  }),
-                )
-              }
-              placeholder="Enter object name"
-            />
-          ) : (
-            <div className="py-2 font-medium">{object.name}</div>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => removeObject(object.id)}
-          className="text-muted-foreground hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
+      <ObjectHeader
+        object={object}
+        isEditing={isEditing}
+        localName={localObject.name}
+        onNameChange={(name) => 
+          setLocalObject((prev) =>
+            produce(prev, (draft) => {
+              draft.name = name;
+            }),
+          )
+        }
+        onRemove={() => removeObject(object.id)}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor={`object-description-${object.id}`}>Description</Label>
-        {isEditing ? (
-          <Textarea
-            id={`object-description-${object.id}`}
-            value={localObject.description}
-            onChange={(e) =>
-              setLocalObject((prev) =>
-                produce(prev, (draft) => {
-                  draft.description = e.target.value;
-                }),
-              )
-            }
-            placeholder="Enter object description"
-          />
-        ) : (
-          <div className="py-2 text-muted-foreground">{object.description || "No description"}</div>
-        )}
-      </div>
+      <ObjectDescription
+        object={object}
+        isEditing={isEditing}
+        localDescription={localObject.description}
+        onDescriptionChange={(description) =>
+          setLocalObject((prev) =>
+            produce(prev, (draft) => {
+              draft.description = description;
+            }),
+          )
+        }
+      />
 
-      {isEditing ? (
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => addObjectField(object.id)}>
-            Add Field
-          </Button>
-          <Button variant="outline" onClick={() => addObjectTable(object.id)}>
-            Add Table
-          </Button>
-        </div>
-      ) : null}
+      <FieldsSection
+        objectId={object.id}
+        fields={object.fields || []}
+        editingFieldId={editingFieldId}
+        onFieldEdit={handleFieldEdit}
+        onFieldSave={handleFieldSave}
+        onFieldCancel={handleFieldCancel}
+        onFieldRemove={(fieldId) => removeField(object.id, fieldId)}
+      />
 
-      <div className="flex gap-2 justify-end">
-        {isEditing ? (
-          <>
-            <Button variant="outline" onClick={handleCancel}>
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              <Save className="mr-2 h-4 w-4" />
-              Save
-            </Button>
-          </>
-        ) : (
-          <Button variant="outline" onClick={handleEdit}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-        )}
-      </div>
+      <TablesSection
+        objectId={object.id}
+        tables={object.tables || []}
+        editingTableId={editingTableId}
+        onTableEdit={handleTableEdit}
+        onTableSave={handleTableSave}
+        onTableCancel={handleTableCancel}
+        onTableRemove={(tableId) => removeTable(object.id, tableId)}
+      />
+
+      <ObjectActions
+        isEditing={isEditing}
+        onAddField={() => addObjectField(object.id)}
+        onAddTable={() => addObjectTable(object.id)}
+      />
+
+      <EditControls
+        isEditing={isEditing}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onEdit={handleEdit}
+      />
     </div>
   );
 }
-

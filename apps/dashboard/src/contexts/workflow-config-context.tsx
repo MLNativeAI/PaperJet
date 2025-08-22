@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { produce } from "immer";
-import type { DraftWorkflowConfig } from "@/types";
+import type { DraftWorkflowConfig, DraftField, DraftTable } from "@/types";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
@@ -8,7 +8,9 @@ interface WorkflowConfigContextType {
   updateObjectName: (objectId: string, name: string) => void;
   updateObjectDescription: (objectId: string, description: string) => void;
   addObjectField: (objectId: string) => void;
+  updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   addObjectTable: (objectId: string) => void;
+  updateTable: (objectId: string, tableId: string, updatedTable: DraftTable) => void;
   removeObject: (objectId: string) => void;
   removeField: (objectId: string, fieldId: string) => void;
   removeTable: (objectId: string, tableId: string) => void;
@@ -67,6 +69,19 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
+  const updateField = (objectId: string, fieldId: string, updatedField: DraftField) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const object = draftState.objects.find(obj => obj.id === objectId);
+      if (object && object.fields) {
+        const fieldIndex = object.fields.findIndex(field => field.id === fieldId);
+        if (fieldIndex !== -1) {
+          object.fields[fieldIndex] = updatedField;
+        }
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
   const addObjectTable = (objectId: string) => {
     const nextState = produce(workflowConfig, (draftState) => {
       const object = draftState.objects.find(obj => obj.id === objectId);
@@ -77,6 +92,19 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
           name: "New Table",
           columns: [],
         });
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const updateTable = (objectId: string, tableId: string, updatedTable: DraftTable) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const object = draftState.objects.find(obj => obj.id === objectId);
+      if (object && object.tables) {
+        const tableIndex = object.tables.findIndex(table => table.id === tableId);
+        if (tableIndex !== -1) {
+          object.tables[tableIndex] = updatedTable;
+        }
       }
     });
     setWorkflowConfig(nextState);
@@ -126,7 +154,9 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         updateObjectName,
         updateObjectDescription,
         addObjectField,
+        updateField,
         addObjectTable,
+        updateTable,
         removeObject,
         removeField,
         removeTable,
