@@ -28,11 +28,7 @@ export async function verifyExtractionAccuracy(
 ) {
   console.log("Verifying extraction accuracy...");
   const expectedResult = JSON.parse(fs.readFileSync(expectedResultFilePath, "utf-8"));
-  const response = await page.request.fetch(`/api/v1/workflows/${workflowId}/executions/${workflowExecutionId}`, {
-    headers: {
-      "x-api-key": process.env.API_KEY || "",
-    },
-  });
+  const response = await page.request.fetch(`/api/v1/workflows/${workflowId}/executions/${workflowExecutionId}`, {});
 
   if (!response.ok()) {
     throw new Error(`Failed to fetch execution data: ${response.status()}`);

@@ -14,9 +14,6 @@ export async function createNewWorkflow(
     configuration: config,
   };
   const newWorkflow = await page.request.post("/api/v1/workflows", {
-    headers: {
-      "x-api-key": process.env.API_KEY || "",
-    },
     data: payload,
   });
 
@@ -31,9 +28,6 @@ export async function createNewWorkflow(
 
 export async function startWorkflowExecution(workflowId: string, filePath: string, page: Page) {
   const executionResponse = await page.request.post(`/api/v1/workflows/${workflowId}/execute`, {
-    headers: {
-      "x-api-key": process.env.API_KEY || "",
-    },
     multipart: {
       workflowId: workflowId,
       file: {
@@ -59,11 +53,6 @@ export async function awaitWorkflowExecutionCompleted(workflowId: string, workfl
   while (currentStatus !== WorkflowExecutionStatus.enum.Completed) {
     const statusResponse = await page.request.fetch(
       `/api/v1/workflows/${workflowId}/executions/${workflowExecutionId}`,
-      {
-        headers: {
-          "x-api-key": process.env.API_KEY || "",
-        },
-      },
     );
     expect(statusResponse.ok()).toBeTruthy();
     if (!statusResponse.ok) {

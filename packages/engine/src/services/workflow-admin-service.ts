@@ -10,6 +10,8 @@ export async function getWorkflows(userId: string): Promise<Workflow[]> {
   return workflows.map((workflow) => {
     return {
       ...workflow,
+      createdAt: workflow.createdAt.toISOString(),
+      updatedAt: workflow.updatedAt.toISOString(),
       configuration: workflow.configuration as WorkflowConfiguration,
     };
   });
@@ -24,6 +26,8 @@ export async function getWorkflow(workflowId: string, userId: string): Promise<W
 
   return {
     ...workflowData,
+    createdAt: workflowData.createdAt.toISOString(),
+    updatedAt: workflowData.updatedAt.toISOString(),
     configuration: workflowData.configuration as WorkflowConfiguration,
   };
 }

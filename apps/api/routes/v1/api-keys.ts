@@ -58,6 +58,7 @@ const router = app
       await auth.api.updateApiKey({
         body: {
           keyId: id,
+          enabled: false,
         },
         headers: c.req.raw.headers,
       });

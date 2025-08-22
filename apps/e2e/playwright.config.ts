@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const API_HOST = process.env.API_HOST || "http://localhost:3000";
+const API_KEY = process.env.API_KEY || "";
 
 export default defineConfig({
   testDir: "./tests",
@@ -13,6 +14,7 @@ export default defineConfig({
     trace: "on-first-retry",
     extraHTTPHeaders: {
       Accept: "application/json",
+      "x-api-key": process.env.API_KEY || "",
     },
   },
 
