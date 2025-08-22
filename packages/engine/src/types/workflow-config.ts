@@ -20,6 +20,7 @@ const TableSchema = z.object({
 
 const FieldsObjectSchema = z.object({
   name: z.string(),
+  description: z.string().optional(),
   fields: z.optional(z.array(FieldSchema)),
   tables: z.optional(z.array(TableSchema)),
 });

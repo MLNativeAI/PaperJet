@@ -1,3 +1,4 @@
+import WorkflowCreatePage from "@/pages/workflow-create-page";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/workflows/new")({
@@ -5,5 +6,5 @@ export const Route = createFileRoute("/_app/workflows/new")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_app/workflows/new"!</div>;
+  return <WorkflowCreatePage />;
 }
