@@ -7,9 +7,10 @@ interface WorkflowConfigContextType {
   addAnObject: () => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
-  // Object-level functions
-  updateField: (objectId: string, handler: (draft: DraftObject) => void) => void;
+  // Field-level functions
   addField: (objectId: string, field: DraftField) => void;
+  updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
+  removeField: (objectId: string, fieldId: string) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
@@ -50,18 +51,6 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
-  const updateField = (objectId: string, handler: (draft: DraftObject) => void) => {
-    const nextState = produce(workflowConfig, (draftState) => {
-      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
-      if (objectIndex !== -1) {
-        // Apply the handler to the specific object
-        const updatedObject = produce(draftState.objects[objectIndex], handler);
-        draftState.objects[objectIndex] = updatedObject;
-      }
-    });
-    setWorkflowConfig(nextState);
-  };
-
   const addField = (objectId: string, field: DraftField) => {
     const nextState = produce(workflowConfig, (draftState) => {
       const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
@@ -77,6 +66,38 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
+  const updateField = (objectId: string, fieldId: string, updatedField: DraftField) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        if (draft.fields) {
+          const fieldIndex = draft.fields.findIndex((f) => f.id === fieldId);
+          if (fieldIndex !== -1) {
+            draft.fields[fieldIndex] = updatedField;
+          }
+        }
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const removeField = (objectId: string, fieldId: string) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        if (draft.fields) {
+          const fieldIndex = draft.fields.findIndex((f) => f.id === fieldId);
+          if (fieldIndex !== -1) {
+            draft.fields.splice(fieldIndex, 1);
+          }
+        }
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
   return (
     <WorkflowConfigContext.Provider
       value={{
@@ -84,8 +105,9 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         addAnObject,
         updateObject,
         removeObject,
-        updateField,
         addField,
+        updateField,
+        removeField,
       }}
     >
       {children}
