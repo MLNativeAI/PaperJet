@@ -1,11 +1,10 @@
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { useWorkflowConfig, WorkflowConfigProvider } from "@/components/workflow/editor/workflow-config-context";
 import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
+import { AddObjectButton } from "@/components/workflow/editor/add-object-button";
 
 function WorkflowCreatePageContent() {
-  const { workflowConfig, addAnObject } = useWorkflowConfig();
+  const { workflowConfig } = useWorkflowConfig();
 
   return (
     <div className="w-full px-4 py-8 space-y-8 max-w-5xl">
@@ -27,18 +26,14 @@ function WorkflowCreatePageContent() {
         {workflowConfig.objects.length === 0 ? (
           <div className="flex flex-col gap-4 items-center text-center py-8">
             <span>You don't have any data defined yet</span>
-            <Button variant="default" onClick={addAnObject}>
-              Add an object
-            </Button>
+            <AddObjectButton />
           </div>
         ) : (
           <>
             {workflowConfig.objects.map((object) => (
               <WorkflowObjectForm key={object.id} draftObject={object} />
             ))}
-            <Button variant="default" onClick={addAnObject} className="self-start">
-              <Plus className="mr-2 h-4 w-4" /> Add another object
-            </Button>
+            <AddObjectButton />
           </>
         )}
       </div>

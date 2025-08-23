@@ -4,7 +4,7 @@ import type { DraftWorkflowConfig, DraftObject, DraftField } from "@/types";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
-  addAnObject: () => void;
+  addAnObject: (initialValues?: { name?: string; description?: string }) => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
   // Field-level functions
@@ -20,12 +20,12 @@ const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefine
 export function WorkflowConfigProvider({ children }: { children: React.ReactNode }) {
   const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
 
-  const addAnObject = () => {
+  const addAnObject = (initialValues?: { name?: string; description?: string }) => {
     const nextState = produce(workflowConfig, (draftState) => {
       draftState.objects.push({
         id: Date.now().toString(),
-        name: "",
-        description: "",
+        name: initialValues?.name || "",
+        description: initialValues?.description || "",
         fields: [],
         tables: [],
       });

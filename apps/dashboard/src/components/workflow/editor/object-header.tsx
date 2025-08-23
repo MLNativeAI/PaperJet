@@ -1,42 +1,38 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { ObjectEditorSheet } from "@/components/workflow/editor/object-editor-sheet";
 import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
 import type { DraftObject } from "@/types";
+import { Trash2 } from "lucide-react";
 
 export function ObjectHeader({ draftObject }: { draftObject: DraftObject }) {
-  const { updateObject } = useWorkflowConfig();
+  const { removeObject } = useWorkflowConfig();
+
   return (
     <div className="py-3 space-y-3">
-      <div className="space-y-3">
-        <div className="flex items-center gap-4">
-          <Label htmlFor={`object-name-${draftObject.id}`} className="w-24">
-            Name
-          </Label>
-          <Input
-            id={`object-name-${draftObject.id}`}
-            value={draftObject.name}
-            onChange={(e) => {
-              updateObject({ ...draftObject, name: e.target.value });
-            }}
-            placeholder="Enter object name"
-            className="flex-1"
-          />
-        </div>
+      <div className="flex justify-between items-start">
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">{draftObject.name || "Unnamed Object"}</span>
+          </div>
 
-        <div className="flex items-start gap-4">
-          <Label htmlFor={`object-description-${draftObject.id}`} className="w-24 pt-2">
-            Description
-          </Label>
-          <Textarea
-            id={`object-description-${draftObject.id}`}
-            value={draftObject.description || ""}
-            onChange={(e) => {
-              updateObject({ ...draftObject, description: e.target.value });
-            }}
-            placeholder="Enter object description"
-            className="flex-1 min-h-[40px] h-10 resize-none"
-          />
+          {draftObject.description && (
+            <div className="flex items-start gap-4">
+              <span className="text-muted-foreground text-sm">
+                {draftObject.description}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => removeObject(draftObject.id)}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <ObjectEditorSheet draftObject={draftObject} mode="edit" />
         </div>
       </div>
     </div>
