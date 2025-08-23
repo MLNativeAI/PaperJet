@@ -11,6 +11,7 @@ interface WorkflowConfigContextType {
   addField: (objectId: string) => void;
   updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   removeField: (objectId: string, fieldId: string) => void;
+  // Table-level functions
   addTable: (objectId: string) => void;
 }
 
@@ -72,23 +73,22 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
   };
 
   const addTable = (objectId: string) => {
-    //TODO:: table add logic
-    // const nextState = produce(workflowConfig, (draftState) => {
-    //   const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
-    //   if (objectIndex !== -1) {
-    //     const draft = draftState.objects[objectIndex];
-    //     // Initialize fields array if it doesn't exist
-    //     if (!draft.fields) {
-    //       draft.fields = [];
-    //     }
-    //     draft.fields.push({
-    //       id: Date.now().toString(),
-    //       name: "New Field",
-    //       type: "string",
-    //     });
-    //   }
-    // });
-    // setWorkflowConfig(nextState);
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        // Initialize tables array if it doesn't exist
+        if (!draft.tables) {
+          draft.tables = [];
+        }
+        draft.tables.push({
+          id: Date.now().toString(),
+          name: "",
+          columns: [],
+        });
+      }
+    });
+    setWorkflowConfig(nextState);
   };
 
   const updateField = (objectId: string, fieldId: string, updatedField: DraftField) => {
