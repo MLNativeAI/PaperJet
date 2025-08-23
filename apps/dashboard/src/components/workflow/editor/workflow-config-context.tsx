@@ -8,9 +8,10 @@ interface WorkflowConfigContextType {
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
   // Field-level functions
-  addField: (objectId: string, field: DraftField) => void;
+  addField: (objectId: string) => void;
   updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   removeField: (objectId: string, fieldId: string) => void;
+  addTable: (objectId: string) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
@@ -22,7 +23,7 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     const nextState = produce(workflowConfig, (draftState) => {
       draftState.objects.push({
         id: Date.now().toString(),
-        name: "New Object",
+        name: "",
         description: "",
         fields: [],
         tables: [],
@@ -51,7 +52,7 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
-  const addField = (objectId: string, field: DraftField) => {
+  const addField = (objectId: string) => {
     const nextState = produce(workflowConfig, (draftState) => {
       const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
       if (objectIndex !== -1) {
@@ -60,10 +61,34 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         if (!draft.fields) {
           draft.fields = [];
         }
-        draft.fields.push(field);
+        draft.fields.push({
+          id: Date.now().toString(),
+          name: "",
+          type: "string",
+        });
       }
     });
     setWorkflowConfig(nextState);
+  };
+
+  const addTable = (objectId: string) => {
+    //TODO:: table add logic
+    // const nextState = produce(workflowConfig, (draftState) => {
+    //   const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+    //   if (objectIndex !== -1) {
+    //     const draft = draftState.objects[objectIndex];
+    //     // Initialize fields array if it doesn't exist
+    //     if (!draft.fields) {
+    //       draft.fields = [];
+    //     }
+    //     draft.fields.push({
+    //       id: Date.now().toString(),
+    //       name: "New Field",
+    //       type: "string",
+    //     });
+    //   }
+    // });
+    // setWorkflowConfig(nextState);
   };
 
   const updateField = (objectId: string, fieldId: string, updatedField: DraftField) => {
@@ -108,6 +133,7 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         addField,
         updateField,
         removeField,
+        addTable,
       }}
     >
       {children}

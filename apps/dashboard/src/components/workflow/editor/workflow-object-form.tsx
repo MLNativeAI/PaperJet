@@ -1,14 +1,23 @@
-import { ObjectDescription } from "@/components/workflow/editor/object-description";
-import { ObjectHeader } from "@/components/workflow/editor/object-header";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { FieldList } from "@/components/workflow/editor/field-list";
+import { ObjectActions } from "@/components/workflow/editor/object-actions";
+import { ObjectHeader } from "@/components/workflow/editor/object-header";
 import type { DraftObject } from "@/types";
 
 export function WorkflowObjectForm({ draftObject }: { draftObject: DraftObject }) {
   return (
-    <div className="p-4 border rounded-lg space-y-6">
-      <ObjectHeader draftObject={draftObject} />
-      <ObjectDescription draftObject={draftObject} />
-      <FieldList draftObject={draftObject} />
-    </div>
+    <Card>
+      <CardHeader>
+        <ObjectHeader draftObject={draftObject} />
+        <Separator />
+      </CardHeader>
+      <CardContent>
+        <div className="py-4 space-y-6">
+          <FieldList draftObject={draftObject} />
+          <ObjectActions draftObject={draftObject} />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
