@@ -8,8 +8,8 @@ interface WorkflowConfigContextType {
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
   // Object-level functions
-  updateField: (objectId: string, fieldId: string, handler: (draft: DraftObject) => void) => void;
-  addField: (objectId: string) => void;
+  updateField: (objectId: string, handler: (draft: DraftObject) => void) => void;
+  addField: (objectId: string, field: DraftField) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);

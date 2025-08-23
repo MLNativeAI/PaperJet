@@ -6,7 +6,7 @@ import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-
 import type { DraftObject } from "@/types";
 
 export function ObjectHeader({ draftObject }: { draftObject: DraftObject }) {
-  const { updateField, removeObject } = useWorkflowConfig();
+  const { updateObject, removeObject } = useWorkflowConfig();
   return (
     <div className="flex justify-between items-start">
       <div className="space-y-2 flex-1 pr-2">
@@ -15,9 +15,7 @@ export function ObjectHeader({ draftObject }: { draftObject: DraftObject }) {
           id={`object-name-${draftObject.id}`}
           value={draftObject.name}
           onChange={(e) => {
-            updateField(draftObject.id, (draft) => {
-              draft.name = e.target.value;
-            });
+            updateObject({ ...draftObject, name: e.target.value });
           }}
           placeholder="Enter object name"
         />

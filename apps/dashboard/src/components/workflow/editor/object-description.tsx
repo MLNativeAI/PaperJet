@@ -4,7 +4,7 @@ import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-
 import type { DraftObject } from "@/types";
 
 export function ObjectDescription({ draftObject }: { draftObject: DraftObject }) {
-  const { updateField } = useWorkflowConfig();
+  const { updateObject } = useWorkflowConfig();
 
   return (
     <div className="space-y-2">
@@ -13,9 +13,7 @@ export function ObjectDescription({ draftObject }: { draftObject: DraftObject })
         id={`object-description-${draftObject.id}`}
         value={draftObject.description || ""}
         onChange={(e) => {
-          updateField(draftObject.id, (draft) => {
-            draft.description = e.target.value;
-          });
+          updateObject({ ...draftObject, description: e.target.value });
         }}
         placeholder="Enter object description"
       />
