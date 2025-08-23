@@ -1,28 +1,24 @@
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useWorkflowObject } from "@/components/workflow/editor/workflow-object-context";
+import { Textarea } from "@/components/ui/textarea";
+import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
+import type { DraftObject } from "@/types";
 
-export function ObjectDescription() {
-  const { draftObject, isEditing, updateField } = useWorkflowObject();
+export function ObjectDescription({ draftObject }: { draftObject: DraftObject }) {
+  const { updateField } = useWorkflowConfig();
 
   return (
     <div className="space-y-2">
       <Label htmlFor={`object-description-${draftObject.id}`}>Description</Label>
-      {isEditing ? (
-        <Textarea
-          id={`object-description-${draftObject.id}`}
-          value={draftObject.description || ""}
-          onChange={(e) => {
-            updateField((draft) => {
-              draft.description = e.target.value;
-            });
-          }}
-          placeholder="Enter object description"
-        />
-      ) : (
-        <div className="py-2 text-muted-foreground">{draftObject.description || "No description"}</div>
-      )}
+      <Textarea
+        id={`object-description-${draftObject.id}`}
+        value={draftObject.description || ""}
+        onChange={(e) => {
+          updateField(draftObject.id, (draft) => {
+            draft.description = e.target.value;
+          });
+        }}
+        placeholder="Enter object description"
+      />
     </div>
   );
 }
-

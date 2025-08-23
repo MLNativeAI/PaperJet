@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { WorkflowConfigProvider, useWorkflowConfig } from "@/contexts/workflow-config-context";
+import { useWorkflowConfig, WorkflowConfigProvider } from "@/components/workflow/editor/workflow-config-context";
 import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
 
 function WorkflowCreatePageContent() {
@@ -36,7 +36,7 @@ function WorkflowCreatePageContent() {
             ) : (
               <>
                 {workflowConfig.objects.map((object) => (
-                  <WorkflowObjectForm key={object.id} initialObject={object} />
+                  <WorkflowObjectForm key={object.id} draftObject={object} />
                 ))}
                 <Button variant="default" onClick={addAnObject} className="self-start">
                   <Plus className="mr-2 h-4 w-4" /> Add another object

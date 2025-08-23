@@ -1,12 +1,15 @@
 import { createContext, useContext, useState } from "react";
 import { produce } from "immer";
-import type { DraftWorkflowConfig, DraftObject } from "@/types";
+import type { DraftWorkflowConfig, DraftObject, DraftField } from "@/types";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
   addAnObject: () => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
+  // Object-level functions
+  updateField: (objectId: string, fieldId: string, handler: (draft: DraftObject) => void) => void;
+  addField: (objectId: string) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
@@ -29,7 +32,7 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
 
   const updateObject = (updatedObject: DraftObject) => {
     const nextState = produce(workflowConfig, (draftState) => {
-      const objectIndex = draftState.objects.findIndex(obj => obj.id === updatedObject.id);
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === updatedObject.id);
       if (objectIndex !== -1) {
         draftState.objects[objectIndex] = updatedObject;
       }
@@ -39,9 +42,36 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
 
   const removeObject = (objectId: string) => {
     const nextState = produce(workflowConfig, (draftState) => {
-      const index = draftState.objects.findIndex(obj => obj.id === objectId);
+      const index = draftState.objects.findIndex((obj) => obj.id === objectId);
       if (index !== -1) {
         draftState.objects.splice(index, 1);
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const updateField = (objectId: string, handler: (draft: DraftObject) => void) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        // Apply the handler to the specific object
+        const updatedObject = produce(draftState.objects[objectIndex], handler);
+        draftState.objects[objectIndex] = updatedObject;
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const addField = (objectId: string, field: DraftField) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        // Initialize fields array if it doesn't exist
+        if (!draft.fields) {
+          draft.fields = [];
+        }
+        draft.fields.push(field);
       }
     });
     setWorkflowConfig(nextState);
@@ -54,6 +84,8 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         addAnObject,
         updateObject,
         removeObject,
+        updateField,
+        addField,
       }}
     >
       {children}
@@ -68,4 +100,3 @@ export function useWorkflowConfig() {
   }
   return context;
 }
-
