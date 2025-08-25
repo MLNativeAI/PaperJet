@@ -52,9 +52,8 @@ export function ObjectEditorSheet({ draftObject, mode, trigger, onObjectAdded }:
 
   const defaultTrigger =
     mode === "edit" ? (
-      <Button variant="ghost" size="sm" className="h-8 px-2">
-        <Pencil className="h-4 w-4 mr-1" />
-        Edit
+      <Button variant="ghost" size="sm" className="text-muted-foreground h-8 px-2">
+        <Pencil className="h-4 w-4 " />
       </Button>
     ) : (
       <Button variant="ghost" size="sm" className="h-8 px-2">
@@ -115,4 +114,3 @@ export function ObjectEditorSheet({ draftObject, mode, trigger, onObjectAdded }:
     </Sheet>
   );
 }
-
