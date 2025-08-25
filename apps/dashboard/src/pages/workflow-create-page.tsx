@@ -1,10 +1,28 @@
+import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useWorkflowConfig, WorkflowConfigProvider } from "@/components/workflow/editor/workflow-config-context";
 import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
 import { AddObjectButton } from "@/components/workflow/editor/add-object-button";
 
 function WorkflowCreatePageContent() {
-  const { workflowConfig } = useWorkflowConfig();
+  const { workflowConfig, name, description, setName, setDescription, createWorkflow } = useWorkflowConfig();
+  const navigate = useNavigate();
+
+  const handleSave = async () => {
+    try {
+      await createWorkflow.mutateAsync();
+      toast.success("Workflow created successfully");
+      navigate({ to: "/" });
+    } catch (error) {
+      toast.error("Failed to create workflow");
+      console.error("Error creating workflow:", error);
+    }
+  };
 
   return (
     <div className="w-full px-4 py-8 space-y-8 max-w-5xl">
@@ -16,6 +34,31 @@ function WorkflowCreatePageContent() {
           </p>
         </div>
       </div>
+      
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="workflow-name">Workflow Name</Label>
+          <Input
+            id="workflow-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter workflow name"
+            className="mt-1"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="workflow-description">Description</Label>
+          <Textarea
+            id="workflow-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter workflow description"
+            className="mt-1"
+          />
+        </div>
+      </div>
+      
       <div>
         <CardTitle>Workflow configuration</CardTitle>
         <CardDescription>
@@ -36,6 +79,14 @@ function WorkflowCreatePageContent() {
             <AddObjectButton />
           </>
         )}
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave} disabled={createWorkflow.isPending}>
+          {createWorkflow.isPending ? "Creating..." : "Create Workflow"}
+        </Button>
       </div>
     </div>
   );

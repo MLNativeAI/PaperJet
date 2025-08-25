@@ -1,4 +1,7 @@
+import type { WorkflowRoutes } from "@paperjet/api/routes";
 import type { Workflow } from "@paperjet/engine/types";
+import { type UseMutationResult, useMutation, useQueryClient } from "@tanstack/react-query";
+import { hc } from "hono/client";
 import { produce } from "immer";
 import { createContext, useContext, useEffect, useState } from "react";
 import {
@@ -7,13 +10,17 @@ import {
   type DraftTable,
   type DraftWorkflowConfig,
   fromWorkflowConfig,
+  toWorkflowConfig,
 } from "@/types";
-import { useMutation } from "@tanstack/react-query";
-import { WorkflowRoutes } from "@paperjet/api/routes";
-import { hc } from "hono/client";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
+  name: string;
+  description: string;
+  setName: (name: string) => void;
+  setDescription: (description: string) => void;
+  createWorkflow: UseMutationResult<never, Error, void, unknown>;
+  updateWorkflow: UseMutationResult<never, Error, void, unknown>;
   addAnObject: (initialValues?: { name?: string; description?: string }) => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
@@ -38,24 +45,52 @@ export function WorkflowConfigProvider({
   children: React.ReactNode;
   initialWorkflow?: Workflow;
 }) {
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
+  const queryClient = useQueryClient();
 
-  const updateWorkflow = useMutation({
-    mutationFn: async (workflowConfig: DraftWorkflowConfig) => {
-      await workflowClient[":workflowId"].$put({
+  const createWorkflow = useMutation({
+    mutationFn: async () => {
+      const response = await workflowClient.index.$post({
         json: {
-          configuration: {
-            objects: workflowConfig.objects,
-          },
+          configuration: toWorkflowConfig(workflowConfig),
+          name: name,
+          description: description,
         },
-      });
-      const response = await adminClient.config.$patch({
-        json: config,
       });
       if (!response.ok) {
         const error = await response.json();
         console.error(error);
-        throw new Error("Failed to update configuration");
+        throw new Error("Failed to create workflow");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["config"] });
+    },
+  });
+
+  const updateWorkflow = useMutation({
+    mutationFn: async () => {
+      if (!initialWorkflow) {
+        console.error(`Initial workflow is missing`);
+        throw new Error(`Initial workflow is missing`);
+      }
+      const response = await workflowClient[":workflowId"].$put({
+        param: {
+          workflowId: initialWorkflow.id,
+        },
+        json: {
+          configuration: toWorkflowConfig(workflowConfig),
+          name: name,
+          description: description,
+        },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        console.error(error);
+        throw new Error("Failed to update workflow");
       }
       return response.json();
     },
@@ -67,6 +102,8 @@ export function WorkflowConfigProvider({
   useEffect(() => {
     if (initialWorkflow) {
       setWorkflowConfig({ objects: fromWorkflowConfig(initialWorkflow.configuration) });
+      setName(initialWorkflow.name);
+      setDescription(initialWorkflow.description);
     }
   }, [initialWorkflow]);
 
@@ -200,6 +237,12 @@ export function WorkflowConfigProvider({
     <WorkflowConfigContext.Provider
       value={{
         workflowConfig,
+        name,
+        description,
+        setName,
+        setDescription,
+        createWorkflow,
+        updateWorkflow,
         addAnObject,
         updateObject,
         removeObject,

@@ -16,7 +16,6 @@ import { Hono } from "hono";
 import z from "zod";
 import { getUser } from "@/lib/auth";
 import { workflowExecutionIdSchema, workflowIdSchema } from "@/lib/validation";
-import { workflow } from "@paperjet/db/schema";
 
 const app = new Hono();
 
@@ -229,7 +228,7 @@ const router = app
           user.id,
         );
         logger.info({ workflowId, name: updateWorkflowData.name }, "Workflow updated");
-        return c.json({ workflowId, message: "Workflow updated" }, 204);
+        return c.json({ workflowId, message: "Workflow updated" }, 200);
       } catch (error) {
         // TODO unified error handling for API requests & shared error types
         logger.error(error, "update workflow error:");

@@ -1,4 +1,4 @@
-import { WorkflowConfiguration } from "../../../packages/engine/src/types/workflow-config";
+import type { WorkflowConfiguration } from "../../../packages/engine/src/types/workflow-config";
 
 export interface DraftField {
   id: string;
@@ -59,4 +59,10 @@ export function fromWorkflowConfig(config: WorkflowConfiguration) {
       })) || [],
   }));
   return draftObjects;
+}
+
+export function toWorkflowConfig(config: DraftWorkflowConfig): WorkflowConfiguration {
+  return {
+    objects: config.objects,
+  };
 }

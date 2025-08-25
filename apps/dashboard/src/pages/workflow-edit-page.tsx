@@ -3,6 +3,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { AddObjectButton } from "@/components/workflow/editor/add-object-button";
 import { useWorkflowConfig, WorkflowConfigProvider } from "@/components/workflow/editor/workflow-config-context";
 import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
@@ -12,11 +15,12 @@ interface WorkflowEditPageProps {
 }
 
 function WorkflowEditPageContent() {
-  const { workflowConfig } = useWorkflowConfig();
+  const { workflowConfig, name, description, setName, setDescription, updateWorkflow } = useWorkflowConfig();
   const navigate = useNavigate();
 
   const handleSave = async () => {
     try {
+      await updateWorkflow.mutateAsync();
       toast.success("Workflow saved successfully");
       navigate({ to: "/" });
     } catch (error) {
@@ -35,6 +39,31 @@ function WorkflowEditPageContent() {
           </p>
         </div>
       </div>
+
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="workflow-name">Workflow Name</Label>
+          <Input
+            id="workflow-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter workflow name"
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="workflow-description">Description</Label>
+          <Textarea
+            id="workflow-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter workflow description"
+            className="mt-1"
+          />
+        </div>
+      </div>
+
       <div>
         <CardTitle>Workflow configuration</CardTitle>
         <CardDescription>
@@ -60,7 +89,9 @@ function WorkflowEditPageContent() {
         <Button variant="outline" onClick={() => navigate({ to: "/" })}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>Save Changes</Button>
+        <Button onClick={handleSave} disabled={updateWorkflow.isPending}>
+          {updateWorkflow.isPending ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
     </div>
   );
