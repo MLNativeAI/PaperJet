@@ -1,7 +1,7 @@
 import { db } from "@paperjet/db";
 import { documentData, file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import type { ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
+import type { ExecutionStatusResponse, ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
 import { exportData } from "./export";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
@@ -94,6 +94,40 @@ export async function getWorkflowExecutionWithExtractedData(
     completedAt: execution.completedAt?.toISOString() || null,
     createdAt: execution.createdAt.toISOString(),
     extractedData: execution.extractedData as unknown as ExtractedDataType,
+  };
+}
+
+export async function getWorkflowExecutionStatus(
+  workflowExecutionId: string,
+  userId: string,
+): Promise<ExecutionStatusResponse> {
+  const result = await db
+    .select({
+      id: workflowExecution.id,
+      workflowId: workflowExecution.workflowId,
+      workflowName: workflow.name,
+      fileId: workflowExecution.fileId,
+      fileName: file.fileName,
+      jobId: workflowExecution.jobId,
+      status: workflowExecution.status,
+      errorMessage: workflowExecution.errorMessage,
+      startedAt: workflowExecution.startedAt,
+      completedAt: workflowExecution.completedAt,
+      createdAt: workflowExecution.createdAt,
+    })
+    .from(workflowExecution)
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)));
+
+  const execution = result[0];
+  if (!execution) {
+    throw new Error("not found");
+  }
+
+  return {
+    ...execution,
+    fileName: execution.fileName || "Unknown File",
+    startedAt: execution.startedAt.toISOString(),
+    completedAt: execution.completedAt?.toISOString() || null,
   };
 }
 

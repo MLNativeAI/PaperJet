@@ -1,5 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
-import { exportExecution, getAllWorkflowExecutions, getWorkflowExecutionWithExtractedData } from "@paperjet/engine";
+import {
+  exportExecution,
+  getAllWorkflowExecutions,
+  getWorkflowExecutionStatus,
+  getWorkflowExecutionWithExtractedData,
+} from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
@@ -32,6 +37,29 @@ const router = app
         const user = await getUser(c);
         const { executionId } = c.req.valid("param");
         const execution = await getWorkflowExecutionWithExtractedData(executionId, user.id);
+        return c.json(execution);
+      } catch (error) {
+        logger.error(error, "Get execution by ID error:");
+        if (error instanceof Error && error.message === "not found") {
+          return c.json({ error: "Execution not found" }, 404);
+        }
+        return c.json({ error: "Failed to get execution" }, 500);
+      }
+    },
+  )
+  .get(
+    "/:executionId/status",
+    zValidator(
+      "param",
+      z.object({
+        executionId: workflowExecutionIdSchema,
+      }),
+    ),
+    async (c) => {
+      try {
+        const user = await getUser(c);
+        const { executionId } = c.req.valid("param");
+        const execution = await getWorkflowExecutionStatus(executionId, user.id);
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");

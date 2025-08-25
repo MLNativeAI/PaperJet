@@ -49,3 +49,16 @@ export type WorkflowExecutionData = {
   completedAt: string | null;
   extractedData: ExtractedDataType;
 };
+
+export type ExecutionStatusResponse = {
+  id: string;
+  status: WorkflowExecutionStatus;
+  workflowId: string;
+  workflowName: string;
+  fileId: string;
+  fileName: string;
+  jobId: string | null;
+  errorMessage: string | null;
+  startedAt: string;
+  completedAt: string | null;
+};
