@@ -54,9 +54,7 @@ export type ExecutionStatusResponse = {
   id: string;
   status: WorkflowExecutionStatus;
   workflowId: string;
-  workflowName: string;
   fileId: string;
-  fileName: string;
   jobId: string | null;
   errorMessage: string | null;
   startedAt: string;

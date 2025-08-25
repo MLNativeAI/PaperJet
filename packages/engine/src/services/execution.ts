@@ -105,9 +105,7 @@ export async function getWorkflowExecutionStatus(
     .select({
       id: workflowExecution.id,
       workflowId: workflowExecution.workflowId,
-      workflowName: workflow.name,
       fileId: workflowExecution.fileId,
-      fileName: file.fileName,
       jobId: workflowExecution.jobId,
       status: workflowExecution.status,
       errorMessage: workflowExecution.errorMessage,
@@ -125,7 +123,6 @@ export async function getWorkflowExecutionStatus(
 
   return {
     ...execution,
-    fileName: execution.fileName || "Unknown File",
     startedAt: execution.startedAt.toISOString(),
     completedAt: execution.completedAt?.toISOString() || null,
   };

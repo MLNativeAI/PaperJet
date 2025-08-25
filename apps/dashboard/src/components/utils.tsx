@@ -1,4 +1,5 @@
-import { Calendar, Hash, Type } from "lucide-react";
+import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
+import { Calendar, CheckCircle, Clock, Hash, Type, XCircle } from "lucide-react";
 
 const getFieldType = (value: string | number | Date | null) => {
   if (value === null || value === undefined) return "empty";
@@ -66,5 +67,35 @@ export const getFieldIconByType = (type: "number" | "string" | "date") => {
       return <Hash className="h-4 w-4" />;
     default:
       return <Type className="h-4 w-4" />;
+  }
+};
+
+export const getStatusIcon = (status: WorkflowExecutionStatus) => {
+  switch (status) {
+    case "Queued":
+      return <Clock className="h-4 w-4 text-yellow-600" />;
+    case "Processing":
+      return <Clock className="h-4 w-4 text-blue-600 animate-spin" />;
+    case "Completed":
+      return <CheckCircle className="h-4 w-4 text-green-600" />;
+    case "Failed":
+      return <XCircle className="h-4 w-4 text-red-600" />;
+    default:
+      return <Clock className="h-4 w-4 text-gray-400" />;
+  }
+};
+
+export const getStatusText = (status: WorkflowExecutionStatus) => {
+  switch (status) {
+    case "Queued":
+      return "Queued";
+    case "Processing":
+      return "Processing";
+    case "Completed":
+      return "Completed";
+    case "Failed":
+      return "Failed";
+    default:
+      return "Unknown";
   }
 };
