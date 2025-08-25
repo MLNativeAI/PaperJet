@@ -33,7 +33,7 @@ export function DocumentPreview({ workflowExecutionId }: { workflowExecutionId: 
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-[500px] md:h-[800px] w-full">
+        <div className="h-[500px] md:h-[1000px] w-full">
           {<iframe src={documentUrl} className="w-full h-full border-0 rounded-b-lg" title="Document Preview" />}
         </div>
       </CardContent>
