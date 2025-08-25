@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import {
   exportExecution,
   getAllWorkflowExecutions,
+  getPresignedFileUrl,
   getWorkflowExecutionStatus,
   getWorkflowExecutionWithExtractedData,
 } from "@paperjet/engine";
@@ -67,6 +68,29 @@ const router = app
           return c.json({ error: "Execution not found" }, 404);
         }
         return c.json({ error: "Failed to get execution" }, 500);
+      }
+    },
+  )
+  .get(
+    "/:executionId/file",
+    zValidator(
+      "param",
+      z.object({
+        executionId: workflowExecutionIdSchema,
+      }),
+    ),
+    async (c) => {
+      try {
+        const user = await getUser(c);
+        const { executionId } = c.req.valid("param");
+        const documentUrl = await getPresignedFileUrl(executionId, user.id);
+        return c.json(documentUrl);
+      } catch (error) {
+        logger.error(error, "Get document url error");
+        if (error instanceof Error && error.message === "not found") {
+          return c.json({ error: "Execution not found" }, 404);
+        }
+        return c.json({ error: "Failed to get document url" }, 500);
       }
     },
   )

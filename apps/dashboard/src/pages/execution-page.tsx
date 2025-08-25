@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileJson, FileText } from "lucide-react";
+import { ArrowLeft, Download, FileJson, FileText, Grid, LayoutPanelLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
@@ -15,11 +15,14 @@ import {
 import { useExecution } from "@/hooks/use-execution";
 import { exportExecution } from "@/lib/api/executions";
 import { formatDuration } from "@/lib/utils/date";
+import { Label } from "@/components/ui/label";
+import { DocumentPreview } from "@/components/document-preview";
 
 export default function ExecutionPage() {
   const { executionId } = useParams({ from: "/_app/executions/$executionId" });
   const navigate = useNavigate();
   const [isExporting, setIsExporting] = useState(false);
+  const [viewMode, setViewMode] = useState<"results" | "compare">("compare");
 
   const { execution, isLoading, error } = useExecution(executionId);
 
@@ -63,6 +66,27 @@ export default function ExecutionPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          <Label>View mode</Label>
+          <div className="flex items-center gap-1 border rounded-lg p-1">
+            <Button
+              onClick={() => setViewMode("compare")}
+              variant={viewMode === "results" ? "ghost" : "secondary"}
+              size="sm"
+              className="h-8 px-3"
+            >
+              <Grid className="h-4 w-4 mr-1" />
+              Compare
+            </Button>
+            <Button
+              onClick={() => setViewMode("results")}
+              variant={viewMode === "compare" ? "ghost" : "secondary"}
+              size="sm"
+              className="h-8 px-3"
+            >
+              <LayoutPanelLeft className="h-4 w-4 mr-1" />
+              Results only
+            </Button>
+          </div>
           {execution.status === "Completed" && execution.extractedData && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -85,37 +109,73 @@ export default function ExecutionPage() {
           )}
         </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>File Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Filename</p>
-              <p className="text-lg font-medium">{execution.fileName}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Status</p>
-              <ExecutionStatusBadge status={execution.status} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Duration</p>
-              <p className="text-lg">{formatDuration(execution.startedAt, execution.completedAt)}</p>
-            </div>
-            {execution.errorMessage && (
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Error Message</p>
-                <p className="text-sm text-red-600">{execution.errorMessage}</p>
+      {viewMode === "results" && execution.status === "Completed" && execution.extractedData && (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>File Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Filename</p>
+                  <p className="text-lg font-medium">{execution.fileName}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <ExecutionStatusBadge status={execution.status} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Duration</p>
+                  <p className="text-lg">{formatDuration(execution.startedAt, execution.completedAt)}</p>
+                </div>
+                {execution.errorMessage && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Error Message</p>
+                    <p className="text-sm text-red-600">{execution.errorMessage}</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
 
-      {execution.status === "Completed" && execution.extractedData && (
-        <ExtractedDataRenderer data={execution.extractedData} />
+          <ExtractedDataRenderer data={execution.extractedData} />
+        </>
+      )}
+      {viewMode === "compare" && execution.status === "Completed" && execution.extractedData && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>File Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Filename</p>
+                    <p className="text-lg font-medium">{execution.fileName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Status</p>
+                    <ExecutionStatusBadge status={execution.status} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Duration</p>
+                    <p className="text-lg">{formatDuration(execution.startedAt, execution.completedAt)}</p>
+                  </div>
+                  {execution.errorMessage && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Error Message</p>
+                      <p className="text-sm text-red-600">{execution.errorMessage}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <ExtractedDataRenderer data={execution.extractedData} />
+          </div>
+          <DocumentPreview workflowExecutionId={execution.id} />
+        </div>
       )}
     </div>
   );

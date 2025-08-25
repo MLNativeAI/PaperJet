@@ -3,6 +3,7 @@ import { documentData, file, workflow, workflowExecution } from "@paperjet/db/sc
 import { and, desc, eq } from "drizzle-orm";
 import type { ExecutionStatusResponse, ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
 import { exportData } from "./export";
+import { s3Client } from "../lib/s3";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
   await db
@@ -138,4 +139,25 @@ export async function exportExecution(workflowExecutionId: string, mode: "csv" |
   }
   const data: ExtractedDataType = executionData.extractedData as unknown as ExtractedDataType;
   return exportData(data, mode, workflowExecutionId);
+}
+
+export async function getPresignedFileUrl(workflowExecutionId: string, userId: string) {
+  const result = await db
+    .select({
+      filePath: file.filePath,
+    })
+    .from(file)
+    .leftJoin(workflowExecution, eq(workflowExecution.fileId, file.id))
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(file.ownerId, userId)))
+    .limit(1);
+
+  if (result.length === 0 || !result[0]?.filePath) {
+    throw new Error("File not found");
+  }
+
+  const presignedUrl = s3Client.presign(result[0]?.filePath);
+
+  return {
+    documentUrl: presignedUrl,
+  };
 }
