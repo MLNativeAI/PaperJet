@@ -1,9 +1,9 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ColumnForm } from "@/components/workflow/editor/column-form";
-import type { DraftObject, DraftTable, DraftColumn } from "@/types";
 import { Separator } from "@/components/ui/separator";
+import { ColumnForm } from "@/components/workflow/editor/column-form";
+import type { DraftColumn, DraftObject, DraftTable } from "@/types";
 
 interface ColumnListProps {
   draftObject: DraftObject;
@@ -11,7 +11,7 @@ interface ColumnListProps {
   onUpdateTable: (updatedTable: DraftTable) => void;
 }
 
-export function ColumnList({ draftObject, draftTable, onUpdateTable }: ColumnListProps) {
+export function ColumnList({ draftTable, onUpdateTable }: ColumnListProps) {
   const [newColumnName, setNewColumnName] = useState("");
 
   const handleAddColumn = () => {
@@ -81,4 +81,3 @@ export function ColumnList({ draftObject, draftTable, onUpdateTable }: ColumnLis
     </div>
   );
 }
-

@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Download, FileJson, FileText, Grid, LayoutPanelLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DocumentPreview } from "@/components/document-preview";
 import { ExecutionStatusBadge } from "@/components/execution-status-badge";
 import { ExtractedDataRenderer } from "@/components/extracted-data-renderer";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
 import { useExecution } from "@/hooks/use-execution";
 import { exportExecution } from "@/lib/api/executions";
 import { formatDuration } from "@/lib/utils/date";
-import { Label } from "@/components/ui/label";
-import { DocumentPreview } from "@/components/document-preview";
 
 export default function ExecutionPage() {
   const { executionId } = useParams({ from: "/_app/executions/$executionId" });

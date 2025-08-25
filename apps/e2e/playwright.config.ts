@@ -1,7 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const API_HOST = process.env.API_HOST || "http://localhost:3000";
-const API_KEY = process.env.API_KEY || "";
 
 export default defineConfig({
   testDir: "./tests",

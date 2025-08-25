@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import { energaWorkflowConfig } from "fixtures/energa/energa-config";
 import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecution } from "helpers/test-helpers";
 import { verifyExtractionAccuracy } from "helpers/verify";
-import { LoginPage } from "page-objects/login-page";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 

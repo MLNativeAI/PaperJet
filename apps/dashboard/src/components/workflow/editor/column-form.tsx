@@ -1,10 +1,8 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { DraftColumn, DraftObject, DraftTable } from "@/types";
+import type { DraftColumn } from "@/types";
 
 interface ColumnFormProps {
   draftColumn: DraftColumn;
@@ -80,4 +78,3 @@ export function ColumnForm({ draftColumn, onUpdateColumn, onRemoveColumn }: Colu
     </div>
   );
 }
-

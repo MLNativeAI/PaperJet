@@ -1,8 +1,8 @@
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ObjectEditorSheet } from "@/components/workflow/editor/object-editor-sheet";
 import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
 import type { DraftObject } from "@/types";
-import { Trash2 } from "lucide-react";
 
 export function ObjectHeader({ draftObject }: { draftObject: DraftObject }) {
   const { removeObject } = useWorkflowConfig();

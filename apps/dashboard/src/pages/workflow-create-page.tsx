@@ -1,13 +1,13 @@
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { AddObjectButton } from "@/components/workflow/editor/add-object-button";
 import { useWorkflowConfig, WorkflowConfigProvider } from "@/components/workflow/editor/workflow-config-context";
 import { WorkflowObjectForm } from "@/components/workflow/editor/workflow-object-form";
-import { AddObjectButton } from "@/components/workflow/editor/add-object-button";
 
 function WorkflowCreatePageContent() {
   const { workflowConfig, name, description, setName, setDescription, createWorkflow } = useWorkflowConfig();
@@ -34,7 +34,7 @@ function WorkflowCreatePageContent() {
           </p>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <div>
           <Label htmlFor="workflow-name">Workflow Name</Label>
@@ -46,7 +46,7 @@ function WorkflowCreatePageContent() {
             className="mt-1"
           />
         </div>
-        
+
         <div>
           <Label htmlFor="workflow-description">Description</Label>
           <Textarea
@@ -58,7 +58,7 @@ function WorkflowCreatePageContent() {
           />
         </div>
       </div>
-      
+
       <div>
         <CardTitle>Workflow configuration</CardTitle>
         <CardDescription>

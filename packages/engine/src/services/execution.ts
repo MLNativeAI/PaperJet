@@ -1,9 +1,9 @@
 import { db } from "@paperjet/db";
 import { documentData, file, workflow, workflowExecution } from "@paperjet/db/schema";
 import { and, desc, eq } from "drizzle-orm";
+import { s3Client } from "../lib/s3";
 import type { ExecutionStatusResponse, ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
 import { exportData } from "./export";
-import { s3Client } from "../lib/s3";
 
 export async function updateExecutionJobId(executionId: string, jobId: string) {
   await db

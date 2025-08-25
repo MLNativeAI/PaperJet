@@ -1,10 +1,9 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getFieldIconByType } from "@/components/utils";
 import { TableEditorSheet } from "@/components/workflow/editor/table-editor-sheet";
 import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
 import type { DraftColumn, DraftObject, DraftTable } from "@/types";
-import { getFieldIconByType } from "@/components/utils";
-import { FieldEditorSheet } from "@/components/workflow/editor/field-editor-sheet";
 
 interface TableListProps {
   draftObject: DraftObject;

@@ -1,12 +1,9 @@
+import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { useParams } from "@tanstack/react-router";
-import { CheckCircle, Clock, FileText, XCircle } from "lucide-react";
 import { useState } from "react";
 import { FileUpload } from "@/components/file-upload";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWorkflowExecution } from "@/hooks/use-workflow-execution";
-import { useExecutionStatus } from "@/hooks/use-execution-status";
-import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import ExecutionStatusRow from "@/components/workflow/execution/execution-status-row";
+import { useWorkflowExecution } from "@/hooks/use-workflow-execution";
 
 export interface ExecutionResult {
   workflowExecutionId: string;

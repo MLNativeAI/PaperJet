@@ -1,11 +1,11 @@
+import { IconEye } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStatusIcon, getStatusText } from "@/components/utils";
 import { useExecutionStatus } from "@/hooks/use-execution-status";
 import type { ExecutionResult } from "@/pages/workflow-executor-page";
-import { Button } from "@/components/ui/button";
-import { IconEye } from "@tabler/icons-react";
-import { useNavigate } from "@tanstack/react-router";
 
 export default function ExecutionStatusRow({ execution }: { execution: ExecutionResult }) {
   const { statusResponse } = useExecutionStatus(execution.workflowExecutionId);

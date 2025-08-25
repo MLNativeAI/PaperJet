@@ -8,375 +8,368 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as AppRouteImport } from './routes/_app'
-import { Route as AuthRouteRouteImport } from './routes/auth/route'
-import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as AuthVerifyMagicLinkRouteImport } from './routes/auth/verify-magic-link'
-import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
-import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
-import { Route as AdminSetupRouteImport } from './routes/admin/setup'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppExecutionsRouteImport } from './routes/_app.executions'
-import { Route as AppExecutionsIndexRouteImport } from './routes/_app.executions.index'
-import { Route as AppWorkflowsNewRouteImport } from './routes/_app.workflows.new'
-import { Route as AppExecutionsExecutionIdRouteImport } from './routes/_app.executions.$executionId'
-import { Route as AppAdminUsageRouteImport } from './routes/_app.admin.usage'
-import { Route as AppAdminConfigRouteImport } from './routes/_app.admin.config'
-import { Route as AppWorkflowsWorkflowIdExecuteRouteImport } from './routes/_app.workflows.$workflowId.execute'
-import { Route as AppWorkflowsWorkflowIdEditRouteImport } from './routes/_app.workflows.$workflowId.edit'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as AppRouteImport } from "./routes/_app";
+import { Route as AppAdminConfigRouteImport } from "./routes/_app.admin.config";
+import { Route as AppAdminUsageRouteImport } from "./routes/_app.admin.usage";
+import { Route as AppExecutionsRouteImport } from "./routes/_app.executions";
+import { Route as AppExecutionsExecutionIdRouteImport } from "./routes/_app.executions.$executionId";
+import { Route as AppExecutionsIndexRouteImport } from "./routes/_app.executions.index";
+import { Route as AppIndexRouteImport } from "./routes/_app.index";
+import { Route as AppSettingsRouteImport } from "./routes/_app.settings";
+import { Route as AppWorkflowsWorkflowIdEditRouteImport } from "./routes/_app.workflows.$workflowId.edit";
+import { Route as AppWorkflowsWorkflowIdExecuteRouteImport } from "./routes/_app.workflows.$workflowId.execute";
+import { Route as AppWorkflowsNewRouteImport } from "./routes/_app.workflows.new";
+import { Route as AdminSetupRouteImport } from "./routes/admin/setup";
+import { Route as AuthRouteRouteImport } from "./routes/auth/route";
+import { Route as AuthSignInRouteImport } from "./routes/auth/sign-in";
+import { Route as AuthSignUpRouteImport } from "./routes/auth/sign-up";
+import { Route as AuthVerifyMagicLinkRouteImport } from "./routes/auth/verify-magic-link";
 
 const AppRoute = AppRouteImport.update({
-  id: '/_app',
+  id: "/_app",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AuthRouteRoute = AuthRouteRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+  id: "/auth",
+  path: "/auth",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AppRoute,
-} as any)
+} as any);
 const AuthVerifyMagicLinkRoute = AuthVerifyMagicLinkRouteImport.update({
-  id: '/verify-magic-link',
-  path: '/verify-magic-link',
+  id: "/verify-magic-link",
+  path: "/verify-magic-link",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
+  id: "/sign-up",
+  path: "/sign-up",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AuthSignInRoute = AuthSignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
+  id: "/sign-in",
+  path: "/sign-in",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AdminSetupRoute = AdminSetupRouteImport.update({
-  id: '/admin/setup',
-  path: '/admin/setup',
+  id: "/admin/setup",
+  path: "/admin/setup",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+  id: "/settings",
+  path: "/settings",
   getParentRoute: () => AppRoute,
-} as any)
+} as any);
 const AppExecutionsRoute = AppExecutionsRouteImport.update({
-  id: '/executions',
-  path: '/executions',
+  id: "/executions",
+  path: "/executions",
   getParentRoute: () => AppRoute,
-} as any)
+} as any);
 const AppExecutionsIndexRoute = AppExecutionsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AppExecutionsRoute,
-} as any)
+} as any);
 const AppWorkflowsNewRoute = AppWorkflowsNewRouteImport.update({
-  id: '/workflows/new',
-  path: '/workflows/new',
+  id: "/workflows/new",
+  path: "/workflows/new",
   getParentRoute: () => AppRoute,
-} as any)
-const AppExecutionsExecutionIdRoute =
-  AppExecutionsExecutionIdRouteImport.update({
-    id: '/$executionId',
-    path: '/$executionId',
-    getParentRoute: () => AppExecutionsRoute,
-  } as any)
+} as any);
+const AppExecutionsExecutionIdRoute = AppExecutionsExecutionIdRouteImport.update({
+  id: "/$executionId",
+  path: "/$executionId",
+  getParentRoute: () => AppExecutionsRoute,
+} as any);
 const AppAdminUsageRoute = AppAdminUsageRouteImport.update({
-  id: '/admin/usage',
-  path: '/admin/usage',
+  id: "/admin/usage",
+  path: "/admin/usage",
   getParentRoute: () => AppRoute,
-} as any)
+} as any);
 const AppAdminConfigRoute = AppAdminConfigRouteImport.update({
-  id: '/admin/config',
-  path: '/admin/config',
+  id: "/admin/config",
+  path: "/admin/config",
   getParentRoute: () => AppRoute,
-} as any)
-const AppWorkflowsWorkflowIdExecuteRoute =
-  AppWorkflowsWorkflowIdExecuteRouteImport.update({
-    id: '/workflows/$workflowId/execute',
-    path: '/workflows/$workflowId/execute',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppWorkflowsWorkflowIdEditRoute =
-  AppWorkflowsWorkflowIdEditRouteImport.update({
-    id: '/workflows/$workflowId/edit',
-    path: '/workflows/$workflowId/edit',
-    getParentRoute: () => AppRoute,
-  } as any)
+} as any);
+const AppWorkflowsWorkflowIdExecuteRoute = AppWorkflowsWorkflowIdExecuteRouteImport.update({
+  id: "/workflows/$workflowId/execute",
+  path: "/workflows/$workflowId/execute",
+  getParentRoute: () => AppRoute,
+} as any);
+const AppWorkflowsWorkflowIdEditRoute = AppWorkflowsWorkflowIdEditRouteImport.update({
+  id: "/workflows/$workflowId/edit",
+  path: "/workflows/$workflowId/edit",
+  getParentRoute: () => AppRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/executions': typeof AppExecutionsRouteWithChildren
-  '/settings': typeof AppSettingsRoute
-  '/admin/setup': typeof AdminSetupRoute
-  '/auth/sign-in': typeof AuthSignInRoute
-  '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
-  '/': typeof AppIndexRoute
-  '/admin/config': typeof AppAdminConfigRoute
-  '/admin/usage': typeof AppAdminUsageRoute
-  '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
-  '/workflows/new': typeof AppWorkflowsNewRoute
-  '/executions/': typeof AppExecutionsIndexRoute
-  '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
-  '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/executions": typeof AppExecutionsRouteWithChildren;
+  "/settings": typeof AppSettingsRoute;
+  "/admin/setup": typeof AdminSetupRoute;
+  "/auth/sign-in": typeof AuthSignInRoute;
+  "/auth/sign-up": typeof AuthSignUpRoute;
+  "/auth/verify-magic-link": typeof AuthVerifyMagicLinkRoute;
+  "/": typeof AppIndexRoute;
+  "/admin/config": typeof AppAdminConfigRoute;
+  "/admin/usage": typeof AppAdminUsageRoute;
+  "/executions/$executionId": typeof AppExecutionsExecutionIdRoute;
+  "/workflows/new": typeof AppWorkflowsNewRoute;
+  "/executions/": typeof AppExecutionsIndexRoute;
+  "/workflows/$workflowId/edit": typeof AppWorkflowsWorkflowIdEditRoute;
+  "/workflows/$workflowId/execute": typeof AppWorkflowsWorkflowIdExecuteRoute;
 }
 export interface FileRoutesByTo {
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/settings': typeof AppSettingsRoute
-  '/admin/setup': typeof AdminSetupRoute
-  '/auth/sign-in': typeof AuthSignInRoute
-  '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
-  '/': typeof AppIndexRoute
-  '/admin/config': typeof AppAdminConfigRoute
-  '/admin/usage': typeof AppAdminUsageRoute
-  '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
-  '/workflows/new': typeof AppWorkflowsNewRoute
-  '/executions': typeof AppExecutionsIndexRoute
-  '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
-  '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/settings": typeof AppSettingsRoute;
+  "/admin/setup": typeof AdminSetupRoute;
+  "/auth/sign-in": typeof AuthSignInRoute;
+  "/auth/sign-up": typeof AuthSignUpRoute;
+  "/auth/verify-magic-link": typeof AuthVerifyMagicLinkRoute;
+  "/": typeof AppIndexRoute;
+  "/admin/config": typeof AppAdminConfigRoute;
+  "/admin/usage": typeof AppAdminUsageRoute;
+  "/executions/$executionId": typeof AppExecutionsExecutionIdRoute;
+  "/workflows/new": typeof AppWorkflowsNewRoute;
+  "/executions": typeof AppExecutionsIndexRoute;
+  "/workflows/$workflowId/edit": typeof AppWorkflowsWorkflowIdEditRoute;
+  "/workflows/$workflowId/execute": typeof AppWorkflowsWorkflowIdExecuteRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/_app': typeof AppRouteWithChildren
-  '/_app/executions': typeof AppExecutionsRouteWithChildren
-  '/_app/settings': typeof AppSettingsRoute
-  '/admin/setup': typeof AdminSetupRoute
-  '/auth/sign-in': typeof AuthSignInRoute
-  '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
-  '/_app/': typeof AppIndexRoute
-  '/_app/admin/config': typeof AppAdminConfigRoute
-  '/_app/admin/usage': typeof AppAdminUsageRoute
-  '/_app/executions/$executionId': typeof AppExecutionsExecutionIdRoute
-  '/_app/workflows/new': typeof AppWorkflowsNewRoute
-  '/_app/executions/': typeof AppExecutionsIndexRoute
-  '/_app/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
-  '/_app/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
+  __root__: typeof rootRouteImport;
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/_app": typeof AppRouteWithChildren;
+  "/_app/executions": typeof AppExecutionsRouteWithChildren;
+  "/_app/settings": typeof AppSettingsRoute;
+  "/admin/setup": typeof AdminSetupRoute;
+  "/auth/sign-in": typeof AuthSignInRoute;
+  "/auth/sign-up": typeof AuthSignUpRoute;
+  "/auth/verify-magic-link": typeof AuthVerifyMagicLinkRoute;
+  "/_app/": typeof AppIndexRoute;
+  "/_app/admin/config": typeof AppAdminConfigRoute;
+  "/_app/admin/usage": typeof AppAdminUsageRoute;
+  "/_app/executions/$executionId": typeof AppExecutionsExecutionIdRoute;
+  "/_app/workflows/new": typeof AppWorkflowsNewRoute;
+  "/_app/executions/": typeof AppExecutionsIndexRoute;
+  "/_app/workflows/$workflowId/edit": typeof AppWorkflowsWorkflowIdEditRoute;
+  "/_app/workflows/$workflowId/execute": typeof AppWorkflowsWorkflowIdExecuteRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/auth'
-    | '/executions'
-    | '/settings'
-    | '/admin/setup'
-    | '/auth/sign-in'
-    | '/auth/sign-up'
-    | '/auth/verify-magic-link'
-    | '/'
-    | '/admin/config'
-    | '/admin/usage'
-    | '/executions/$executionId'
-    | '/workflows/new'
-    | '/executions/'
-    | '/workflows/$workflowId/edit'
-    | '/workflows/$workflowId/execute'
-  fileRoutesByTo: FileRoutesByTo
+    | "/auth"
+    | "/executions"
+    | "/settings"
+    | "/admin/setup"
+    | "/auth/sign-in"
+    | "/auth/sign-up"
+    | "/auth/verify-magic-link"
+    | "/"
+    | "/admin/config"
+    | "/admin/usage"
+    | "/executions/$executionId"
+    | "/workflows/new"
+    | "/executions/"
+    | "/workflows/$workflowId/edit"
+    | "/workflows/$workflowId/execute";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/auth'
-    | '/settings'
-    | '/admin/setup'
-    | '/auth/sign-in'
-    | '/auth/sign-up'
-    | '/auth/verify-magic-link'
-    | '/'
-    | '/admin/config'
-    | '/admin/usage'
-    | '/executions/$executionId'
-    | '/workflows/new'
-    | '/executions'
-    | '/workflows/$workflowId/edit'
-    | '/workflows/$workflowId/execute'
+    | "/auth"
+    | "/settings"
+    | "/admin/setup"
+    | "/auth/sign-in"
+    | "/auth/sign-up"
+    | "/auth/verify-magic-link"
+    | "/"
+    | "/admin/config"
+    | "/admin/usage"
+    | "/executions/$executionId"
+    | "/workflows/new"
+    | "/executions"
+    | "/workflows/$workflowId/edit"
+    | "/workflows/$workflowId/execute";
   id:
-    | '__root__'
-    | '/auth'
-    | '/_app'
-    | '/_app/executions'
-    | '/_app/settings'
-    | '/admin/setup'
-    | '/auth/sign-in'
-    | '/auth/sign-up'
-    | '/auth/verify-magic-link'
-    | '/_app/'
-    | '/_app/admin/config'
-    | '/_app/admin/usage'
-    | '/_app/executions/$executionId'
-    | '/_app/workflows/new'
-    | '/_app/executions/'
-    | '/_app/workflows/$workflowId/edit'
-    | '/_app/workflows/$workflowId/execute'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/auth"
+    | "/_app"
+    | "/_app/executions"
+    | "/_app/settings"
+    | "/admin/setup"
+    | "/auth/sign-in"
+    | "/auth/sign-up"
+    | "/auth/verify-magic-link"
+    | "/_app/"
+    | "/_app/admin/config"
+    | "/_app/admin/usage"
+    | "/_app/executions/$executionId"
+    | "/_app/workflows/new"
+    | "/_app/executions/"
+    | "/_app/workflows/$workflowId/edit"
+    | "/_app/workflows/$workflowId/execute";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  AuthRouteRoute: typeof AuthRouteRouteWithChildren
-  AppRoute: typeof AppRouteWithChildren
-  AdminSetupRoute: typeof AdminSetupRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren;
+  AppRoute: typeof AppRouteWithChildren;
+  AdminSetupRoute: typeof AdminSetupRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/': {
-      id: '/_app/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/auth/verify-magic-link': {
-      id: '/auth/verify-magic-link'
-      path: '/verify-magic-link'
-      fullPath: '/auth/verify-magic-link'
-      preLoaderRoute: typeof AuthVerifyMagicLinkRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/auth/sign-up': {
-      id: '/auth/sign-up'
-      path: '/sign-up'
-      fullPath: '/auth/sign-up'
-      preLoaderRoute: typeof AuthSignUpRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/auth/sign-in': {
-      id: '/auth/sign-in'
-      path: '/sign-in'
-      fullPath: '/auth/sign-in'
-      preLoaderRoute: typeof AuthSignInRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/admin/setup': {
-      id: '/admin/setup'
-      path: '/admin/setup'
-      fullPath: '/admin/setup'
-      preLoaderRoute: typeof AdminSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/executions': {
-      id: '/_app/executions'
-      path: '/executions'
-      fullPath: '/executions'
-      preLoaderRoute: typeof AppExecutionsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/executions/': {
-      id: '/_app/executions/'
-      path: '/'
-      fullPath: '/executions/'
-      preLoaderRoute: typeof AppExecutionsIndexRouteImport
-      parentRoute: typeof AppExecutionsRoute
-    }
-    '/_app/workflows/new': {
-      id: '/_app/workflows/new'
-      path: '/workflows/new'
-      fullPath: '/workflows/new'
-      preLoaderRoute: typeof AppWorkflowsNewRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/executions/$executionId': {
-      id: '/_app/executions/$executionId'
-      path: '/$executionId'
-      fullPath: '/executions/$executionId'
-      preLoaderRoute: typeof AppExecutionsExecutionIdRouteImport
-      parentRoute: typeof AppExecutionsRoute
-    }
-    '/_app/admin/usage': {
-      id: '/_app/admin/usage'
-      path: '/admin/usage'
-      fullPath: '/admin/usage'
-      preLoaderRoute: typeof AppAdminUsageRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/admin/config': {
-      id: '/_app/admin/config'
-      path: '/admin/config'
-      fullPath: '/admin/config'
-      preLoaderRoute: typeof AppAdminConfigRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/workflows/$workflowId/execute': {
-      id: '/_app/workflows/$workflowId/execute'
-      path: '/workflows/$workflowId/execute'
-      fullPath: '/workflows/$workflowId/execute'
-      preLoaderRoute: typeof AppWorkflowsWorkflowIdExecuteRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/workflows/$workflowId/edit': {
-      id: '/_app/workflows/$workflowId/edit'
-      path: '/workflows/$workflowId/edit'
-      fullPath: '/workflows/$workflowId/edit'
-      preLoaderRoute: typeof AppWorkflowsWorkflowIdEditRouteImport
-      parentRoute: typeof AppRoute
-    }
+    "/_app": {
+      id: "/_app";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof AppRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/auth": {
+      id: "/auth";
+      path: "/auth";
+      fullPath: "/auth";
+      preLoaderRoute: typeof AuthRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_app/": {
+      id: "/_app/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof AppIndexRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/auth/verify-magic-link": {
+      id: "/auth/verify-magic-link";
+      path: "/verify-magic-link";
+      fullPath: "/auth/verify-magic-link";
+      preLoaderRoute: typeof AuthVerifyMagicLinkRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/sign-up": {
+      id: "/auth/sign-up";
+      path: "/sign-up";
+      fullPath: "/auth/sign-up";
+      preLoaderRoute: typeof AuthSignUpRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/sign-in": {
+      id: "/auth/sign-in";
+      path: "/sign-in";
+      fullPath: "/auth/sign-in";
+      preLoaderRoute: typeof AuthSignInRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/admin/setup": {
+      id: "/admin/setup";
+      path: "/admin/setup";
+      fullPath: "/admin/setup";
+      preLoaderRoute: typeof AdminSetupRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_app/settings": {
+      id: "/_app/settings";
+      path: "/settings";
+      fullPath: "/settings";
+      preLoaderRoute: typeof AppSettingsRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/executions": {
+      id: "/_app/executions";
+      path: "/executions";
+      fullPath: "/executions";
+      preLoaderRoute: typeof AppExecutionsRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/executions/": {
+      id: "/_app/executions/";
+      path: "/";
+      fullPath: "/executions/";
+      preLoaderRoute: typeof AppExecutionsIndexRouteImport;
+      parentRoute: typeof AppExecutionsRoute;
+    };
+    "/_app/workflows/new": {
+      id: "/_app/workflows/new";
+      path: "/workflows/new";
+      fullPath: "/workflows/new";
+      preLoaderRoute: typeof AppWorkflowsNewRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/executions/$executionId": {
+      id: "/_app/executions/$executionId";
+      path: "/$executionId";
+      fullPath: "/executions/$executionId";
+      preLoaderRoute: typeof AppExecutionsExecutionIdRouteImport;
+      parentRoute: typeof AppExecutionsRoute;
+    };
+    "/_app/admin/usage": {
+      id: "/_app/admin/usage";
+      path: "/admin/usage";
+      fullPath: "/admin/usage";
+      preLoaderRoute: typeof AppAdminUsageRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/admin/config": {
+      id: "/_app/admin/config";
+      path: "/admin/config";
+      fullPath: "/admin/config";
+      preLoaderRoute: typeof AppAdminConfigRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/workflows/$workflowId/execute": {
+      id: "/_app/workflows/$workflowId/execute";
+      path: "/workflows/$workflowId/execute";
+      fullPath: "/workflows/$workflowId/execute";
+      preLoaderRoute: typeof AppWorkflowsWorkflowIdExecuteRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/workflows/$workflowId/edit": {
+      id: "/_app/workflows/$workflowId/edit";
+      path: "/workflows/$workflowId/edit";
+      fullPath: "/workflows/$workflowId/edit";
+      preLoaderRoute: typeof AppWorkflowsWorkflowIdEditRouteImport;
+      parentRoute: typeof AppRoute;
+    };
   }
 }
 
 interface AuthRouteRouteChildren {
-  AuthSignInRoute: typeof AuthSignInRoute
-  AuthSignUpRoute: typeof AuthSignUpRoute
-  AuthVerifyMagicLinkRoute: typeof AuthVerifyMagicLinkRoute
+  AuthSignInRoute: typeof AuthSignInRoute;
+  AuthSignUpRoute: typeof AuthSignUpRoute;
+  AuthVerifyMagicLinkRoute: typeof AuthVerifyMagicLinkRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
   AuthVerifyMagicLinkRoute: AuthVerifyMagicLinkRoute,
-}
+};
 
-const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
-  AuthRouteRouteChildren,
-)
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(AuthRouteRouteChildren);
 
 interface AppExecutionsRouteChildren {
-  AppExecutionsExecutionIdRoute: typeof AppExecutionsExecutionIdRoute
-  AppExecutionsIndexRoute: typeof AppExecutionsIndexRoute
+  AppExecutionsExecutionIdRoute: typeof AppExecutionsExecutionIdRoute;
+  AppExecutionsIndexRoute: typeof AppExecutionsIndexRoute;
 }
 
 const AppExecutionsRouteChildren: AppExecutionsRouteChildren = {
   AppExecutionsExecutionIdRoute: AppExecutionsExecutionIdRoute,
   AppExecutionsIndexRoute: AppExecutionsIndexRoute,
-}
+};
 
-const AppExecutionsRouteWithChildren = AppExecutionsRoute._addFileChildren(
-  AppExecutionsRouteChildren,
-)
+const AppExecutionsRouteWithChildren = AppExecutionsRoute._addFileChildren(AppExecutionsRouteChildren);
 
 interface AppRouteChildren {
-  AppExecutionsRoute: typeof AppExecutionsRouteWithChildren
-  AppSettingsRoute: typeof AppSettingsRoute
-  AppIndexRoute: typeof AppIndexRoute
-  AppAdminConfigRoute: typeof AppAdminConfigRoute
-  AppAdminUsageRoute: typeof AppAdminUsageRoute
-  AppWorkflowsNewRoute: typeof AppWorkflowsNewRoute
-  AppWorkflowsWorkflowIdEditRoute: typeof AppWorkflowsWorkflowIdEditRoute
-  AppWorkflowsWorkflowIdExecuteRoute: typeof AppWorkflowsWorkflowIdExecuteRoute
+  AppExecutionsRoute: typeof AppExecutionsRouteWithChildren;
+  AppSettingsRoute: typeof AppSettingsRoute;
+  AppIndexRoute: typeof AppIndexRoute;
+  AppAdminConfigRoute: typeof AppAdminConfigRoute;
+  AppAdminUsageRoute: typeof AppAdminUsageRoute;
+  AppWorkflowsNewRoute: typeof AppWorkflowsNewRoute;
+  AppWorkflowsWorkflowIdEditRoute: typeof AppWorkflowsWorkflowIdEditRoute;
+  AppWorkflowsWorkflowIdExecuteRoute: typeof AppWorkflowsWorkflowIdExecuteRoute;
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -388,15 +381,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppWorkflowsNewRoute: AppWorkflowsNewRoute,
   AppWorkflowsWorkflowIdEditRoute: AppWorkflowsWorkflowIdEditRoute,
   AppWorkflowsWorkflowIdExecuteRoute: AppWorkflowsWorkflowIdExecuteRoute,
-}
+};
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AdminSetupRoute: AdminSetupRoute,
-}
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+};
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>();

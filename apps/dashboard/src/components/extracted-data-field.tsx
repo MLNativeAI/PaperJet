@@ -1,5 +1,4 @@
 import { formatValue, getFieldIcon } from "@/components/utils";
-import { Calendar, Hash, Type } from "lucide-react";
 
 interface ExtractedDataFieldProps {
   name: string;
