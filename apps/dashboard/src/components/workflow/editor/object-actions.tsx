@@ -5,7 +5,7 @@ import { DraftObject } from "@/types";
 import { Plus } from "lucide-react";
 
 export function ObjectActions({ draftObject }: { draftObject: DraftObject }) {
-  const { addField, addTable } = useWorkflowConfig();
+  const { addField } = useWorkflowConfig();
 
   return (
     <div className="flex justify-between gap-2">
@@ -20,10 +20,6 @@ export function ObjectActions({ draftObject }: { draftObject: DraftObject }) {
             </Button>
           }
         />
-        <Button onClick={() => addTable(draftObject.id)} variant="outline" size="sm">
-          <Plus className="h-4 w-4" />
-          Add Table
-        </Button>
       </div>
     </div>
   );

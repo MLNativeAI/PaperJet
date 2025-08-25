@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { produce } from "immer";
 import type { DraftWorkflowConfig, DraftObject, DraftField } from "@/types";
+import type { Workflow } from "@paperjet/engine/types";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
@@ -11,14 +12,54 @@ interface WorkflowConfigContextType {
   addField: (objectId: string, newField: DraftField) => void;
   updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   removeField: (objectId: string, fieldId: string) => void;
-  // Table-level functions
-  addTable: (objectId: string) => void;
+  // Initialize with existing workflow
+  initializeWithWorkflow: (workflow: Workflow) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
 
-export function WorkflowConfigProvider({ children }: { children: React.ReactNode }) {
+export function WorkflowConfigProvider({ 
+  children, 
+  initialWorkflow 
+}: { 
+  children: React.ReactNode;
+  initialWorkflow?: Workflow;
+}) {
   const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
+
+  // Initialize with existing workflow data if provided
+  useEffect(() => {
+    if (initialWorkflow) {
+      initializeWithWorkflow(initialWorkflow);
+    }
+  }, [initialWorkflow]);
+
+  const initializeWithWorkflow = (workflow: Workflow) => {
+    const draftObjects: DraftObject[] = workflow.configuration.objects.map(obj => ({
+      id: `draft-${obj.name}-${Date.now()}`, // Generate a unique ID for the draft
+      name: obj.name,
+      description: obj.description || "",
+      fields: obj.fields?.map(field => ({
+        id: `field-${field.name}-${Date.now()}`,
+        name: field.name,
+        description: field.description || "",
+        type: field.type as "string" | "date" | "number"
+      })) || [],
+      tables: obj.tables?.map(table => ({
+        id: `table-${table.name}-${Date.now()}`,
+        name: table.name,
+        description: table.description || "",
+        columns: table.columns.map(column => ({
+          id: `column-${column.name}-${Date.now()}`,
+          name: column.name,
+          description: column.description || "",
+          type: column.type as "string" | "date" | "number"
+        }))
+      })) || []
+    }));
+    
+    setWorkflowConfig({ objects: draftObjects });
+  };
 
   const addAnObject = (initialValues?: { name?: string; description?: string }) => {
     const nextState = produce(workflowConfig, (draftState) => {
@@ -67,25 +108,6 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
-  const addTable = (objectId: string) => {
-    const nextState = produce(workflowConfig, (draftState) => {
-      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
-      if (objectIndex !== -1) {
-        const draft = draftState.objects[objectIndex];
-        // Initialize tables array if it doesn't exist
-        if (!draft.tables) {
-          draft.tables = [];
-        }
-        draft.tables.push({
-          id: Date.now().toString(),
-          name: "",
-          columns: [],
-        });
-      }
-    });
-    setWorkflowConfig(nextState);
-  };
-
   const updateField = (objectId: string, fieldId: string, updatedField: DraftField) => {
     const nextState = produce(workflowConfig, (draftState) => {
       const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
@@ -128,7 +150,7 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
         addField,
         updateField,
         removeField,
-        addTable,
+        initializeWithWorkflow
       }}
     >
       {children}

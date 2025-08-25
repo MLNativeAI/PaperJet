@@ -24,6 +24,7 @@ import { Route as AppExecutionsExecutionIdRouteImport } from './routes/_app.exec
 import { Route as AppAdminUsageRouteImport } from './routes/_app.admin.usage'
 import { Route as AppAdminConfigRouteImport } from './routes/_app.admin.config'
 import { Route as AppWorkflowsWorkflowIdExecuteRouteImport } from './routes/_app.workflows.$workflowId.execute'
+import { Route as AppWorkflowsWorkflowIdEditRouteImport } from './routes/_app.workflows.$workflowId.edit'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -101,6 +102,12 @@ const AppWorkflowsWorkflowIdExecuteRoute =
     path: '/workflows/$workflowId/execute',
     getParentRoute: () => AppRoute,
   } as any)
+const AppWorkflowsWorkflowIdEditRoute =
+  AppWorkflowsWorkflowIdEditRouteImport.update({
+    id: '/workflows/$workflowId/edit',
+    path: '/workflows/$workflowId/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
   '/workflows/new': typeof AppWorkflowsNewRoute
   '/executions/': typeof AppExecutionsIndexRoute
+  '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 export interface FileRoutesByTo {
@@ -131,6 +139,7 @@ export interface FileRoutesByTo {
   '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
   '/workflows/new': typeof AppWorkflowsNewRoute
   '/executions': typeof AppExecutionsIndexRoute
+  '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 export interface FileRoutesById {
@@ -149,6 +158,7 @@ export interface FileRoutesById {
   '/_app/executions/$executionId': typeof AppExecutionsExecutionIdRoute
   '/_app/workflows/new': typeof AppWorkflowsNewRoute
   '/_app/executions/': typeof AppExecutionsIndexRoute
+  '/_app/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/_app/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 export interface FileRouteTypes {
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/executions/$executionId'
     | '/workflows/new'
     | '/executions/'
+    | '/workflows/$workflowId/edit'
     | '/workflows/$workflowId/execute'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/executions/$executionId'
     | '/workflows/new'
     | '/executions'
+    | '/workflows/$workflowId/edit'
     | '/workflows/$workflowId/execute'
   id:
     | '__root__'
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
     | '/_app/executions/$executionId'
     | '/_app/workflows/new'
     | '/_app/executions/'
+    | '/_app/workflows/$workflowId/edit'
     | '/_app/workflows/$workflowId/execute'
   fileRoutesById: FileRoutesById
 }
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWorkflowsWorkflowIdExecuteRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/workflows/$workflowId/edit': {
+      id: '/_app/workflows/$workflowId/edit'
+      path: '/workflows/$workflowId/edit'
+      fullPath: '/workflows/$workflowId/edit'
+      preLoaderRoute: typeof AppWorkflowsWorkflowIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -355,6 +375,7 @@ interface AppRouteChildren {
   AppAdminConfigRoute: typeof AppAdminConfigRoute
   AppAdminUsageRoute: typeof AppAdminUsageRoute
   AppWorkflowsNewRoute: typeof AppWorkflowsNewRoute
+  AppWorkflowsWorkflowIdEditRoute: typeof AppWorkflowsWorkflowIdEditRoute
   AppWorkflowsWorkflowIdExecuteRoute: typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 
@@ -365,6 +386,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminConfigRoute: AppAdminConfigRoute,
   AppAdminUsageRoute: AppAdminUsageRoute,
   AppWorkflowsNewRoute: AppWorkflowsNewRoute,
+  AppWorkflowsWorkflowIdEditRoute: AppWorkflowsWorkflowIdEditRoute,
   AppWorkflowsWorkflowIdExecuteRoute: AppWorkflowsWorkflowIdExecuteRoute,
 }
 

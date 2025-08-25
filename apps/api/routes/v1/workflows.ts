@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import {
   createWorkflowFromApi,
   deleteWorkflow,
+  getWorkflow,
   getWorkflowExecutionWithExtractedData,
   getWorkflows,
   updateExecutionJobId,
@@ -14,6 +15,7 @@ import { Hono } from "hono";
 import z from "zod";
 import { getUser } from "@/lib/auth";
 import { workflowExecutionIdSchema, workflowIdSchema } from "@/lib/validation";
+import { workflow } from "@paperjet/db/schema";
 
 const app = new Hono();
 
@@ -180,6 +182,21 @@ const router = app
         }
         return c.json({ error: "Internal server error" }, 500);
       }
+    },
+  )
+  .get(
+    "/:workflowId",
+    zValidator(
+      "param",
+      z.object({
+        workflowId: workflowIdSchema,
+      }),
+    ),
+    async (c) => {
+      const user = await getUser(c);
+      const { workflowId } = c.req.valid("param");
+      const execution = await getWorkflow(workflowId, user.id);
+      return c.json(execution);
     },
   )
   .get(
