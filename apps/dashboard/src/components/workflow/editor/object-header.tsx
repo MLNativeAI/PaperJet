@@ -31,21 +31,6 @@ export function ObjectHeader({ draftObject }: { draftObject: DraftObject }) {
           >
             <Trash2 className="h-4 w-4" />
           </Button>
-          <div className="flex gap-2">
-            {/* <FieldEditorSheet */}
-            {/*   mode="edit" */}
-            {/*   objectId={objectId} */}
-            {/*   draftField={field} */}
-            {/*   trigger={ */}
-            {/*     <Button size="sm" variant="ghost"> */}
-            {/*       <Pencil className="h-4 w-4 text-muted-foreground" /> */}
-            {/*     </Button> */}
-            {/*   } */}
-            {/* /> */}
-            {/* <Button size="sm" variant="ghost" onClick={() => removeField(objectId, field.id)}> */}
-            {/*   <Trash2 className="h-4 w-4 text-muted-foreground" /> */}
-            {/* </Button> */}
-          </div>
         </div>
       </div>
     </div>

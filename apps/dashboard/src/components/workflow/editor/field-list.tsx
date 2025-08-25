@@ -37,7 +37,7 @@ function FieldCard({ objectId, field }: { objectId: string; field: DraftField })
   return (
     <div key={field.id} className="flex flex-col p-3 bg-muted/30 rounded-lg border h-[80px]">
       <div className="flex items-center justify-between">
-        <span className="text-md font-medium flex items-center gap-1">
+        <span className="text-md font-medium flex items-center gap-2">
           {getFieldIconByType(field.type)}
           {field.name}
         </span>

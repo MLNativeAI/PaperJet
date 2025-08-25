@@ -61,10 +61,10 @@ export const getFieldIcon = (value: string | number | Date | null) => {
 export const getFieldIconByType = (type: "number" | "string" | "date") => {
   switch (type) {
     case "date":
-      return <Calendar className="h-3 w-3" />;
+      return <Calendar className="h-4 w-4" />;
     case "number":
-      return <Hash className="h-3 w-3" />;
+      return <Hash className="h-4 w-4" />;
     default:
-      return <Type className="h-3 w-3" />;
+      return <Type className="h-4 w-4" />;
   }
 };
