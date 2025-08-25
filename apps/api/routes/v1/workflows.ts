@@ -6,6 +6,7 @@ import {
   getWorkflowExecutionWithExtractedData,
   getWorkflows,
   updateExecutionJobId,
+  updateWorkflow,
   uploadFileAndCreateExecution,
 } from "@paperjet/engine";
 import { WorkflowConfigurationSchema } from "@paperjet/engine/types";
@@ -20,6 +21,12 @@ import { workflow } from "@paperjet/db/schema";
 const app = new Hono();
 
 const createWorkflowApiSchema = z.object({
+  name: z.string().min(1, "Workflow name is required"),
+  description: z.string().default(""),
+  configuration: WorkflowConfigurationSchema,
+});
+
+const updateWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
   configuration: WorkflowConfigurationSchema,
@@ -197,6 +204,51 @@ const router = app
       const { workflowId } = c.req.valid("param");
       const execution = await getWorkflow(workflowId, user.id);
       return c.json(execution);
+    },
+  )
+  .put(
+    "/:workflowId",
+    zValidator("json", updateWorkflowApiSchema),
+    zValidator(
+      "param",
+      z.object({
+        workflowId: workflowIdSchema,
+      }),
+    ),
+    async (c) => {
+      try {
+        const { workflowId } = c.req.valid("param");
+        const updateWorkflowData = c.req.valid("json");
+        const user = await getUser(c);
+        logger.info({ data: updateWorkflowData }, `Updating workflow ${workflowId}`);
+        await updateWorkflow(
+          workflowId,
+          updateWorkflowData.name,
+          updateWorkflowData.description,
+          updateWorkflowData.configuration,
+          user.id,
+        );
+        logger.info({ workflowId, name: updateWorkflowData.name }, "Workflow updated");
+        return c.json({ workflowId, message: "Workflow updated" }, 204);
+      } catch (error) {
+        // TODO unified error handling for API requests & shared error types
+        logger.error(error, "update workflow error:");
+        if (error instanceof Error) {
+          return c.json(
+            {
+              error: error.message,
+            },
+            500,
+          );
+        } else {
+          return c.json(
+            {
+              error: "Unknown server error",
+            },
+            500,
+          );
+        }
+      }
     },
   )
   .get(

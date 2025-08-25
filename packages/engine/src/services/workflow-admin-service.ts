@@ -125,3 +125,20 @@ export async function createWorkflowFromApi(
   await db.insert(workflow).values(newWorkflowData);
   return { workflowId };
 }
+
+export async function updateWorkflow(
+  workflowId: string,
+  name: string,
+  description: string,
+  configuration: WorkflowConfiguration,
+  userId: string,
+): Promise<void> {
+  await db
+    .update(workflow)
+    .set({
+      name: name,
+      description: description,
+      configuration: configuration,
+    })
+    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, userId)));
+}

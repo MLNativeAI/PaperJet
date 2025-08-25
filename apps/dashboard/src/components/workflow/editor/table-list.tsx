@@ -2,7 +2,9 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableEditorSheet } from "@/components/workflow/editor/table-editor-sheet";
 import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
-import type { DraftObject, DraftTable } from "@/types";
+import type { DraftColumn, DraftObject, DraftTable } from "@/types";
+import { getFieldIconByType } from "@/components/utils";
+import { FieldEditorSheet } from "@/components/workflow/editor/field-editor-sheet";
 
 interface TableListProps {
   draftObject: DraftObject;
@@ -16,7 +18,7 @@ export function TableList({ draftObject }: TableListProps) {
           <div className="flex justify-between items-center">
             <h3 className="text-md text-muted-foreground">Tables</h3>
           </div>
-          <div className="grid gap-3 md:grid-cols-2 space-y-3">
+          <div className="w-full space-y-3">
             {draftObject.tables.map((table) => (
               <TableCard key={table.id} objectId={draftObject.id} table={table} draftObject={draftObject} />
             ))}
@@ -39,7 +41,7 @@ function TableCard({
   const { removeTable } = useWorkflowConfig();
 
   return (
-    <div className="flex flex-col p-3 bg-muted/30 rounded-lg border h-[80px]">
+    <div className="flex flex-col p-3 bg-muted/30 rounded-lg border gap-4">
       <div className="flex items-center justify-between">
         <span className="text-md font-medium">{table.name}</span>
         <div className="flex gap-2">
@@ -60,6 +62,27 @@ function TableCard({
       </div>
       <div className="text-sm text-muted-foreground flex-grow">
         {table.description || <span className="opacity-0">No description</span>}
+      </div>
+      <div className="flex flex-col gap-4">
+        <h3 className="text-md text-muted-foreground">Columns</h3>
+        <div>
+          {table.columns.map((column) => (
+            <ColumnRow column={column} key={column.id} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ColumnRow({ column }: { column: DraftColumn }) {
+  return (
+    <div key={column.id} className="flex flex-col p-3 ">
+      <div className="flex items-center justify-between">
+        <span className="text-md font-medium flex items-center gap-2">
+          {getFieldIconByType(column.type)}
+          {column.name}
+        </span>
       </div>
     </div>
   );

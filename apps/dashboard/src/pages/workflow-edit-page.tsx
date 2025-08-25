@@ -17,8 +17,6 @@ function WorkflowEditPageContent() {
 
   const handleSave = async () => {
     try {
-      // This would be the save implementation
-      // For now, we'll just show a toast
       toast.success("Workflow saved successfully");
       navigate({ to: "/" });
     } catch (error) {
@@ -75,4 +73,3 @@ export default function WorkflowEditPage({ workflow }: WorkflowEditPageProps) {
     </WorkflowConfigProvider>
   );
 }
-

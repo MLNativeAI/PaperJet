@@ -26,24 +26,18 @@ interface TableEditorSheetProps {
 }
 
 export function TableEditorSheet({ draftObject, initialTable, mode, trigger }: TableEditorSheetProps) {
-  const { updateObject } = useWorkflowConfig();
-  const [draftTable, setDraftTable] = useState<DraftTable>(initialTable || { id: "", name: "", description: "", columns: [] });
-  
+  const { addTable, updateTable } = useWorkflowConfig();
+  const [draftTable, setDraftTable] = useState<DraftTable>(
+    initialTable || { id: "", name: "", description: "", columns: [] },
+  );
+  const [isOpen, setIsOpen] = useState(false);
+
   const { name, description } = draftTable;
 
   const handleSave = () => {
     if (mode === "edit" && draftTable) {
-      // Update existing table
-      const updatedTables =
-        draftObject.tables?.map((table) => (table.id === draftTable.id ? draftTable : table)) ||
-        [];
-
-      updateObject({
-        ...draftObject,
-        tables: updatedTables,
-      });
+      updateTable(draftObject.id, draftTable.id, draftTable);
     } else if (mode === "add") {
-      // Add a new table with the provided details
       const newTable: DraftTable = {
         id: Date.now().toString(),
         name: draftTable.name,
@@ -51,19 +45,17 @@ export function TableEditorSheet({ draftObject, initialTable, mode, trigger }: T
         columns: draftTable.columns || [],
       };
 
-      updateObject({
-        ...draftObject,
-        tables: [...(draftObject.tables || []), newTable],
-      });
+      addTable(draftObject.id, newTable);
     }
+    setIsOpen(false);
   };
 
   const setName = (name: string) => {
-    setDraftTable(prev => ({ ...prev, name }));
+    setDraftTable((prev) => ({ ...prev, name }));
   };
 
   const setDescription = (description: string) => {
-    setDraftTable(prev => ({ ...prev, description }));
+    setDraftTable((prev) => ({ ...prev, description }));
   };
 
   const defaultTrigger =
@@ -79,7 +71,7 @@ export function TableEditorSheet({ draftObject, initialTable, mode, trigger }: T
     );
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{trigger || defaultTrigger}</SheetTrigger>
       <SheetContent className="w-full sm:max-w-2xl">
         <SheetHeader>
@@ -117,11 +109,7 @@ export function TableEditorSheet({ draftObject, initialTable, mode, trigger }: T
               <div className="flex justify-between items-center">
                 <h3 className="text-md font-medium">Columns</h3>
               </div>
-              <ColumnList 
-                draftObject={draftObject} 
-                draftTable={draftTable} 
-                onUpdateTable={setDraftTable} 
-              />
+              <ColumnList draftObject={draftObject} draftTable={draftTable} onUpdateTable={setDraftTable} />
             </div>
           </div>
         </div>
@@ -131,11 +119,9 @@ export function TableEditorSheet({ draftObject, initialTable, mode, trigger }: T
               Cancel
             </Button>
           </SheetClose>
-          <SheetClose asChild>
-            <Button type="button" onClick={handleSave}>
-              Save
-            </Button>
-          </SheetClose>
+          <Button type="button" onClick={handleSave}>
+            Save
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

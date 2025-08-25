@@ -1,7 +1,16 @@
 import type { Workflow } from "@paperjet/engine/types";
 import { produce } from "immer";
 import { createContext, useContext, useEffect, useState } from "react";
-import { type DraftField, type DraftObject, type DraftTable, type DraftWorkflowConfig, fromWorkflowConfig } from "@/types";
+import {
+  type DraftField,
+  type DraftObject,
+  type DraftTable,
+  type DraftWorkflowConfig,
+  fromWorkflowConfig,
+} from "@/types";
+import { useMutation } from "@tanstack/react-query";
+import { WorkflowRoutes } from "@paperjet/api/routes";
+import { hc } from "hono/client";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
@@ -18,6 +27,8 @@ interface WorkflowConfigContextType {
   removeTable: (objectId: string, tableId: string) => void;
 }
 
+const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
+
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
 
 export function WorkflowConfigProvider({
@@ -28,6 +39,30 @@ export function WorkflowConfigProvider({
   initialWorkflow?: Workflow;
 }) {
   const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
+
+  const updateWorkflow = useMutation({
+    mutationFn: async (workflowConfig: DraftWorkflowConfig) => {
+      await workflowClient[":workflowId"].$put({
+        json: {
+          configuration: {
+            objects: workflowConfig.objects,
+          },
+        },
+      });
+      const response = await adminClient.config.$patch({
+        json: config,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        console.error(error);
+        throw new Error("Failed to update configuration");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["config"] });
+    },
+  });
 
   useEffect(() => {
     if (initialWorkflow) {
