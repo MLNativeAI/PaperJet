@@ -1,7 +1,7 @@
 import type { Workflow } from "@paperjet/engine/types";
 import { produce } from "immer";
 import { createContext, useContext, useEffect, useState } from "react";
-import { type DraftField, type DraftObject, type DraftWorkflowConfig, fromWorkflowConfig } from "@/types";
+import { type DraftField, type DraftObject, type DraftTable, type DraftWorkflowConfig, fromWorkflowConfig } from "@/types";
 
 interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
@@ -12,6 +12,10 @@ interface WorkflowConfigContextType {
   addField: (objectId: string, newField: DraftField) => void;
   updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   removeField: (objectId: string, fieldId: string) => void;
+  // Table-level functions
+  addTable: (objectId: string, newTable: DraftTable) => void;
+  updateTable: (objectId: string, tableId: string, updatedTable: DraftTable) => void;
+  removeTable: (objectId: string, tableId: string) => void;
 }
 
 const WorkflowConfigContext = createContext<WorkflowConfigContextType | undefined>(undefined);
@@ -111,6 +115,52 @@ export function WorkflowConfigProvider({
     setWorkflowConfig(nextState);
   };
 
+  const addTable = (objectId: string, newTable: DraftTable) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        if (!draft.tables) {
+          draft.tables = [];
+        }
+        draft.tables.push(newTable);
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const updateTable = (objectId: string, tableId: string, updatedTable: DraftTable) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        if (draft.tables) {
+          const tableIndex = draft.tables.findIndex((t) => t.id === tableId);
+          if (tableIndex !== -1) {
+            draft.tables[tableIndex] = updatedTable;
+          }
+        }
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
+  const removeTable = (objectId: string, tableId: string) => {
+    const nextState = produce(workflowConfig, (draftState) => {
+      const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
+      if (objectIndex !== -1) {
+        const draft = draftState.objects[objectIndex];
+        if (draft.tables) {
+          const tableIndex = draft.tables.findIndex((t) => t.id === tableId);
+          if (tableIndex !== -1) {
+            draft.tables.splice(tableIndex, 1);
+          }
+        }
+      }
+    });
+    setWorkflowConfig(nextState);
+  };
+
   return (
     <WorkflowConfigContext.Provider
       value={{
@@ -121,6 +171,9 @@ export function WorkflowConfigProvider({
         addField,
         updateField,
         removeField,
+        addTable,
+        updateTable,
+        removeTable,
       }}
     >
       {children}
