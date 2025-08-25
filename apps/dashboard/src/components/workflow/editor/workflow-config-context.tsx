@@ -8,7 +8,7 @@ interface WorkflowConfigContextType {
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
   // Field-level functions
-  addField: (objectId: string) => void;
+  addField: (objectId: string, newField: DraftField) => void;
   updateField: (objectId: string, fieldId: string, updatedField: DraftField) => void;
   removeField: (objectId: string, fieldId: string) => void;
   // Table-level functions
@@ -53,20 +53,15 @@ export function WorkflowConfigProvider({ children }: { children: React.ReactNode
     setWorkflowConfig(nextState);
   };
 
-  const addField = (objectId: string) => {
+  const addField = (objectId: string, newField: DraftField) => {
     const nextState = produce(workflowConfig, (draftState) => {
       const objectIndex = draftState.objects.findIndex((obj) => obj.id === objectId);
       if (objectIndex !== -1) {
         const draft = draftState.objects[objectIndex];
-        // Initialize fields array if it doesn't exist
         if (!draft.fields) {
           draft.fields = [];
         }
-        draft.fields.push({
-          id: Date.now().toString(),
-          name: "",
-          type: "string",
-        });
+        draft.fields.push(newField);
       }
     });
     setWorkflowConfig(nextState);

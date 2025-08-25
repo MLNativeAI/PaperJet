@@ -1,6 +1,4 @@
-import { Separator } from "@/components/ui/separator";
-import { FieldForm } from "@/components/workflow/editor/field-form";
-import { useWorkflowConfig } from "@/components/workflow/editor/workflow-config-context";
+import { getFieldIconByType } from "@/components/utils";
 import type { DraftObject } from "@/types";
 
 interface FieldListProps {
@@ -8,7 +6,7 @@ interface FieldListProps {
 }
 
 export function FieldList({ draftObject }: FieldListProps) {
-  const { updateField, removeField } = useWorkflowConfig();
+  // const { updateField, removeField } = useWorkflowConfig();
 
   if (!draftObject.fields || draftObject.fields.length === 0) {
     return null;
@@ -24,13 +22,15 @@ export function FieldList({ draftObject }: FieldListProps) {
         <div className="space-y-3">
           {draftObject.fields.map((field, index) => (
             <>
-              <FieldForm
-                key={field.id}
-                field={field}
-                onChange={(updatedField) => updateField(draftObject.id, field.id, updatedField)}
-                onRemove={() => removeField(draftObject.id, field.id)}
-              />
-              {draftObject.fields && index < draftObject.fields.length - 1 && <Separator />}
+              <div className="flex flex-col space-y-1 p-3 bg-muted/30 rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                    {getFieldIconByType(field.type)}
+                    {field.name}
+                  </span>
+                </div>
+                <div className="text-sm font-medium">{field.description}</div>
+              </div>
             </>
           ))}
         </div>
