@@ -2,15 +2,10 @@ import fs from "node:fs";
 import { type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { expect, type Page } from "@playwright/test";
 
-export async function createNewWorkflow(
-  _name: string,
-  _description: string,
-  config: WorkflowConfiguration,
-  page: Page,
-) {
+export async function createNewWorkflow(name: string, description: string, config: WorkflowConfiguration, page: Page) {
   const payload = {
-    name: "Energa invoice parser",
-    description: "Extracts core invoice information",
+    name,
+    description,
     configuration: config,
   };
   const newWorkflow = await page.request.post("/api/v1/workflows", {
@@ -27,11 +22,13 @@ export async function createNewWorkflow(
 }
 
 export async function startWorkflowExecution(workflowId: string, filePath: string, page: Page) {
+  const fileName = filePath.split("/").pop() || "unknown-file";
+
   const executionResponse = await page.request.post(`/api/v1/workflows/${workflowId}/execute`, {
     multipart: {
       workflowId: workflowId,
       file: {
-        name: "Energa.pdf",
+        name: fileName,
         mimeType: "application/pdf",
         buffer: fs.readFileSync(filePath),
       },

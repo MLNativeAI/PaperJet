@@ -57,7 +57,6 @@ function validateFiles(body: any): { success: true; files: File[] } | { success:
 const router = app
   .get("/", async (c) => {
     try {
-      logger.info("Getting workflows");
       const user = await getUser(c);
       const workflows = await getWorkflows(user.id);
       return c.json(workflows);
