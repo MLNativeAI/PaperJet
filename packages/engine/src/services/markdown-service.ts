@@ -2,8 +2,7 @@ import { db } from "@paperjet/db";
 import { documentPage } from "@paperjet/db/schema";
 import { logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
-import { generateObject } from "../lib/ai-sdk-wrapper";
+import { generateText } from "../lib/ai-sdk-wrapper";
 import { s3Client } from "../lib/s3";
 
 export type MarkdownDocument = {
@@ -26,7 +25,7 @@ export const convertPageToMarkdown = async (workflowExecutionId: string, documen
   await db
     .update(documentPage)
     .set({
-      rawMarkdown: markdownPage.markdown,
+      rawMarkdown: markdownPage,
     })
     .where(eq(documentPage.id, documentPageId));
 
@@ -37,11 +36,7 @@ const extractMarkdownFromPageImage = async (pageBuffer: ArrayBuffer) => {
   const prompt =
     "You're an expert in document processing. Please convert this document page into markdown. Reply only with the markdown, make sure to preserve all of the original content of the document page.";
 
-  //TODO: use generateText since smaller models struggle with this prompt/schema combo
-  const result = await generateObject("convert-to-markdown", {
-    schema: z.object({
-      markdown: z.string(),
-    }),
+  const result = await generateText("convert-to-markdown", {
     messages: [
       {
         role: "user",
@@ -59,5 +54,5 @@ const extractMarkdownFromPageImage = async (pageBuffer: ArrayBuffer) => {
     ],
   });
 
-  return result.object;
+  return result;
 };

@@ -1,6 +1,6 @@
 import type { WorkflowConfiguration } from "@paperjet/engine/types";
 
-export const energaWorkflowConfig: WorkflowConfiguration = {
+export const energyConfig: WorkflowConfiguration = {
   objects: [
     {
       name: "Seller details",

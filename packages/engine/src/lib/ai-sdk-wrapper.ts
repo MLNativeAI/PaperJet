@@ -2,7 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { logger } from "@paperjet/shared";
 import type { CoreMessage, GenerateObjectResult, LanguageModelV1, Message } from "ai";
-import { generateObject as aiGenerateObject } from "ai";
+import { generateObject as aiGenerateObject, generateText as aiGenerateText } from "ai";
 import type { z } from "zod";
 import { getValidModelConfig } from "../services/admin-service";
 import type { ValidModelConfig } from "../types";
@@ -15,6 +15,59 @@ export type GenerateObjectOptions<T extends z.ZodType> = {
   prompt?: string;
   modelConfig?: ValidModelConfig;
 };
+
+export type GenerateTextOptions = {
+  messages: CoreMessage[] | Omit<Message, "id">[];
+  model?: LanguageModelV1;
+  prompt?: string;
+  modelConfig?: ValidModelConfig;
+};
+
+export async function generateText(operationName: string, options: GenerateTextOptions): Promise<string> {
+  const startTime = Date.now();
+  const modelConfig = options.modelConfig || (await getValidModelConfig());
+  const model = options.model || (await getModelInstance(modelConfig));
+
+  try {
+    const result = await aiGenerateText({
+      model,
+      messages: options.messages,
+      prompt: options.prompt,
+    });
+
+    const durationMs = Date.now() - startTime;
+
+    logger.debug(
+      {
+        operationName,
+        modelId: model.modelId,
+        durationMs,
+        promptTokens: result.usage?.promptTokens,
+        completionTokens: result.usage?.completionTokens,
+        totalTokens: result.usage?.totalTokens,
+      },
+      "AI generation completed",
+    );
+
+    await trackUsage(operationName, model.modelId, result.usage, durationMs);
+
+    return result.text;
+  } catch (error) {
+    const durationMs = Date.now() - startTime;
+
+    logger.error(
+      {
+        operationName,
+        modelId: model.modelId,
+        durationMs,
+        error,
+      },
+      "AI generation failed",
+    );
+
+    throw error;
+  }
+}
 
 export async function generateObject<T extends z.ZodType>(
   operationName: string,
