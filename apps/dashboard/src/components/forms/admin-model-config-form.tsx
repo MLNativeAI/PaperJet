@@ -145,7 +145,7 @@ export default function AdminModelConfigForm({ configuration }: { configuration:
                   <FormItem>
                     <FormLabel>Model endpoint</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="http://localhost:11434/v1" disabled={!editModeEnabled} />
+                      <Input {...field} placeholder="https://openrouter.ai/api/v1" disabled={!editModeEnabled} />
                     </FormControl>
                     <p className="text-sm text-muted-foreground">The base URL for your custom API endpoint</p>
                   </FormItem>

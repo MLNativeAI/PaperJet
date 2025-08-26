@@ -38,8 +38,11 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
         setNewKey(data.key);
         setShowKeyDialog(true);
         setName("");
-        onOpenChange(false);
-        onSuccess();
+        // Close the create dialog after a short delay to ensure the key dialog is visible
+        setTimeout(() => {
+          onOpenChange(false);
+          onSuccess();
+        }, 100);
       },
       onError: () => {
         toast.error("Failed to create API key");

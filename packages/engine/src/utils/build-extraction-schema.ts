@@ -1,6 +1,5 @@
 import { z } from "zod";
 import type { WorkflowConfiguration } from "../types";
-import { logger } from "@paperjet/shared";
 
 export function buildExtractionSchema(configuration: WorkflowConfiguration) {
   const objectSchemas: Record<string, any> = {};

@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { getStatusIcon, getStatusText } from "@/components/utils";
 import { useExecutionStatus } from "@/hooks/use-execution-status";
 import type { ExecutionResult } from "@/pages/workflow-executor-page";
@@ -31,6 +32,9 @@ export default function ExecutionStatusRow({ execution }: { execution: Execution
                 <IconEye className="h-4 w-4 mr-2" />
                 View
               </Button>
+            )}
+            {statusResponse?.status && statusResponse.status === "Failed" && (
+              <Label>Unfortunately, this execution has failed. Please try again later.</Label>
             )}
           </div>
         </div>

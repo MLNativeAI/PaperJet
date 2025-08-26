@@ -96,6 +96,16 @@ export const extractionWorkflowWorker = new Worker(
   },
 );
 
+extractionWorkflowWorker.on("failed", async (job, error) => {
+  if (job?.data.workflowExecutionId) {
+    logger.error(`parent job ${job?.data.workflowExecutionId} failed`);
+    await db
+      .update(workflowExecution)
+      .set({ status: WorkflowExecutionStatus.enum.Failed, completedAt: new Date() })
+      .where(eq(workflowExecution.id, job.data.workflowExecutionId));
+  }
+});
+
 async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
   const { workflowExecutionId } = job.data;
   await db
@@ -112,7 +122,7 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
       id: job.id,
       queue: job.queueQualifiedName,
     },
-    ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
+    failParentOnFailure: true,
   });
 }
 
@@ -142,7 +152,7 @@ async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
           id: job.id,
           queue: job.queueQualifiedName,
         },
-        ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
+        failParentOnFailure: true,
       },
     };
   });
@@ -161,7 +171,7 @@ async function addExtractionJob(job: Job<WorkflowExtractionData>) {
       id: job.id,
       queue: job.queueQualifiedName,
     },
-    ignoreDependencyOnFailure: true, // this is needed so that we're not hanging on the parent waiting for the failed jobs
+    failParentOnFailure: true,
   });
 }
 
@@ -191,15 +201,6 @@ async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionDa
     // Children are still processing, throw error to pause this job
     logger.info(`Waiting for ${jobName} children to complete`);
     throw new WaitingChildrenError();
-  }
-
-  // All children have completed, check for failures
-  const childrenValues = await job.getChildrenValues();
-  const failedChildren = Object.entries(childrenValues).filter(([_, result]) => result instanceof Error);
-
-  if (failedChildren.length > 0) {
-    logger.error(`${jobName} failed - ${failedChildren.length} child jobs failed`);
-    throw new Error(`${jobName} failed with ${failedChildren.length} failures`);
   }
 
   logger.info(`All ${jobName} children completed successfully`);

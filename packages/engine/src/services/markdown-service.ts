@@ -37,6 +37,7 @@ const extractMarkdownFromPageImage = async (pageBuffer: ArrayBuffer) => {
   const prompt =
     "You're an expert in document processing. Please convert this document page into markdown. Reply only with the markdown, make sure to preserve all of the original content of the document page.";
 
+  //TODO: use generateText since smaller models struggle with this prompt/schema combo
   const result = await generateObject("convert-to-markdown", {
     schema: z.object({
       markdown: z.string(),

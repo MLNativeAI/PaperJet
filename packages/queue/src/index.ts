@@ -19,13 +19,13 @@ allWorkers.forEach((worker) => {
       "Worker job completed",
     );
   });
-  worker.on("failed", (job: any, err: any) => {
-    logger.error({ err, job }, "Worker job failed");
+  worker.on("failed", (job: any, err: Error) => {
+    logger.error({ error: err.message, jobName: job.jobName }, "Worker job failed");
   });
   worker.on("stalled", (jobId: any) => {
     logger.warn({ jobId }, "Worker job stalled");
   });
-  worker.on("error", (err: any) => {
+  worker.on("error", (err: Error) => {
     logger.error(err, "Worker error");
   });
 });
