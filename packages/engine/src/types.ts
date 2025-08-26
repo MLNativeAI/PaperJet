@@ -76,7 +76,6 @@ export const fieldsConfigurationSchema = z.array(
     slug: z.string(),
     description: z.string(),
     type: z.enum(["text", "number", "date", "currency", "boolean"]),
-    required: z.boolean(),
     categoryId: z.string(),
     lastModified: z.string().datetime().optional(),
   }),

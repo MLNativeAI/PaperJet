@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { WorkflowConfiguration } from "../types";
+import { logger } from "@paperjet/shared";
 
 export function buildExtractionSchema(configuration: WorkflowConfiguration) {
   const objectSchemas: Record<string, any> = {};
@@ -13,13 +14,13 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
       obj.fields?.forEach((field) => {
         switch (field.type) {
           case "number":
-            fieldsSchema[field.name] = z.number().nullable();
+            fieldsSchema[field.name] = z.number().nullable().optional();
             break;
           case "date":
-            fieldsSchema[field.name] = z.string().nullable(); // Date as ISO string
+            fieldsSchema[field.name] = z.string().nullable().optional(); // Date as ISO string
             break;
           default:
-            fieldsSchema[field.name] = z.string().nullable();
+            fieldsSchema[field.name] = z.string().nullable().optional();
         }
       });
 
@@ -35,23 +36,23 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
         table.columns.forEach((col) => {
           switch (col.type) {
             case "number":
-              columnSchemas[col.name] = z.number().nullable();
+              columnSchemas[col.name] = z.number().nullable().optional();
               break;
             case "date":
-              columnSchemas[col.name] = z.string().nullable();
+              columnSchemas[col.name] = z.string().nullable().optional();
               break;
             default:
-              columnSchemas[col.name] = z.string().nullable();
+              columnSchemas[col.name] = z.string().nullable().optional();
           }
         });
 
-        tablesSchema[table.name] = z.array(z.object(columnSchemas));
+        tablesSchema[table.name] = z.array(z.object(columnSchemas)).optional();
       });
 
-      objectProperties.tables = z.object(tablesSchema);
+      objectProperties.tables = z.object(tablesSchema).optional();
     }
 
-    objectSchemas[obj.name] = z.object(objectProperties);
+    objectSchemas[obj.name] = z.object(objectProperties).optional();
   });
 
   return z.object(objectSchemas);
