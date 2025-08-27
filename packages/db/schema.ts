@@ -21,6 +21,7 @@ export const user = pgTable("user", {
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
   role: text("role"),
+  lastActiveOrgId: text("last_active_org_id"),
   banned: boolean("banned"),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
@@ -37,6 +38,7 @@ export const session = pgTable("session", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  activeOrganizationId: text("active_organization_id").references(() => organization.id, { onDelete: "cascade" }),
   impersonatedBy: text("impersonated_by"),
 });
 

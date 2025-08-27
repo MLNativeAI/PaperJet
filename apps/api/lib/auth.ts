@@ -1,12 +1,13 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
+import { organization as dbOrganization, user } from "@paperjet/db/schema";
 import { MagicLinkEmail, render } from "@paperjet/email";
-import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
+import { generateId, generateOrgSlug, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
 import { betterAuth, type User } from "better-auth";
-
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
 import { Resend } from "resend";
 
@@ -31,6 +32,10 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
+        type: "string",
+        input: false,
+      },
+      lastActiveOrgId: {
         type: "string",
         input: false,
       },
@@ -64,9 +69,18 @@ export const auth = betterAuth({
     session: {
       create: {
         before: async (session) => {
+          const orgId = await getDefaultOrgOrCreate(session.userId);
+          await db
+            .update(user)
+            .set({
+              lastActiveOrgId: orgId,
+            })
+            .where(eq(user.id, session.userId));
+
           return {
             data: {
               ...session,
+              activeOrganizationId: orgId,
               id: generateId(ID_PREFIXES.session),
             },
           };
@@ -112,7 +126,6 @@ export const auth = betterAuth({
           console.log(`Magic link for ${email}: ${url}`);
           return;
         }
-
         try {
           logger.info({ email, url }, `Sending magic link to ${email}: ${url}`);
           const emailHtml = await render(MagicLinkEmail({ url, token }));
@@ -192,4 +205,41 @@ export const getUser = async (c: Context): Promise<User> => {
     throw new Error("Unauthorized");
   }
   return session.user;
+};
+
+const getDefaultOrgOrCreate = async (userId: string) => {
+  try {
+    const userData = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+    });
+    if (userData?.lastActiveOrgId) {
+      return userData.lastActiveOrgId;
+    } else {
+      const usersOrgs = await db.query.member.findMany({
+        where: eq(schema.member.userId, userId),
+      });
+      if (usersOrgs.length > 0) {
+        return usersOrgs[0]?.organizationId;
+      } else {
+        const { slug, id } = generateOrgSlug();
+        await db.insert(dbOrganization).values({
+          id: id,
+          slug: slug,
+          name: "Default",
+          createdAt: new Date(),
+        });
+        await db.insert(schema.member).values({
+          id: crypto.randomUUID(),
+          createdAt: new Date(),
+          organizationId: id,
+          userId: userId,
+          role: "admin",
+        });
+        logger.info("Org and member created");
+        return id;
+      }
+    }
+  } catch (error) {
+    logger.error(error, "Create org failed:");
+  }
 };
