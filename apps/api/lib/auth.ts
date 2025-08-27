@@ -70,6 +70,15 @@ export const auth = betterAuth({
       create: {
         before: async (session) => {
           const orgId = await getDefaultOrgOrCreate(session.userId);
+          if (!orgId) {
+            throw new Error("org not found");
+          }
+          const org = await db.query.organization.findFirst({
+            where: eq(dbOrganization.id, orgId),
+          });
+          if (!org) {
+            throw new Error("org not found");
+          }
           await db
             .update(user)
             .set({
@@ -81,6 +90,8 @@ export const auth = betterAuth({
             data: {
               ...session,
               activeOrganizationId: orgId,
+              activeOrganizationSlug: org.slug,
+              activeOrganizationName: org.name,
               id: generateId(ID_PREFIXES.session),
             },
           };

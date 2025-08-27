@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { BookOpen, FileText, Play, Settings, Shield } from "lucide-react";
 import type * as React from "react";
 import { useMemo } from "react";
+import { OrgSwitcher } from "@/components/org-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -76,6 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
+        <OrgSwitcher />
         <SidebarGroup>
           <SidebarMenu>
             {data.navMain.map((item) => {
