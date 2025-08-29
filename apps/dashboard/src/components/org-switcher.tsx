@@ -6,13 +6,17 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
+import { authClient } from "@/lib/auth-client";
+
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+
+  console.log(activeOrganization);
 
   return (
     <SidebarMenu>
@@ -28,7 +32,9 @@ export function OrgSwitcher() {
                 <BuildingIcon className="h-4 w-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Default organization</span>
+                <span className="truncate font-medium">
+                  {activeOrganization ? `${activeOrganization?.name} Organization` : "..."}{" "}
+                </span>
                 <span className="truncate text-xs">Free</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
