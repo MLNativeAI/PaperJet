@@ -6,12 +6,11 @@ export const Route = createFileRoute("/_app/settings")({
 
 function RouteComponent() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl w-full mx-auto">
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences</p>
       </div>
-      
+
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
           <Link
@@ -52,7 +51,7 @@ function RouteComponent() {
           </Link>
         </nav>
       </div>
-      
+
       <div className="pt-4">
         <Outlet />
       </div>

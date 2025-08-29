@@ -32,8 +32,6 @@ export default function SettingsPage() {
           <h2 className="text-2xl font-bold">API Keys</h2>
           <p className="text-muted-foreground mt-1">Create and manage API keys to access PaperJet programmatically</p>
         </div>
-
-        <ApiKeysList apiKeys={apiKeys} onRefresh={refetch} />
       </div>
     </div>
   );
