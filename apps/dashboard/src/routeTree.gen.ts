@@ -16,10 +16,17 @@ import { Route as AuthVerifyMagicLinkRouteImport } from './routes/auth/verify-ma
 import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppExecutionsRouteImport } from './routes/_app.executions'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppExecutionsIndexRouteImport } from './routes/_app.executions.index'
+import { Route as AppAdminIndexRouteImport } from './routes/_app.admin.index'
 import { Route as AppWorkflowsNewRouteImport } from './routes/_app.workflows.new'
+import { Route as AppSettingsOrganizationRouteImport } from './routes/_app/settings/organization'
+import { Route as AppSettingsModelsRouteImport } from './routes/_app/settings/models'
+import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/billing'
+import { Route as AppSettingsApiKeysRouteImport } from './routes/_app/settings/api-keys'
 import { Route as AppExecutionsExecutionIdRouteImport } from './routes/_app.executions.$executionId'
 import { Route as AppAdminUsageRouteImport } from './routes/_app.admin.usage'
 import { Route as AppAdminConfigRouteImport } from './routes/_app.admin.config'
@@ -70,15 +77,50 @@ const AppExecutionsRoute = AppExecutionsRouteImport.update({
   path: '/executions',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppExecutionsIndexRoute = AppExecutionsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppExecutionsRoute,
 } as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppWorkflowsNewRoute = AppWorkflowsNewRouteImport.update({
   id: '/workflows/new',
   path: '/workflows/new',
   getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsOrganizationRoute = AppSettingsOrganizationRouteImport.update({
+  id: '/organization',
+  path: '/organization',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsModelsRoute = AppSettingsModelsRouteImport.update({
+  id: '/models',
+  path: '/models',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsApiKeysRoute = AppSettingsApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AppSettingsRoute,
 } as any)
 const AppExecutionsExecutionIdRoute =
   AppExecutionsExecutionIdRouteImport.update({
@@ -87,14 +129,14 @@ const AppExecutionsExecutionIdRoute =
     getParentRoute: () => AppExecutionsRoute,
   } as any)
 const AppAdminUsageRoute = AppAdminUsageRouteImport.update({
-  id: '/admin/usage',
-  path: '/admin/usage',
-  getParentRoute: () => AppRoute,
+  id: '/usage',
+  path: '/usage',
+  getParentRoute: () => AppAdminRoute,
 } as any)
 const AppAdminConfigRoute = AppAdminConfigRouteImport.update({
-  id: '/admin/config',
-  path: '/admin/config',
-  getParentRoute: () => AppRoute,
+  id: '/config',
+  path: '/config',
+  getParentRoute: () => AppAdminRoute,
 } as any)
 const AppWorkflowsWorkflowIdExecuteRoute =
   AppWorkflowsWorkflowIdExecuteRouteImport.update({
@@ -111,8 +153,9 @@ const AppWorkflowsWorkflowIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
+  '/admin': typeof AppAdminRouteWithChildren
   '/executions': typeof AppExecutionsRouteWithChildren
-  '/settings': typeof AppSettingsRoute
+  '/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -121,14 +164,19 @@ export interface FileRoutesByFullPath {
   '/admin/config': typeof AppAdminConfigRoute
   '/admin/usage': typeof AppAdminUsageRoute
   '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
+  '/settings/api-keys': typeof AppSettingsApiKeysRoute
+  '/settings/billing': typeof AppSettingsBillingRoute
+  '/settings/models': typeof AppSettingsModelsRoute
+  '/settings/organization': typeof AppSettingsOrganizationRoute
   '/workflows/new': typeof AppWorkflowsNewRoute
+  '/admin/': typeof AppAdminIndexRoute
   '/executions/': typeof AppExecutionsIndexRoute
+  '/settings/': typeof AppSettingsIndexRoute
   '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
-  '/settings': typeof AppSettingsRoute
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -137,8 +185,14 @@ export interface FileRoutesByTo {
   '/admin/config': typeof AppAdminConfigRoute
   '/admin/usage': typeof AppAdminUsageRoute
   '/executions/$executionId': typeof AppExecutionsExecutionIdRoute
+  '/settings/api-keys': typeof AppSettingsApiKeysRoute
+  '/settings/billing': typeof AppSettingsBillingRoute
+  '/settings/models': typeof AppSettingsModelsRoute
+  '/settings/organization': typeof AppSettingsOrganizationRoute
   '/workflows/new': typeof AppWorkflowsNewRoute
+  '/admin': typeof AppAdminIndexRoute
   '/executions': typeof AppExecutionsIndexRoute
+  '/settings': typeof AppSettingsIndexRoute
   '/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
@@ -146,8 +200,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/auth': typeof AuthRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
+  '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/executions': typeof AppExecutionsRouteWithChildren
-  '/_app/settings': typeof AppSettingsRoute
+  '/_app/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -156,8 +211,14 @@ export interface FileRoutesById {
   '/_app/admin/config': typeof AppAdminConfigRoute
   '/_app/admin/usage': typeof AppAdminUsageRoute
   '/_app/executions/$executionId': typeof AppExecutionsExecutionIdRoute
+  '/_app/settings/api-keys': typeof AppSettingsApiKeysRoute
+  '/_app/settings/billing': typeof AppSettingsBillingRoute
+  '/_app/settings/models': typeof AppSettingsModelsRoute
+  '/_app/settings/organization': typeof AppSettingsOrganizationRoute
   '/_app/workflows/new': typeof AppWorkflowsNewRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
   '/_app/executions/': typeof AppExecutionsIndexRoute
+  '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/workflows/$workflowId/edit': typeof AppWorkflowsWorkflowIdEditRoute
   '/_app/workflows/$workflowId/execute': typeof AppWorkflowsWorkflowIdExecuteRoute
 }
@@ -165,6 +226,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
+    | '/admin'
     | '/executions'
     | '/settings'
     | '/admin/setup'
@@ -175,14 +237,19 @@ export interface FileRouteTypes {
     | '/admin/config'
     | '/admin/usage'
     | '/executions/$executionId'
+    | '/settings/api-keys'
+    | '/settings/billing'
+    | '/settings/models'
+    | '/settings/organization'
     | '/workflows/new'
+    | '/admin/'
     | '/executions/'
+    | '/settings/'
     | '/workflows/$workflowId/edit'
     | '/workflows/$workflowId/execute'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
-    | '/settings'
     | '/admin/setup'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -191,14 +258,21 @@ export interface FileRouteTypes {
     | '/admin/config'
     | '/admin/usage'
     | '/executions/$executionId'
+    | '/settings/api-keys'
+    | '/settings/billing'
+    | '/settings/models'
+    | '/settings/organization'
     | '/workflows/new'
+    | '/admin'
     | '/executions'
+    | '/settings'
     | '/workflows/$workflowId/edit'
     | '/workflows/$workflowId/execute'
   id:
     | '__root__'
     | '/auth'
     | '/_app'
+    | '/_app/admin'
     | '/_app/executions'
     | '/_app/settings'
     | '/admin/setup'
@@ -209,8 +283,14 @@ export interface FileRouteTypes {
     | '/_app/admin/config'
     | '/_app/admin/usage'
     | '/_app/executions/$executionId'
+    | '/_app/settings/api-keys'
+    | '/_app/settings/billing'
+    | '/_app/settings/models'
+    | '/_app/settings/organization'
     | '/_app/workflows/new'
+    | '/_app/admin/'
     | '/_app/executions/'
+    | '/_app/settings/'
     | '/_app/workflows/$workflowId/edit'
     | '/_app/workflows/$workflowId/execute'
   fileRoutesById: FileRoutesById
@@ -286,6 +366,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppExecutionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/': {
+      id: '/_app/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/_app/executions/': {
       id: '/_app/executions/'
       path: '/'
@@ -293,12 +387,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppExecutionsIndexRouteImport
       parentRoute: typeof AppExecutionsRoute
     }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/workflows/new': {
       id: '/_app/workflows/new'
       path: '/workflows/new'
       fullPath: '/workflows/new'
       preLoaderRoute: typeof AppWorkflowsNewRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/settings/organization': {
+      id: '/_app/settings/organization'
+      path: '/organization'
+      fullPath: '/settings/organization'
+      preLoaderRoute: typeof AppSettingsOrganizationRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/models': {
+      id: '/_app/settings/models'
+      path: '/models'
+      fullPath: '/settings/models'
+      preLoaderRoute: typeof AppSettingsModelsRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/billing': {
+      id: '/_app/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/api-keys': {
+      id: '/_app/settings/api-keys'
+      path: '/api-keys'
+      fullPath: '/settings/api-keys'
+      preLoaderRoute: typeof AppSettingsApiKeysRouteImport
+      parentRoute: typeof AppSettingsRoute
     }
     '/_app/executions/$executionId': {
       id: '/_app/executions/$executionId'
@@ -309,17 +438,17 @@ declare module '@tanstack/react-router' {
     }
     '/_app/admin/usage': {
       id: '/_app/admin/usage'
-      path: '/admin/usage'
+      path: '/usage'
       fullPath: '/admin/usage'
       preLoaderRoute: typeof AppAdminUsageRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAdminRoute
     }
     '/_app/admin/config': {
       id: '/_app/admin/config'
-      path: '/admin/config'
+      path: '/config'
       fullPath: '/admin/config'
       preLoaderRoute: typeof AppAdminConfigRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAdminRoute
     }
     '/_app/workflows/$workflowId/execute': {
       id: '/_app/workflows/$workflowId/execute'
@@ -354,6 +483,22 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface AppAdminRouteChildren {
+  AppAdminConfigRoute: typeof AppAdminConfigRoute
+  AppAdminUsageRoute: typeof AppAdminUsageRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+}
+
+const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminConfigRoute: AppAdminConfigRoute,
+  AppAdminUsageRoute: AppAdminUsageRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+}
+
+const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
+  AppAdminRouteChildren,
+)
+
 interface AppExecutionsRouteChildren {
   AppExecutionsExecutionIdRoute: typeof AppExecutionsExecutionIdRoute
   AppExecutionsIndexRoute: typeof AppExecutionsIndexRoute
@@ -368,23 +513,41 @@ const AppExecutionsRouteWithChildren = AppExecutionsRoute._addFileChildren(
   AppExecutionsRouteChildren,
 )
 
+interface AppSettingsRouteChildren {
+  AppSettingsApiKeysRoute: typeof AppSettingsApiKeysRoute
+  AppSettingsBillingRoute: typeof AppSettingsBillingRoute
+  AppSettingsModelsRoute: typeof AppSettingsModelsRoute
+  AppSettingsOrganizationRoute: typeof AppSettingsOrganizationRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsApiKeysRoute: AppSettingsApiKeysRoute,
+  AppSettingsBillingRoute: AppSettingsBillingRoute,
+  AppSettingsModelsRoute: AppSettingsModelsRoute,
+  AppSettingsOrganizationRoute: AppSettingsOrganizationRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
+}
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+)
+
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRouteWithChildren
   AppExecutionsRoute: typeof AppExecutionsRouteWithChildren
-  AppSettingsRoute: typeof AppSettingsRoute
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
-  AppAdminConfigRoute: typeof AppAdminConfigRoute
-  AppAdminUsageRoute: typeof AppAdminUsageRoute
   AppWorkflowsNewRoute: typeof AppWorkflowsNewRoute
   AppWorkflowsWorkflowIdEditRoute: typeof AppWorkflowsWorkflowIdEditRoute
   AppWorkflowsWorkflowIdExecuteRoute: typeof AppWorkflowsWorkflowIdExecuteRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRouteWithChildren,
   AppExecutionsRoute: AppExecutionsRouteWithChildren,
-  AppSettingsRoute: AppSettingsRoute,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
-  AppAdminConfigRoute: AppAdminConfigRoute,
-  AppAdminUsageRoute: AppAdminUsageRoute,
   AppWorkflowsNewRoute: AppWorkflowsNewRoute,
   AppWorkflowsWorkflowIdEditRoute: AppWorkflowsWorkflowIdEditRoute,
   AppWorkflowsWorkflowIdExecuteRoute: AppWorkflowsWorkflowIdExecuteRoute,

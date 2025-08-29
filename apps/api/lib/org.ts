@@ -21,10 +21,11 @@ export const getDefaultOrgOrCreate = async (userId: string) => {
         return usersOrgs[0]?.organizationId;
       } else {
         const { slug, id } = generateOrgSlug();
+        const orgName = userData?.email ? await detectOrgNameFromEmail(userData?.email) : "Default";
         await db.insert(dbOrganization).values({
           id: id,
           slug: slug,
-          name: "Default",
+          name: orgName,
           createdAt: new Date(),
         });
         await db.insert(schema.member).values({
@@ -43,7 +44,7 @@ export const getDefaultOrgOrCreate = async (userId: string) => {
   }
 };
 
-export const getUserDomain = async (email: string): Promise<string> => {
+export const detectOrgNameFromEmail = async (email: string): Promise<string> => {
   let orgName = email.split("@")[0];
 
   try {

@@ -1,5 +1,7 @@
 import { ApiKeysList } from "@/components/api-keys-list";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApiKeys } from "@/hooks/use-api-keys";
+import { Link } from "@tanstack/react-router";
 
 export default function SettingsPage() {
   const { apiKeys, isLoading, refetch } = useApiKeys();
@@ -21,7 +23,9 @@ export default function SettingsPage() {
           <p className="text-muted-foreground mt-2">Manage your account settings and API keys</p>
         </div>
       </div>
-
+      <div className="flex gap-4">
+        <Link to="/settings/models">Models</Link>
+      </div>
       {/* API Keys Section */}
       <div className="space-y-6">
         <div>

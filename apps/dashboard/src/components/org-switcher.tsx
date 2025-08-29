@@ -16,7 +16,7 @@ function OrgLogoOrName({ activeOrganization }: { activeOrganization: Organizatio
   return activeOrganization.logo ? (
     <AvatarImage src={activeOrganization.logo} alt={activeOrganization.name.substring(0, 1)} />
   ) : (
-    <AvatarFallback className="rounded-lg">
+    <AvatarFallback className="rounded-lg bg-secondary">
       {activeOrganization.name
         ?.split(" ")
         .map((n) => n[0])
@@ -46,7 +46,7 @@ export function OrgSwitcher() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {activeOrganization ? `${activeOrganization?.name} Organization` : "..."}{" "}
+                  {activeOrganization ? `${activeOrganization?.name} ` : "..."}{" "}
                 </span>
                 <span className="truncate text-xs">Free</span>
               </div>

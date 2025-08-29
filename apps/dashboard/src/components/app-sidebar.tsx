@@ -40,19 +40,9 @@ const data = {
     },
     {
       title: "Admin",
-      url: "/admin/config",
+      url: "/admin",
       icon: Shield,
       adminOnly: true,
-      items: [
-        {
-          title: "Configuration",
-          url: "/admin/config",
-        },
-        {
-          title: "Usage",
-          url: "/admin/usage",
-        },
-      ],
     },
     {
       title: "Documentation",
@@ -92,23 +82,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <span>{item.title}</span>
                       </a>
                     ) : (
-                      <Link to={item.url} className="font-medium flex items-center gap-2">
+                      <Link
+                        to={item.url}
+                        activeProps={{
+                          className: "bg-sidebar-accent text-sidebar-accent-foreground",
+                        }}
+                        className="font-medium flex items-center gap-2"
+                      >
                         <Icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>
                     )}
                   </SidebarMenuButton>
-                  {item.items?.length ? (
-                    <SidebarMenuSub>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <Link to={subItem.url}>{subItem.title}</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  ) : null}
                 </SidebarMenuItem>
               );
             })}
