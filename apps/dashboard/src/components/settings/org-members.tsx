@@ -1,18 +1,15 @@
-import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
+import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import InviteDialog from "@/components/settings/invite-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { IconPlus, IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function OrgMembers() {
   return (
@@ -22,46 +19,8 @@ export default function OrgMembers() {
           <h2 className="text-2xl font-bold">Team Members</h2>
           <p className="text-muted-foreground">Manage who has access to your organization</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <IconPlus className="mr-2 h-4 w-4" />
-              Invite Member
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Invite Team Member</DialogTitle>
-              <DialogDescription>
-                Enter the email address of the person you want to invite to your organization.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" placeholder="user@example.com" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select defaultValue="member">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Send Invitation</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
-
+      <InviteDialog />
       <div className="pt-4">
         <div className="rounded-md border">
           <Table>

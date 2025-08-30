@@ -11,3 +11,4 @@ export { SignupNotificationEmail } from "./emails/signup-notification";
 // Types
 export type { WelcomeEmailProps } from "./emails/welcome";
 export { WelcomeEmail } from "./emails/welcome";
+export { InvitationEmail } from "./emails/invitation";

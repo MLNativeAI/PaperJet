@@ -1,7 +1,6 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
-import { MagicLinkEmail, render } from "@paperjet/email";
 import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
 import { betterAuth, type User } from "better-auth";
@@ -9,12 +8,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
-import { Resend } from "resend";
+import { sendInvitationEmail, sendMagicLink } from "@/lib/email";
 import { getDefaultOrgOrCreate } from "@/lib/org";
 
 const publicRoutes = ["/api/health", "/api/auth/**"];
-
-const resend = envVars.RESEND_API_KEY ? new Resend(envVars.RESEND_API_KEY) : null;
 
 export const auth = betterAuth({
   session: {
@@ -129,28 +126,11 @@ export const auth = betterAuth({
         enabled: false,
       },
     }),
-    organization(),
+    organization({
+      sendInvitationEmail: sendInvitationEmail,
+    }),
     magicLink({
-      sendMagicLink: async ({ email, token, url }, _request) => {
-        if (!resend) {
-          console.log(`Magic link for ${email}: ${url}`);
-          return;
-        }
-        try {
-          logger.info({ email, url }, `Sending magic link to ${email}: ${url}`);
-          const emailHtml = await render(MagicLinkEmail({ url, token }));
-
-          await resend.emails.send({
-            from: envVars.FROM_EMAIL,
-            to: email,
-            subject: "Sign in to PaperJet",
-            html: emailHtml,
-          });
-        } catch (error) {
-          console.error("Failed to send magic link email:", error);
-          throw error;
-        }
-      },
+      sendMagicLink: sendMagicLink,
     }),
   ],
   socialProviders: {
