@@ -26,7 +26,7 @@ export function SiteHeader() {
           label: "Default",
           link: "/",
         };
-  const elements = breadcrumbs.splice(0, 1);
+  const elements = breadcrumbs.slice(1, undefined);
   return (
     <header
       className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12
@@ -43,7 +43,7 @@ export function SiteHeader() {
                 <>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem key={elem.label}>
-                    <BreadcrumbLink href={elem.link}>{elem.link}</BreadcrumbLink>
+                    <BreadcrumbLink href={elem.link}>{elem.label}</BreadcrumbLink>
                   </BreadcrumbItem>
                 </>
               );

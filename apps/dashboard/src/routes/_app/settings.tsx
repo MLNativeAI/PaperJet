@@ -1,4 +1,3 @@
-import { SiteHeader } from "@/components/site-header";
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/settings")({
@@ -8,7 +7,6 @@ export const Route = createFileRoute("/_app/settings")({
 function RouteComponent() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      {/* <SiteHeader breadcrumbs={["Settings"]} /> */}
       <div className="max-w-7xl w-full mx-auto">
         <div className="space-y-6 max-w-7xl w-full mx-auto">
           <div>

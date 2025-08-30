@@ -10,7 +10,12 @@ const router = createRouter({
   routeTree,
   defaultStructuralSharing: true, // Enable structural sharing for better performance
   context: {
-    breadcrumbs: [],
+    breadcrumbs: [
+      {
+        label: "PaperJet",
+        link: "/",
+      },
+    ],
     useFullWidth: false,
   },
 });
