@@ -1,7 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import OrganizationPage from "@/pages/settings/organization";
 
-export const Route = createFileRoute('/_app/settings/organization')({
-  component: RouteComponent,
+export const Route = createFileRoute("/_app/settings/organization")({
+  component: OrganizationPage,
   beforeLoad: () => {
     return {
       breadcrumbs: [
@@ -16,8 +17,4 @@ export const Route = createFileRoute('/_app/settings/organization')({
       ],
     };
   },
-})
-
-function RouteComponent() {
-  return <div>Hello "/_app/settings/organization"!</div>
-}
+});

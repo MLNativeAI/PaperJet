@@ -11,20 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-
-function OrgLogoOrName({ activeOrganization }: { activeOrganization: Organization }) {
-  return activeOrganization.logo ? (
-    <AvatarImage src={activeOrganization.logo} alt={activeOrganization.name.substring(0, 1)} />
-  ) : (
-    <AvatarFallback className="rounded-lg bg-secondary">
-      {activeOrganization.name
-        ?.split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase() || "U"}
-    </AvatarFallback>
-  );
-}
+import OrgLogoWithFallback from "@/components/org-logo-with-fallback";
 
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();
@@ -40,7 +27,7 @@ export function OrgSwitcher() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {activeOrganization && <OrgLogoOrName activeOrganization={activeOrganization} />}
+                {activeOrganization && <OrgLogoWithFallback activeOrganization={activeOrganization} />}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">

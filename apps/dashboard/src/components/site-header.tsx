@@ -17,8 +17,6 @@ export function SiteHeader() {
   });
 
   const { breadcrumbs, useFullWidth } = context;
-  console.log(breadcrumbs);
-  console.log(useFullWidth);
   const root =
     breadcrumbs.length > 0
       ? breadcrumbs[0]
