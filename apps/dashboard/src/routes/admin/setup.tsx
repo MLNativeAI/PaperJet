@@ -18,6 +18,15 @@ export const Route = createFileRoute("/admin/setup")({
     //     to: "/",
     //   });
     // }
+    
+    return {
+      breadcrumbs: [
+        {
+          link: "/admin/setup",
+          label: "Admin Setup",
+        },
+      ],
+    };
   },
   component: AdminSetupPage,
 });

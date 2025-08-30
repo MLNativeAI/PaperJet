@@ -24,6 +24,20 @@ export const Route = createFileRoute("/_app/workflows/$workflowId/edit")({
     }
   },
   component: RouteComponent,
+  beforeLoad: ({ params }) => {
+    return {
+      breadcrumbs: [
+        {
+          link: "/workflows",
+          label: "Workflows",
+        },
+        {
+          link: `/workflows/${params.workflowId}/edit`,
+          label: "Edit workflow",
+        },
+      ],
+    };
+  },
 });
 
 function RouteComponent() {
