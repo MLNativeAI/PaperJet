@@ -22,7 +22,6 @@ export default function WorkflowListPage() {
 
   return (
     <div className="w-full px-4 py-8 space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">My Workflows</h1>

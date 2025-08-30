@@ -6,13 +6,17 @@ export const Route = createFileRoute("/_app/settings")({
 
 function RouteComponent() {
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="max-w-7xl w-full mx-auto">
-        <div className="space-y-6 max-w-7xl w-full mx-auto">
-          <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-          </div>
+    <div className="w-full px-4 py-8 space-y-8 max-w-6xl">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground mt-2">Manage your account settings, plans and configuration</p>
+        </div>
+      </div>
 
+      <div>
+        <div>
           <div className="border-b">
             <nav className="-mb-px flex space-x-8">
               <Link
