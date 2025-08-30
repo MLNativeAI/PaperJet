@@ -1,8 +1,16 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import "../../styles.css";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-export const Route = createRootRoute({
+type RouterContext = {
+  breadcrumbs: {
+    link: string;
+    label: string;
+  }[];
+  useFullWidth: boolean;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <>
       <Outlet />

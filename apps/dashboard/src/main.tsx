@@ -9,6 +9,10 @@ import { routeTree } from "./routeTree.gen";
 const router = createRouter({
   routeTree,
   defaultStructuralSharing: true, // Enable structural sharing for better performance
+  context: {
+    breadcrumbs: [],
+    useFullWidth: false,
+  },
 });
 
 declare module "@tanstack/react-router" {
