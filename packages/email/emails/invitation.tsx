@@ -1,33 +1,42 @@
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
 
-export const InvitationEmail = ({ url, inviter }: { url: string; inviter: string }) => {
+interface InvitationEmailProps {
+  url: string;
+  inviter: string;
+  organizationName: string;
+  role: string;
+}
+
+export const InvitationEmail = ({ 
+  url, 
+  inviter,
+  organizationName,
+  role
+}: InvitationEmailProps) => {
   return (
     <Html>
       <Head />
-      <Preview>Sign in to PaperJet</Preview>
+      <Preview>You've been invited to join {organizationName} on PaperJet</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>Sign in to PaperJet</Heading>
+          <Heading style={h1}>You're invited to PaperJet</Heading>
           <Text style={text}>
-            Click the button below to sign in to your PaperJet account. This link will expire in 10 minutes.
+            <strong>{inviter}</strong> has invited you to join <strong>{organizationName}</strong> on PaperJet as a <strong>{role}</strong>.
+          </Text>
+          <Text style={text}>
+            Click the button below to accept the invitation and get started. This link will expire in 7 days.
           </Text>
           <Section style={buttonContainer}>
             <Button style={button} href={url}>
-              Sign in to PaperJet
+              Accept Invitation
             </Button>
           </Section>
-          <Text style={text}>If you didn't request this email, you can safely ignore it.</Text>
+          <Text style={text}>If you didn't expect this invitation, you can safely ignore it.</Text>
           <Text style={footer}>
             If the button doesn't work, copy and paste this link into your browser:
             <br />
             {url}
           </Text>
-          {token && (
-            <Text style={footer}>
-              <br />
-              Alternatively, you can use this one-time code: <strong>{token}</strong>
-            </Text>
-          )}
         </Container>
       </Body>
     </Html>
