@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     libgomp1 \
     build-essential \
+    ocrmypdf \
+    tesseract-ocr-pol \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure Poetry
@@ -30,11 +32,8 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 # Configure poetry to not create virtual environments
 RUN poetry config virtualenvs.create false
 
-RUN apt install ocrmypdf
-RUN apt install tesseract-ocr-pol
-
 # Copy only pyproject.toml and poetry.lock first to cache dependencies
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
 
 # Install dependencies
 RUN poetry install --no-root --no-interaction
