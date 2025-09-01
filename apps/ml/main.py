@@ -1,30 +1,18 @@
 import base64
 import logging
-import os
-# import tempfile
-
-from pymupdf.mupdf import pdf_document
 import requests
 import pymupdf
 from fastapi import FastAPI, Form
 from typing import Annotated
 from fastapi.middleware.cors import CORSMiddleware
+import pymupdf4llm
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create debug directory
-debug_dir = "debug_ocr"
-os.makedirs(debug_dir, exist_ok=True)
+app = FastAPI(title="PaperJet ML service")
 
-# Create jobs directory for PDF processing
-jobs_dir = "jobs"
-os.makedirs(jobs_dir, exist_ok=True)
-
-app = FastAPI(title="Technical Drawing Analyzer API")
-
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
@@ -36,7 +24,26 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Technical Drawing Analyzer API is running"}
+    return {"message": "PaperJet ML Service is running"}
+
+
+@app.post("/ocr")
+async def ocr(presigned_url: Annotated[str, Form()]):
+    try:
+        r = requests.get(presigned_url)
+        data = r.content
+        pdf_document = pymupdf.Document(stream=data)
+        pages_to_process = list(range(len(pdf_document)))
+        md_text = pymupdf4llm.to_markdown(doc=pdf_document, pages=pages_to_process)
+        print("Markdown:")
+        print(md_text)
+        return {
+            "success": True,
+            "markdown": md_text,
+        }
+    except Exception as e:
+        logger.error(f"Error parsing PDF: {str(e)}")
+        return {"error": str(e)}
 
 
 @app.post("/split-pdf")

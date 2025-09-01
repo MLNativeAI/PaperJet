@@ -53,6 +53,11 @@ export type PdfSplitResult = {
   }[];
 };
 
+export type OcrResult = {
+  success: boolean;
+  markdown: string;
+};
+
 export type IDReference = {
   userId?: string;
   workflowId?: string;
@@ -166,3 +171,4 @@ export type ApiKey = {
 
 export * from "./types/executions";
 export * from "./types/workflow-config";
+export * from "./types/runtime-config.ts";

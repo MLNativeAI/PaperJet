@@ -170,6 +170,7 @@ const router = app
           const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
+            runtimeConfig: "quick",
           });
           const jobId = job.id;
           await updateExecutionJobId(execution.workflowExecutionId, jobId || "");

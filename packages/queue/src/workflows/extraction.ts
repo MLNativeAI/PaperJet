@@ -7,7 +7,7 @@ import { asc, eq } from "drizzle-orm";
 import z from "zod";
 import { extractionQueue } from "../jobs/extraction";
 import { markdownQueue } from "../jobs/markdown";
-import { splitPdfQueue } from "../jobs/split-pdf";
+import { mlServiceQueue } from "../jobs/ml";
 import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
 
@@ -27,6 +27,8 @@ export const workflowExecutionQueue = new Queue(QUEUE_NAMES.EXTRACTION_WORKFLOW,
 const workflowSteps = z.enum([
   "INIT",
   "WAITING_FOR_SPLIT",
+  "NATIVE_OCR",
+  "WAITING_FOR_NATIVE_OCR",
   "MARKDOWN",
   "WAITING_FOR_MARKDOWN",
   "EXTRACTION",
@@ -38,6 +40,7 @@ const WorkflowExtractionDataSchema = z.object({
   workflowId: z.string(),
   workflowExecutionId: z.string(),
   step: workflowSteps,
+  runtimeConfig: z.enum(["accurate", "quick"]),
 });
 
 export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema>;
@@ -49,30 +52,46 @@ export const extractionWorkflowWorker = new Worker(
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
-          await addDocumentSplitJob(job);
-          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
-          step = workflowSteps.enum.WAITING_FOR_SPLIT;
+          if (job.data.runtimeConfig === "accurate") {
+            await addDocumentSplitJob(job);
+            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
+            step = workflowSteps.enum.WAITING_FOR_SPLIT;
+          } else {
+            // quick path
+            await addNativeOcrJob(job);
+            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_NATIVE_OCR });
+            step = workflowSteps.enum.WAITING_FOR_NATIVE_OCR;
+          }
           break;
         }
-        case workflowSteps.enum.WAITING_FOR_SPLIT: {
-          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
-          await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
-          step = workflowSteps.enum.MARKDOWN;
-          break;
-        }
-        case workflowSteps.enum.MARKDOWN: {
-          await addMarkdownJobs(job);
-          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
-          step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
-          break;
-        }
-        case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
-          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
-          await assembleFullDocument(job);
+        // path 1: full conversion
+        // case workflowSteps.enum.WAITING_FOR_SPLIT: {
+        //   await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
+        //   await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
+        //   step = workflowSteps.enum.MARKDOWN;
+        //   break;
+        // }
+        // case workflowSteps.enum.MARKDOWN: {
+        //   await addMarkdownJobs(job);
+        //   await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_MARKDOWN });
+        //   step = workflowSteps.enum.WAITING_FOR_MARKDOWN;
+        //   break;
+        // }
+        // case workflowSteps.enum.WAITING_FOR_MARKDOWN: {
+        //   await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_MARKDOWN, token);
+        //   await assembleFullDocument(job);
+        //   await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
+        //   step = workflowSteps.enum.EXTRACTION;
+        //   break;
+        // }
+        // path2: quick conversion
+        case workflowSteps.enum.WAITING_FOR_NATIVE_OCR: {
+          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_NATIVE_OCR, token);
           await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
           step = workflowSteps.enum.EXTRACTION;
           break;
         }
+        // joint finish
         case workflowSteps.enum.EXTRACTION: {
           await addExtractionJob(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_EXTRACTION });
@@ -106,6 +125,33 @@ extractionWorkflowWorker.on("failed", async (job, error) => {
   }
 });
 
+async function addNativeOcrJob(job: Job<WorkflowExtractionData>) {
+  const { workflowExecutionId } = job.data;
+  await db
+    .update(workflowExecution)
+    .set({ status: WorkflowExecutionStatus.enum.Processing })
+    .where(eq(workflowExecution.id, workflowExecutionId));
+
+  if (!job.id) {
+    throw new Error("Fatal error, job ID missing");
+  }
+
+  await mlServiceQueue.add(
+    workflowExecutionId,
+    {
+      ...job.data,
+      operation: "ocr",
+    },
+    {
+      parent: {
+        id: job.id,
+        queue: job.queueQualifiedName,
+      },
+      failParentOnFailure: true,
+    },
+  );
+}
+
 async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
   const { workflowExecutionId } = job.data;
   await db
@@ -117,13 +163,20 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await splitPdfQueue.add(workflowExecutionId, job.data, {
-    parent: {
-      id: job.id,
-      queue: job.queueQualifiedName,
+  await mlServiceQueue.add(
+    workflowExecutionId,
+    {
+      ...job.data,
+      operation: "split",
     },
-    failParentOnFailure: true,
-  });
+    {
+      parent: {
+        id: job.id,
+        queue: job.queueQualifiedName,
+      },
+      failParentOnFailure: true,
+    },
+  );
 }
 
 async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {

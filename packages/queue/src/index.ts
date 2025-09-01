@@ -1,11 +1,11 @@
 import { logger } from "@paperjet/shared";
 import { extractWorker } from "./jobs/extraction";
 import { markdownWorker } from "./jobs/markdown";
-import { splitPdfWorker } from "./jobs/split-pdf";
+import { mlWorker } from "./jobs/ml";
 import { extractionWorkflowWorker } from "./workflows/extraction";
 
 export { workflowExecutionQueue } from "./workflows/extraction";
-export const allWorkers = [extractionWorkflowWorker, markdownWorker, splitPdfWorker, extractWorker];
+export const allWorkers = [extractionWorkflowWorker, markdownWorker, mlWorker, extractWorker];
 
 allWorkers.forEach((worker) => {
   worker.on("completed", (job: any, result: any) => {
