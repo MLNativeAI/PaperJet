@@ -51,6 +51,7 @@ async def ocr(presigned_url: Annotated[str, Form()]):
                 language=["eng", "pol"],
                 deskew=True,
                 clean=True,
+                force_ocr=True,
             )
 
             # Process the OCR'd PDF with pymupdf4llm
