@@ -7,6 +7,11 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
   configuration.objects.forEach((obj) => {
     const objectProperties: Record<string, any> = {};
 
+    // Add description field to the object schema
+    if (obj.description) {
+      objectProperties.description = z.string();
+    }
+
     if ("fields" in obj) {
       const fieldsSchema: Record<string, any> = {};
 
@@ -20,6 +25,11 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
             break;
           default:
             fieldsSchema[field.name] = z.string().nullable().optional();
+        }
+        
+        // Add description to field if it exists
+        if (field.description) {
+          fieldsSchema[field.name] = fieldsSchema[field.name].describe(field.description);
         }
       });
 
@@ -43,9 +53,19 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
             default:
               columnSchemas[col.name] = z.string().nullable().optional();
           }
+          
+          // Add description to column if it exists
+          if (col.description) {
+            columnSchemas[col.name] = columnSchemas[col.name].describe(col.description);
+          }
         });
 
         tablesSchema[table.name] = z.array(z.object(columnSchemas)).optional();
+        
+        // Add description to table if it exists
+        if (table.description) {
+          tablesSchema[table.name] = tablesSchema[table.name].describe(table.description);
+        }
       });
 
       objectProperties.tables = z.object(tablesSchema).optional();
