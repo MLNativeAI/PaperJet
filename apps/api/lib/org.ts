@@ -4,10 +4,10 @@ import { organization as dbOrganization, user } from "@paperjet/db/schema";
 import { generateOrgSlug } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
-import { COMMON_EMAIL_PROVIDERS } from "@/lib/const";
 import type { Context } from "hono";
 import type { BlankEnv, BlankInput } from "hono/types";
+import { auth } from "@/lib/auth";
+import { COMMON_EMAIL_PROVIDERS } from "@/lib/const";
 
 export const getDefaultOrgOrCreate = async (userId: string) => {
   try {
@@ -66,28 +66,37 @@ export const detectOrgNameFromEmail = async (email: string): Promise<string> => 
 };
 
 export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-invitation", BlankInput>) {
+  logger.debug(`Handling invitation ${c.req.query("id")}`);
   const invitationId = c.req.query("id");
   if (!invitationId) {
     return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);
   }
-  const invitationResponse = await auth.api.getInvitation({
-    query: {
-      id: invitationId,
-    },
-    headers: c.req.raw.headers,
-  });
-  const email = invitationResponse.email;
-  const userData = await db.query.user.findFirst({
-    where: eq(user.email, email),
-  });
-  if (!userData) {
-    return c.redirect(`${envVars.BASE_URL}/auth/sign-up`);
-  } else {
-    const session = await auth.api.getSession({ headers: c.req.raw.headers });
-    if (!session) {
-      return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);
-    } else {
-      return c.redirect(`${envVars.BASE_URL}/settings/organization`);
+  try {
+    const invitationResponse = await db.query.invitation.findFirst({
+      where: eq(schema.invitation.id, invitationId),
+    });
+    if (!invitationResponse) {
+      return c.redirect(`${envVars.BASE_URL}/auth/sign-up?notFound=true`);
     }
+    const email = invitationResponse?.email;
+    const userData = await db.query.user.findFirst({
+      where: eq(user.email, email),
+    });
+    if (!userData) {
+      logger.debug(`User not found, redirecting to sign up`);
+      return c.redirect(`${envVars.BASE_URL}/auth/sign-up?invite=true`);
+    } else {
+      const session = await auth.api.getSession({ headers: c.req.raw.headers });
+      if (!session) {
+        logger.debug("User exists but not signed in, redirecting to sign-in");
+        return c.redirect(`${envVars.BASE_URL}/auth/sign-in?invite=true`);
+      } else {
+        logger.debug("User exists and signed in, redirect to org settings page");
+        return c.redirect(`${envVars.BASE_URL}/settings/organization`);
+      }
+    }
+  } catch (error) {
+    logger.error(error, "Unknown invitation error, redirecting to sign-up");
+    return c.redirect(`${envVars.BASE_URL}/auth/sign-up`);
   }
 }

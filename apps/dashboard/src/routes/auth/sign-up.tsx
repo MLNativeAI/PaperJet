@@ -7,5 +7,9 @@ export const Route = createFileRoute("/auth/sign-up")({
     const { authMode } = await getAuthMode();
     return { authMode };
   },
+  validateSearch: (search: Record<string, unknown>) => ({
+    notFound: search.notFound as string | undefined,
+    invite: search.invite as string | undefined,
+  }),
   component: SignUpPage,
 });
