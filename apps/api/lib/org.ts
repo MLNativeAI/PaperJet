@@ -6,6 +6,8 @@ import { envVars, logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { COMMON_EMAIL_PROVIDERS } from "@/lib/const";
+import type { Context } from "hono";
+import type { BlankEnv, BlankInput } from "hono/types";
 
 export const getDefaultOrgOrCreate = async (userId: string) => {
   try {
@@ -63,30 +65,29 @@ export const detectOrgNameFromEmail = async (email: string): Promise<string> => 
   return orgName || "Default";
 };
 
-export async function handleOrganizationInvite(c: any) {
+export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-invitation", BlankInput>) {
   const invitationId = c.req.query("id");
   if (!invitationId) {
-    return c.redirect(`${envVars.BASE_URL}/auth/sign-in`, 301);
+    return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);
   }
-
   const invitationResponse = await auth.api.getInvitation({
     query: {
       id: invitationId,
     },
     headers: c.req.raw.headers,
   });
-
   const email = invitationResponse.email;
   const userData = await db.query.user.findFirst({
     where: eq(user.email, email),
   });
   if (!userData) {
-    await c.redirect(`${envVars.BASE_URL}/auth/sign-up?email=${email}&id=${invitationId}`);
+    return c.redirect(`${envVars.BASE_URL}/auth/sign-up`);
   } else {
-    // check if a user is logged in
-    // if yes, redirect to org settings page
-    // if no, show sign-in page with redirect url set to join org
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    if (!session) {
+      return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);
+    } else {
+      return c.redirect(`${envVars.BASE_URL}/settings/organization`);
+    }
   }
-
-  return c.redirect(`${envVars.BASE_URL}/?joined=true`, 301);
 }

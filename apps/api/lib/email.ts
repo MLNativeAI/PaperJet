@@ -7,6 +7,14 @@ import { Resend } from "resend";
 
 const resend = envVars.RESEND_API_KEY ? new Resend(envVars.RESEND_API_KEY) : null;
 
+function getApiBaseUrl() {
+  if (envVars.ENVIRONMENT === "dev") {
+    return "http://localhost:3000";
+  } else {
+    return envVars.BASE_URL;
+  }
+}
+
 export async function sendMagicLink({ email, token, url }: { email: string; token: string; url: string }) {
   if (!resend) {
     logger.info(`Magic link for ${email}: ${url}`);
@@ -49,7 +57,7 @@ export async function sendInvitationEmail({
     return;
   }
   try {
-    const url = `http://localhost:3000/api/admin/accept-invitation?id=${id}`;
+    const url = `${getApiBaseUrl()}/api/admin/accept-invitation?id=${id}`;
     logger.info({ email, url }, `Sending invitation link to ${email}: ${url}`);
     const emailHtml = await render(
       InvitationEmail({

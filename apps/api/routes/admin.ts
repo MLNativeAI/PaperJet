@@ -1,4 +1,3 @@
-import { handleOrganizationInvite } from "@/lib/org";
 import { zValidator } from "@hono/zod-validator";
 import {
   getConfiguration,
@@ -12,6 +11,7 @@ import { configUpdateSchema } from "@paperjet/engine/types";
 import { getAuthMode, logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
+import { handleOrganizationInvite } from "@/lib/org";
 
 const app = new Hono();
 
