@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import React from "react";
 
 interface InvitationEmailProps {
   url: string;
@@ -7,12 +8,7 @@ interface InvitationEmailProps {
   role: string;
 }
 
-export const InvitationEmail = ({ 
-  url, 
-  inviter,
-  organizationName,
-  role
-}: InvitationEmailProps) => {
+export const InvitationEmail = ({ url, inviter, organizationName, role }: InvitationEmailProps) => {
   return (
     <Html>
       <Head />
@@ -21,7 +17,8 @@ export const InvitationEmail = ({
         <Container style={container}>
           <Heading style={h1}>You're invited to PaperJet</Heading>
           <Text style={text}>
-            <strong>{inviter}</strong> has invited you to join <strong>{organizationName}</strong> on PaperJet as a <strong>{role}</strong>.
+            <strong>{inviter}</strong> has invited you to join <strong>{organizationName}</strong> on PaperJet as a{" "}
+            <strong>{role}</strong>.
           </Text>
           <Text style={text}>
             Click the button below to accept the invitation and get started. This link will expire in 7 days.

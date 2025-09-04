@@ -1,3 +1,4 @@
+import { handleOrganizationInvite } from "@/lib/org";
 import { zValidator } from "@hono/zod-validator";
 import {
   getConfiguration,
@@ -20,6 +21,9 @@ const router = app
     return c.json({
       isSetupRequired: isAdminSetupRequired,
     });
+  })
+  .get("/accept-invitation", async (c) => {
+    return handleOrganizationInvite(c);
   })
   .get("/auth-mode", async (c) => {
     return c.json({

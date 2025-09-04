@@ -49,7 +49,7 @@ export async function sendInvitationEmail({
     return;
   }
   try {
-    const url = `${envVars.BASE_URL}/accept-invitation/${id}`;
+    const url = `http://localhost:3000/api/admin/accept-invitation?id=${id}`;
     logger.info({ email, url }, `Sending invitation link to ${email}: ${url}`);
     const emailHtml = await render(
       InvitationEmail({
