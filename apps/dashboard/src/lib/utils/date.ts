@@ -1,4 +1,4 @@
-import { subDays } from "date-fns";
+import { formatDistance, subDays } from "date-fns";
 
 export function formatDuration(startedAt: string, completedAt?: string | null): string {
   if (!completedAt) {
@@ -55,4 +55,8 @@ export function formatRelativeTime(date: string | Date): string {
 export function getInvitationSendDate(expiryDate: Date) {
   // this is a small hack to derive the invite send date from the expiry date based on th expiry period (which is 2 days by default)
   return subDays(expiryDate, 2);
+}
+
+export function renderTimestamp(date: Date): string {
+  return formatDistance(date, new Date(), { addSuffix: true });
 }

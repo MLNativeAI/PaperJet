@@ -1,4 +1,5 @@
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconDotsVertical, IconMail, IconTrash, IconUserMinus, IconUserX } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   type ColumnDef,
   flexRender,
@@ -7,6 +8,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { formatRelative } from "date-fns";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { isOrgInvitation, isOrgMember, type OrgMemberInvitation } from "@/hooks/use-org-members";
-import { Badge } from "@/components/ui/badge";
+import { authClient } from "@/lib/auth-client";
 import { capitalizeFirstLetter } from "@/lib/utils/string";
 
 function InviteOrJoinDate({ invOrMember }: { invOrMember: OrgMemberInvitation }) {
@@ -42,7 +45,103 @@ function InvitationBadge({ invOrMember }: { invOrMember: OrgMemberInvitation }) 
   return null;
 }
 
-export function OrgMembersTable({ data, isLoading }: { data: OrgMemberInvitation[]; isLoading: boolean }) {
+export function OrgMembersTable({
+  data,
+  activeMember,
+  isAdmin,
+  isLoading,
+}: {
+  data: OrgMemberInvitation[];
+  activeMember?: {
+    id: string;
+    organizationId: string;
+  };
+  isAdmin: boolean;
+  isLoading: boolean;
+}) {
+  const queryClient = useQueryClient();
+
+  const handleRemoveMember = async (memberId: string, memberEmail: string) => {
+    try {
+      const { error } = await authClient.organization.removeMember({
+        memberIdOrEmail: memberId,
+      });
+
+      if (error) {
+        toast.error("Failed to remove member");
+        console.error(error);
+      } else {
+        toast.success(`Removed ${memberEmail} from organization`);
+        // Invalidate the query to refetch the data
+        queryClient.invalidateQueries({ queryKey: ["organization-members"] });
+      }
+    } catch (err) {
+      toast.error("Failed to remove member");
+      console.error(err);
+    }
+  };
+
+  const handleCancelInvitation = async (invitationId: string, inviteeEmail: string) => {
+    try {
+      const { error } = await authClient.organization.cancelInvitation({
+        invitationId,
+      });
+
+      if (error) {
+        toast.error("Failed to cancel invitation");
+        console.error(error);
+      } else {
+        toast.success(`Cancelled invitation for ${inviteeEmail}`);
+        // Invalidate the query to refetch the data
+        queryClient.invalidateQueries({ queryKey: ["organization-members"] });
+      }
+    } catch (err) {
+      toast.error("Failed to cancel invitation");
+      console.error(err);
+    }
+  };
+
+  const handleResendInvitation = async (email: string, role: "member" | "admin" | "owner") => {
+    try {
+      const { error } = await authClient.organization.inviteMember({
+        email,
+        role,
+        resend: true,
+      });
+
+      if (error) {
+        toast.error("Failed to resend invitation");
+        console.error(error);
+      } else {
+        toast.success(`Resent invitation to ${email}`);
+      }
+    } catch (err) {
+      toast.error("Failed to resend invitation");
+      console.error(err);
+    }
+  };
+
+  const handleLeaveOrganization = async () => {
+    if (!activeMember) return;
+
+    try {
+      const { error } = await authClient.organization.leave({
+        organizationId: activeMember.organizationId,
+      });
+
+      if (error) {
+        toast.error("Failed to leave organization");
+        console.error(error);
+      } else {
+        toast.success("You have left the organization");
+        // This would typically log the user out or redirect them
+      }
+    } catch (err) {
+      toast.error("Failed to leave organization");
+      console.error(err);
+    }
+  };
+
   const columns: ColumnDef<OrgMemberInvitation>[] = [
     {
       accessorKey: "email",
@@ -70,45 +169,79 @@ export function OrgMembersTable({ data, isLoading }: { data: OrgMemberInvitation
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                size="icon"
-              >
-                <IconDotsVertical className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              {isOrgMember(row.original) && (
-                <>
-                  <DropdownMenuItem>
-                    <IconEdit className="mr-2 h-4 w-4" />
-                    Leave
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconEdit className="mr-2 h-4 w-4" />
-                    Remove if admin
-                  </DropdownMenuItem>
-                </>
-              )}
-              {isOrgInvitation(row.original) && (
-                <>
-                  <DropdownMenuItem>
+      cell: ({ row }) => {
+        // For members
+        if (isOrgMember(row.original)) {
+          const isCurrentUser = row.original.id === activeMember?.id;
+
+          return (
+            <div className="flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                    size="icon"
+                  >
+                    <IconDotsVertical className="h-4 w-4" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {isCurrentUser ? (
+                    <DropdownMenuItem onClick={handleLeaveOrganization} className="text-destructive">
+                      <IconUserMinus className="mr-2 h-4 w-4" />
+                      Leave Organization
+                    </DropdownMenuItem>
+                  ) : (
+                    isAdmin && (
+                      <DropdownMenuItem
+                        onClick={() => handleRemoveMember(row.original.id, row.original.email)}
+                        className="text-destructive"
+                      >
+                        <IconUserX className="mr-2 h-4 w-4" />
+                        Remove from Organization
+                      </DropdownMenuItem>
+                    )
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          );
+        }
+
+        // For invitations
+        if (isOrgInvitation(row.original)) {
+          return (
+            <div className="flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                    size="icon"
+                  >
+                    <IconDotsVertical className="h-4 w-4" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => handleCancelInvitation(row.original.id, row.original.email)}>
                     <IconTrash className="mr-2 h-4 w-4" />
-                    Cancel
+                    Cancel Invitation
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Resend invitation</DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
+                  <DropdownMenuItem onClick={() => handleResendInvitation(row.original.email, row.original.role)}>
+                    <IconMail className="mr-2 h-4 w-4" />
+                    Resend Invitation
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          );
+        }
+
+        return null;
+      },
     },
   ];
 

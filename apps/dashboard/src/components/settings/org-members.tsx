@@ -3,7 +3,7 @@ import { OrgMembersTable } from "@/components/settings/org-members-table";
 import { useOrgMembers } from "@/hooks/use-org-members";
 
 export default function OrgMembers() {
-  const { orgMemberInvitations, isLoading } = useOrgMembers();
+  const { orgMemberInvitations, activeMember, isAdmin, isLoading } = useOrgMembers();
 
   return (
     <div className="space-y-6">
@@ -15,7 +15,12 @@ export default function OrgMembers() {
         <InviteDialog />
       </div>
       <div className="pt-4">
-        <OrgMembersTable data={orgMemberInvitations} isLoading={isLoading} />
+        <OrgMembersTable
+          data={orgMemberInvitations}
+          activeMember={activeMember}
+          isAdmin={isAdmin}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

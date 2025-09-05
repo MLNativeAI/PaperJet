@@ -3,17 +3,18 @@ import type { InvitationStatus } from "better-auth/plugins/organization";
 import { authClient } from "@/lib/auth-client";
 import { getInvitationSendDate } from "@/lib/utils/date";
 
-type OrgMember = {
+export type OrgMember = {
   id: string;
   email: string;
-  role: string;
+  role: "member" | "admin" | "owner";
   createdAt: Date;
+  organizationId: string;
 };
 
-type OrgInvitation = {
+export type OrgInvitation = {
   id: string;
   email: string;
-  role: string;
+  role: "member" | "admin" | "owner";
   status: InvitationStatus;
   issuedAt: Date;
 };
@@ -30,8 +31,7 @@ export function isOrgInvitation(item: OrgMemberInvitation): item is OrgInvitatio
 
 export function useOrgMembers() {
   const { data: session } = authClient.useSession();
-
-  const { data: orgMemberInvitations = [], isLoading } = useQuery({
+  const { data: orgData, isLoading } = useQuery({
     queryKey: ["organization-members"],
     queryFn: async () => {
       const activeOrgId = session?.session.activeOrganizationId;
@@ -49,14 +49,21 @@ export function useOrgMembers() {
         throw new Error("Active org not found");
       }
 
-      const invitations: OrgInvitation[] =
+      const { data: activeMember, error: memberError } = await authClient.organization.getActiveMember();
+
+      if (memberError) {
+        throw new Error("Active member not found");
+      }
+
+      const invitations: OrgInvitation[] = (
         data?.invitations.map((invitation) => ({
           id: invitation.id,
           email: invitation.email,
           role: invitation.role,
           status: invitation.status,
           issuedAt: getInvitationSendDate(invitation.expiresAt),
-        })) || [];
+        })) || []
+      ).filter((inv) => inv.status === "pending");
 
       const members: OrgMember[] =
         data?.members.map((member) => ({
@@ -64,14 +71,21 @@ export function useOrgMembers() {
           email: member.user.email,
           role: member.role,
           createdAt: member.createdAt,
+          organizationId: member.organizationId,
         })) || [];
 
-      return [...invitations, ...members];
+      return {
+        membersAndInvitations: [...invitations, ...members],
+        activeMember,
+        isAdmin: activeMember?.role === "admin" || activeMember?.role === "owner",
+      };
     },
   });
 
   return {
-    orgMemberInvitations,
+    orgMemberInvitations: orgData?.membersAndInvitations || [],
+    activeMember: orgData?.activeMember,
+    isAdmin: orgData?.isAdmin || false,
     isLoading,
   };
 }

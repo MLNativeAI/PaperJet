@@ -128,6 +128,7 @@ export const auth = betterAuth({
     }),
     organization({
       sendInvitationEmail: sendInvitationEmail,
+      cancelPendingInvitationsOnReInvite: true,
     }),
     magicLink({
       sendMagicLink: sendMagicLink,

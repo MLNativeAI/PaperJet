@@ -11,7 +11,7 @@ import { configUpdateSchema } from "@paperjet/engine/types";
 import { getAuthMode, logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { handleOrganizationInvite } from "@/lib/org";
+import { handleOrganizationInvite, listUserInvitations } from "@/lib/org";
 
 const app = new Hono();
 
@@ -24,6 +24,9 @@ const router = app
   })
   .get("/accept-invitation", async (c) => {
     return handleOrganizationInvite(c);
+  })
+  .get("/invitations", async (c) => {
+    return listUserInvitations(c);
   })
   .get("/auth-mode", async (c) => {
     return c.json({

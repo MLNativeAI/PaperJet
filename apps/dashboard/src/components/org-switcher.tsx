@@ -1,7 +1,6 @@
-import type { Organization } from "better-auth/plugins/organization";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import OrgLogoWithFallback from "@/components/org-logo-with-fallback";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +32,7 @@ export function OrgSwitcher() {
                 <span className="truncate font-medium">
                   {activeOrganization ? `${activeOrganization?.name} ` : "..."}{" "}
                 </span>
-                <span className="truncate text-xs">Free</span>
+                <span className="truncate text-xs"> </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -45,15 +44,6 @@ export function OrgSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">Teams</DropdownMenuLabel>
-            {/* {teams.map((team, index) => ( */}
-            {/*   <DropdownMenuItem key={team.name} onClick={() => setActiveTeam(team)} className="gap-2 p-2"> */}
-            {/*     <div className="flex size-6 items-center justify-center rounded-md border"> */}
-            {/*       <team.logo className="size-3.5 shrink-0" /> */}
-            {/*     </div> */}
-            {/*     {team.name} */}
-            {/*     <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
-            {/*   </DropdownMenuItem> */}
-            {/* ))} */}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
