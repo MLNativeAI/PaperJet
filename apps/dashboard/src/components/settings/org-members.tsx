@@ -1,9 +1,11 @@
 import InviteDialog from "@/components/settings/invite-dialog";
 import { OrgMembersTable } from "@/components/settings/org-members-table";
 import { useOrgMembers } from "@/hooks/use-org-members";
+import { useRole } from "@/hooks/use-role";
 
 export default function OrgMembers() {
-  const { orgMemberInvitations, activeMember, isAdmin, isLoading } = useOrgMembers();
+  const { orgMemberInvitations, isLoading } = useOrgMembers();
+  const { member } = useRole();
 
   return (
     <div className="space-y-6">
@@ -12,15 +14,17 @@ export default function OrgMembers() {
           <h2 className="text-xl font-bold">Team Members</h2>
           <p className="text-muted-foreground">Manage who has access to your organization</p>
         </div>
-        <InviteDialog />
+        {member && member.role === "admin" && <InviteDialog />}
       </div>
       <div className="pt-4">
-        <OrgMembersTable
-          data={orgMemberInvitations}
-          activeMember={activeMember}
-          isAdmin={isAdmin}
-          isLoading={isLoading}
-        />
+        {member?.role && (
+          <OrgMembersTable
+            data={orgMemberInvitations}
+            userId={member.userId}
+            isAdmin={member.role === "admin"}
+            isLoading={isLoading}
+          />
+        )}
       </div>
     </div>
   );

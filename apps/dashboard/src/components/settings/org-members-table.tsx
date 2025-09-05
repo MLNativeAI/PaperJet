@@ -47,15 +47,12 @@ function InvitationBadge({ invOrMember }: { invOrMember: OrgMemberInvitation }) 
 
 export function OrgMembersTable({
   data,
-  activeMember,
+  userId,
   isAdmin,
   isLoading,
 }: {
   data: OrgMemberInvitation[];
-  activeMember?: {
-    id: string;
-    organizationId: string;
-  };
+  userId: string;
   isAdmin: boolean;
   isLoading: boolean;
 }) {
@@ -121,12 +118,10 @@ export function OrgMembersTable({
     }
   };
 
-  const handleLeaveOrganization = async () => {
-    if (!activeMember) return;
-
+  const handleLeaveOrganization = async (organizationId: string) => {
     try {
       const { error } = await authClient.organization.leave({
-        organizationId: activeMember.organizationId,
+        organizationId: organizationId,
       });
 
       if (error) {
@@ -172,7 +167,8 @@ export function OrgMembersTable({
       cell: ({ row }) => {
         // For members
         if (isOrgMember(row.original)) {
-          const isCurrentUser = row.original.id === activeMember?.id;
+          const isCurrentUser = row.original.id === userId;
+          const orgId = row.original.organizationId;
 
           return (
             <div className="flex justify-end">
@@ -189,7 +185,7 @@ export function OrgMembersTable({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {isCurrentUser ? (
-                    <DropdownMenuItem onClick={handleLeaveOrganization} className="text-destructive">
+                    <DropdownMenuItem onClick={() => handleLeaveOrganization(orgId)} className="text-destructive">
                       <IconUserMinus className="mr-2 h-4 w-4" />
                       Leave Organization
                     </DropdownMenuItem>

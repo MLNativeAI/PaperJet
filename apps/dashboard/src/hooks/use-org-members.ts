@@ -30,22 +30,14 @@ export function isOrgInvitation(item: OrgMemberInvitation): item is OrgInvitatio
 }
 
 export function useOrgMembers() {
-  const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: orgData, isLoading } = useQuery({
-    queryKey: ["organization-members", activeOrganization?.id],
+    queryKey: ["organization-members"],
     queryFn: async () => {
-      const { data, error } = await authClient.organization.getFullOrganization({
-        query: {
-          organizationId: activeOrganization?.id,
-        },
-      });
-      console.log("activeOrg", activeOrganization?.name);
+      const { data, error } = await authClient.organization.getFullOrganization();
 
       if (error) {
         throw new Error("Active org not found");
       }
-
-      console.log("members", data?.members);
 
       const invitations: OrgInvitation[] = (
         data?.invitations.map((invitation) => ({
@@ -68,14 +60,12 @@ export function useOrgMembers() {
 
       return {
         membersAndInvitations: [...invitations, ...members],
-        isAdmin: true,
       };
     },
   });
 
   return {
     orgMemberInvitations: orgData?.membersAndInvitations || [],
-    isAdmin: orgData?.isAdmin || false,
     isLoading,
   };
 }

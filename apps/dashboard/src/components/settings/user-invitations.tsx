@@ -4,9 +4,11 @@ import { renderTimestamp } from "@/lib/utils/date";
 
 export default function UserInvitations() {
   const { invitations, isLoading, acceptInvitation, rejectInvitation } = useUserInvitations();
+
   if (isLoading || !invitations || invitations.length === 0) {
     return null;
   }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1">

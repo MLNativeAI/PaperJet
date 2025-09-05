@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { isAdminSetupRequired } from "@/lib/api/admin";
 import { authClient } from "@/lib/auth-client";
 
+// TODO save auth in context
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
   beforeLoad: async () => {
