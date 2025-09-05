@@ -10,11 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
+import { useOrganization } from "@/hooks/use-organization";
 
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();
-  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const { activeOrganization, setActiveOrganization, organizations } = useOrganization();
 
   return (
     <SidebarMenu>
@@ -43,13 +43,24 @@ export function OrgSwitcher() {
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">Teams</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {organizations?.map((org) => (
+              <DropdownMenuItem
+                onClick={async () => {
+                  setActiveOrganization(org.id);
+                }}
+                key={org.id}
+              >
+                {org.name}
+              </DropdownMenuItem>
+            ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
+              <div className="text-muted-foreground font-medium">Create organization</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
