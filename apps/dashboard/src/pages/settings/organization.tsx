@@ -1,6 +1,6 @@
 import OrgMembers from "@/components/settings/org-members";
 import OrgNameLogo from "@/components/settings/org-name-logo";
-import UserInvitations from "@/components/user-invitations";
+import UserInvitations from "@/components/settings/user-invitations";
 
 export default function OrganizationPage() {
   return (

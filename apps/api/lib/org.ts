@@ -114,14 +114,16 @@ export async function listUserInvitations(c: Context<BlankEnv, "/invitations", B
     },
   });
 
-  const organizationIds = invitations.map((invitation) => invitation.organizationId);
+  const pendingInvitations = invitations.filter((inv) => inv.status === "pending");
+
+  const organizationIds = pendingInvitations.map((invitation) => invitation.organizationId);
   const organizations = await db.query.organization.findMany({
     where: (organization, { inArray }) => inArray(organization.id, organizationIds),
   });
 
   const organizationMap = new Map(organizations.map((org) => [org.id, org]));
 
-  const invitationsWithOrgNames: UserInvitation = invitations.map((invitation) => ({
+  const invitationsWithOrgNames: UserInvitation = pendingInvitations.map((invitation) => ({
     ...invitation,
     organizationName: organizationMap.get(invitation.organizationId)?.name || "Unknown",
     expiresAt: invitation.expiresAt.toISOString(),
