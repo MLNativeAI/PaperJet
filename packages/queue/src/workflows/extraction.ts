@@ -96,7 +96,7 @@ export const extractionWorkflowWorker = new Worker(
   },
 );
 
-extractionWorkflowWorker.on("failed", async (job, error) => {
+extractionWorkflowWorker.on("failed", async (job, _) => {
   if (job?.data.workflowExecutionId) {
     logger.error(`parent job ${job?.data.workflowExecutionId} failed`);
     await db

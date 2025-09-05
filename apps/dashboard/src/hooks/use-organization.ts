@@ -1,10 +1,10 @@
-import { authClient } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
 
 export function useOrganization() {
   const queryClient = useQueryClient();
   const setActiveOrganization = async (organizationId: string) => {
-    const { data, error } = await authClient.organization.setActive({
+    await authClient.organization.setActive({
       organizationId: organizationId,
     });
     queryClient.invalidateQueries();

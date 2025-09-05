@@ -87,7 +87,6 @@ export const auth = betterAuth({
           return {
             data: {
               ...session,
-              activeOrganizationId: orgId,
               id: generateId(ID_PREFIXES.session),
             },
           };

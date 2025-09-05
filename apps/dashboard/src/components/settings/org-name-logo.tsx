@@ -38,7 +38,7 @@ export default function OrgNameLogo() {
     setError("");
 
     try {
-      const { data, error } = await authClient.organization.update({
+      const { error } = await authClient.organization.update({
         data: {
           name: values.name,
         },

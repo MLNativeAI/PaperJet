@@ -47,7 +47,7 @@ export default function InviteDialog() {
   const onSubmit = async (values: InviteFormValues) => {
     setIsLoading(true);
     try {
-      const { data, error } = await authClient.organization.inviteMember({
+      const { error } = await authClient.organization.inviteMember({
         email: values.email,
         role: values.role,
         resend: true,
