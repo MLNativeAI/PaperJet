@@ -1,47 +1,42 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { InvitationStatus } from "better-auth/plugins/organization";
 import { authClient } from "@/lib/auth-client";
-import { InvitationStatus } from "better-auth/plugins/organization";
+import { getInvitationSendDate } from "@/lib/utils/date";
 
-interface OrgMember {
+type OrgMember = {
   id: string;
   email: string;
-  name?: string;
   role: string;
-  status: "active";
-  avatar?: string;
-}
+  createdAt: Date;
+};
 
-interface OrgInvitation {
+type OrgInvitation = {
   id: string;
   email: string;
   role: string;
   status: InvitationStatus;
-}
+  issuedAt: Date;
+};
 
 export type OrgMemberInvitation = OrgMember | OrgInvitation;
 
 export function isOrgMember(item: OrgMemberInvitation): item is OrgMember {
-  return item.status === "active";
+  return (item as OrgInvitation).status === undefined;
 }
 
 export function isOrgInvitation(item: OrgMemberInvitation): item is OrgInvitation {
-  return item.status !== "active";
+  return (item as OrgInvitation).status !== undefined;
 }
 
 export function useOrgMembers() {
   const { data: session } = authClient.useSession();
-  const [membersInvitations, setMembersInvitations] = useState<OrgMemberInvitation[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
+  const { data: orgMemberInvitations = [], isLoading } = useQuery({
+    queryKey: ["organization-members"],
+    queryFn: async () => {
       const activeOrgId = session?.session.activeOrganizationId;
       if (!activeOrgId) {
-        setMembersInvitations([]);
-        setLoading(false);
-        return;
+        throw new Error("Active org not found");
       }
 
       const { data, error } = await authClient.organization.getFullOrganization({
@@ -51,10 +46,7 @@ export function useOrgMembers() {
       });
 
       if (error) {
-        console.error("Error fetching organization data:", error);
-        setMembersInvitations([]);
-        setLoading(false);
-        return;
+        throw new Error("Active org not found");
       }
 
       const invitations: OrgInvitation[] =
@@ -63,67 +55,23 @@ export function useOrgMembers() {
           email: invitation.email,
           role: invitation.role,
           status: invitation.status,
+          issuedAt: getInvitationSendDate(invitation.expiresAt),
         })) || [];
 
       const members: OrgMember[] =
         data?.members.map((member) => ({
           id: member.userId,
           email: member.user.email,
-          name: member.user.name,
           role: member.role,
-          status: "active",
-          avatar: member.user.image,
+          createdAt: member.createdAt,
         })) || [];
 
-      setMembersInvitations([...invitations, ...members]);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [session?.session.activeOrganizationId]);
-
-  const refreshMembers = async () => {
-    // Re-fetch the data
-    const activeOrgId = session?.session.activeOrganizationId;
-    if (!activeOrgId) {
-      setMembersInvitations([]);
-      return;
-    }
-
-    setLoading(true);
-    const { data, error } = await authClient.organization.getFullOrganization({
-      query: {
-        organizationId: activeOrgId,
-      },
-    });
-
-    if (!error && data) {
-      const invitations: OrgInvitation[] =
-        data?.invitations.map((invitation) => ({
-          id: invitation.id,
-          email: invitation.email,
-          role: invitation.role,
-          status: invitation.status,
-        })) || [];
-
-      const members: OrgMember[] =
-        data?.members.map((member) => ({
-          id: member.userId,
-          email: member.user.email,
-          name: member.user.name,
-          role: member.role,
-          status: "active",
-          avatar: member.user.image,
-        })) || [];
-
-      setMembersInvitations([...invitations, ...members]);
-    }
-    setLoading(false);
-  };
+      return [...invitations, ...members];
+    },
+  });
 
   return {
-    membersInvitations,
-    loading,
-    refreshMembers,
+    orgMemberInvitations,
+    isLoading,
   };
 }

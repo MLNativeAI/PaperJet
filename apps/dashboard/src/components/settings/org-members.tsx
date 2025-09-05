@@ -8,64 +8,77 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { isOrgInvitation, isOrgMember, useOrgMembers } from "@/hooks/use-org-members";
+import { isOrgInvitation, isOrgMember, type OrgMemberInvitation, useOrgMembers } from "@/hooks/use-org-members";
+import { formatRelative, subDays } from "date-fns";
 
+function InviteOrJoinDate({ invOrMember: invOrMember }: { invOrMember: OrgMemberInvitation }) {
+  if (isOrgMember(invOrMember)) {
+    const relativeTime = formatRelative(invOrMember.createdAt, new Date());
+    return <div className="text-xs text-muted-foreground">Joined {relativeTime}</div>;
+  } else {
+    const relativeTime = formatRelative(invOrMember.issuedAt, new Date());
+    return <div className="text-xs text-muted-foreground">Invited {relativeTime}</div>;
+  }
+}
+
+// function StatusLabel({ orgInvitation }: { orgInvitation: OrgInvitation }) {
+//   let color = "text-green-600";
+//
+//   switch (orgInvitation.status) {
+//     case "pending":
+//       color = "text-yellow-600";
+//       break;
+//     case "accepted":
+//       color = "text-green-600";
+//       break;
+//     case "rejected":
+//       color = "text-red-600";
+//       break;
+//     case "canceled":
+//       color = "text-gray-600";
+//   }
+//
+//   return <div className={color}>{invOrMember.status}</div>;
+// }
+//
 export default function OrgMembers() {
-  const { membersInvitations, loading } = useOrgMembers();
+  const { orgMemberInvitations, isLoading } = useOrgMembers();
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Team Members</h2>
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-bold">Team Members</h2>
           <p className="text-muted-foreground">Manage who has access to your organization</p>
         </div>
+        <InviteDialog />
       </div>
-      <InviteDialog />
       <div className="pt-4">
-        <div className="rounded-md border">
+        <div className="">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right"></TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {membersInvitations.map((member) => (
-                <TableRow key={member.id}>
+            <TableBody className="border rounded-md p-4">
+              {orgMemberInvitations.map((invOrMember) => (
+                <TableRow key={invOrMember.id}>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        {isOrgMember(member) && member.avatar ? (
-                          <AvatarImage src={member.avatar} alt={member.name || member.email} />
-                        ) : (
-                          <AvatarFallback>
-                            {member.name ? member.name.charAt(0).toUpperCase() : member.email.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{member.name || "Unnamed User"}</div>
-                        <div className="text-sm text-muted-foreground">{member.email}</div>
-                      </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm font-semibold">{invOrMember.email}</div>
+                      <InviteOrJoinDate invOrMember={invOrMember} />
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{member.role}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className={isOrgMember(member) ? "text-green-600" : "text-yellow-600"}>
-                      {isOrgMember(member) ? "Active" : "Pending"}
-                    </div>
+                    <div className="font-medium">{invOrMember.role}</div>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -76,14 +89,27 @@ export default function OrgMembers() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <IconEdit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <IconTrash className="mr-2 h-4 w-4" />
-                          Remove
-                        </DropdownMenuItem>
+                        {isOrgMember(invOrMember) && (
+                          <>
+                            <DropdownMenuItem>
+                              <IconEdit className="mr-2 h-4 w-4" />
+                              Leave
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <IconEdit className="mr-2 h-4 w-4" />
+                              Remove if admin
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {isOrgInvitation(invOrMember) && (
+                          <>
+                            <DropdownMenuItem>
+                              <IconTrash className="mr-2 h-4 w-4" />
+                              Cancel
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>Resend invitation</DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

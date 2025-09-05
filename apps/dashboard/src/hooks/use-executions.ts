@@ -17,13 +17,13 @@ interface WorkflowExecution {
   filename: string;
 }
 
-export function useExecutions(workflowId: string) {
+export function useExecutions() {
   const {
     data: executions = [],
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["executions", workflowId],
+    queryKey: ["executions"],
     queryFn: () => getAllExecutions(),
   });
 

@@ -9,9 +9,9 @@ function RouteComponent() {
     <div className="w-full px-4 py-8 space-y-8 max-w-6xl">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-2">Manage your account settings, plans and configuration</p>
+          <p className="text-muted-foreground">Manage your account settings, plans and configuration</p>
         </div>
       </div>
 

@@ -61,8 +61,8 @@ export default function OrgNameLogo() {
   };
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div>
+    <div className="flex flex-col space-y-6">
+      <div className="flex flex-col gap-1">
         <h2 className="text-xl font-bold">Organization Information</h2>
         <p className="text-muted-foreground">Manage your organization's details and settings</p>
       </div>
