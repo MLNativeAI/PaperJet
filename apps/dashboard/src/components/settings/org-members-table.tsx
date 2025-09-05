@@ -26,6 +26,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { isOrgInvitation, isOrgMember, type OrgMemberInvitation } from "@/hooks/use-org-members";
+import { Badge } from "@/components/ui/badge";
+import { capitalizeFirstLetter } from "@/lib/utils/string";
 
 function InviteOrJoinDate({ invOrMember }: { invOrMember: OrgMemberInvitation }) {
   if (isOrgMember(invOrMember)) {
@@ -53,11 +55,15 @@ export function OrgMembersTable({ data, isLoading }: { data: OrgMemberInvitation
     {
       accessorKey: "role",
       header: "Role",
-      cell: ({ row }) => <div className="font-medium">{row.original.role}</div>,
+      cell: ({ row }) => (
+        <Badge className="min-w-20" variant="outline">
+          {capitalizeFirstLetter(row.original.role)}
+        </Badge>
+      ),
     },
     {
       id: "actions",
-      header: "Actions",
+      header: "",
       cell: ({ row }) => (
         <div className="flex justify-end">
           <DropdownMenu>
