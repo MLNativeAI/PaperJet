@@ -3,11 +3,13 @@ import type { UserInvitation } from "@paperjet/api/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { hc } from "hono/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/use-organization";
 import { authClient } from "@/lib/auth-client";
 
 const adminClient = hc<AdminRoutes>("/api/admin");
 
 export function useUserInvitations() {
+  const { setActiveOrganization } = useOrganization();
   const queryClient = useQueryClient();
   const {
     data: invitations = [],
@@ -31,11 +33,11 @@ export function useUserInvitations() {
     const { data: invResponse } = await authClient.organization.acceptInvitation({
       invitationId: invitationId,
     });
-    await authClient.organization.setActive({
-      organizationId: invResponse?.invitation.organizationId,
-    });
+    if (!invResponse) {
+      toast.error(`Failed to join ${orgName}`);
+    }
+    setActiveOrganization(invResponse.invitation.organizationId);
     toast.success(`You've joined the ${orgName} Organization`);
-    queryClient.invalidateQueries({ queryKey: ["user-invitations"] });
   };
 
   const rejectInvitation = async (invitationId: string, orgName: string) => {

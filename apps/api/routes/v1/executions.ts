@@ -9,7 +9,7 @@ import {
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { getUser } from "@/lib/auth";
+import { getUserSession } from "@/lib/auth";
 import { workflowExecutionIdSchema } from "@/lib/validation";
 
 const app = new Hono();
@@ -17,8 +17,8 @@ const app = new Hono();
 const router = app
   .get("/", async (c) => {
     try {
-      const user = await getUser(c);
-      const executions = await getAllWorkflowExecutions(user.id);
+      const { session } = await getUserSession(c);
+      const executions = await getAllWorkflowExecutions(session.activeOrganizationId);
       return c.json(executions);
     } catch (error) {
       logger.error(error, "Get all executions error:");
@@ -35,9 +35,9 @@ const router = app
     ),
     async (c) => {
       try {
-        const user = await getUser(c);
+        const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const execution = await getWorkflowExecutionWithExtractedData(executionId, user.id);
+        const execution = await getWorkflowExecutionWithExtractedData(executionId, session.activeOrganizationId);
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");
@@ -58,9 +58,9 @@ const router = app
     ),
     async (c) => {
       try {
-        const user = await getUser(c);
+        const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const execution = await getWorkflowExecutionStatus(executionId, user.id);
+        const execution = await getWorkflowExecutionStatus(executionId, session.id);
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");
@@ -81,9 +81,9 @@ const router = app
     ),
     async (c) => {
       try {
-        const user = await getUser(c);
+        const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const documentUrl = await getPresignedFileUrl(executionId, user.id);
+        const documentUrl = await getPresignedFileUrl(executionId, session.id);
         return c.json(documentUrl);
       } catch (error) {
         logger.error(error, "Get document url error");
@@ -110,10 +110,10 @@ const router = app
     ),
     async (c) => {
       try {
-        const user = await getUser(c);
+        const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
         const { mode } = c.req.valid("query");
-        const result = await exportExecution(executionId, mode, user.id);
+        const result = await exportExecution(executionId, mode, session.id);
 
         c.header("Content-Type", result.contentType);
         c.header("Content-Disposition", `attachment; filename="${result.filename}"`);

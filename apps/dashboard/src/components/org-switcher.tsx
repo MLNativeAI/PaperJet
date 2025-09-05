@@ -17,7 +17,6 @@ export function OrgSwitcher() {
   const { isMobile } = useSidebar();
   const { activeOrganization, setActiveOrganization } = useOrganization();
   const { data: organizations } = authClient.useListOrganizations();
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>

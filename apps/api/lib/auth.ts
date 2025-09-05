@@ -3,13 +3,14 @@ import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
 import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
-import { betterAuth, type User } from "better-auth";
+import { betterAuth, type Session, type User } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
 import { sendInvitationEmail, sendMagicLink } from "@/lib/email";
 import { getDefaultOrgOrCreate } from "@/lib/org";
+import type { SessionWithOrg } from "@/types";
 
 const publicRoutes = ["/api/health", "/api/auth/**"];
 
@@ -87,6 +88,7 @@ export const auth = betterAuth({
           return {
             data: {
               ...session,
+              activeOrganizationId: org.id,
               id: generateId(ID_PREFIXES.session),
             },
           };
@@ -189,10 +191,24 @@ export const getUserIfLoggedIn = async (c: Context): Promise<string | undefined>
   return session.user.id;
 };
 
-export const getUser = async (c: Context): Promise<User> => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  if (!session) {
+export const getUserSession = async (
+  c: Context,
+): Promise<{
+  user: User;
+  session: SessionWithOrg;
+}> => {
+  const sessionData = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!sessionData) {
     throw new Error("Unauthorized");
   }
-  return session.user;
+  if (!sessionData.session.activeOrganizationId) {
+    throw new Error("Active organization is missing");
+  }
+  return {
+    user: sessionData.user,
+    session: {
+      ...sessionData.session,
+      activeOrganizationId: sessionData.session.activeOrganizationId,
+    },
+  };
 };

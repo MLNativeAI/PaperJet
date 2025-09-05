@@ -52,11 +52,16 @@ export async function getDocumentForFile(fileId: string, userId: string) {
   return result;
 }
 
-export async function uploadFileAndCreateExecution(workflowId: string, userId: string, uploadedFile: File) {
+export async function uploadFileAndCreateExecution(
+  workflowId: string,
+  organizationId: string,
+  userId: string,
+  uploadedFile: File,
+) {
   const [workflowData] = await db
     .select()
     .from(workflow)
-    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, userId)));
+    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, organizationId)));
 
   if (!workflowData) {
     throw new Error("Workflow not found");
@@ -71,7 +76,7 @@ export async function uploadFileAndCreateExecution(workflowId: string, userId: s
     id: fileId,
     fileName: uploadedFile.name,
     filePath: filePath,
-    ownerId: userId,
+    ownerId: organizationId,
     createdAt: new Date(),
   });
 
@@ -82,7 +87,8 @@ export async function uploadFileAndCreateExecution(workflowId: string, userId: s
     status: WorkflowExecutionStatus.enum.Queued,
     startedAt: new Date(),
     createdAt: new Date(),
-    ownerId: userId,
+    ownerId: organizationId,
+    creatorId: userId,
   });
 
   return {
@@ -109,6 +115,7 @@ export async function createWorkflowFromApi(
   name: string,
   description: string,
   configuration: WorkflowConfiguration,
+  organizationId: string,
   userId: string,
 ): Promise<{
   workflowId: string;
@@ -119,7 +126,8 @@ export async function createWorkflowFromApi(
     name: name,
     description: description || "",
     configuration: configuration,
-    ownerId: userId,
+    ownerId: organizationId,
+    creatorId: userId,
   };
 
   await db.insert(workflow).values(newWorkflowData);
@@ -131,7 +139,7 @@ export async function updateWorkflow(
   name: string,
   description: string,
   configuration: WorkflowConfiguration,
-  userId: string,
+  organizationId: string,
 ): Promise<void> {
   await db
     .update(workflow)
@@ -140,5 +148,5 @@ export async function updateWorkflow(
       description: description,
       configuration: configuration,
     })
-    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, userId)));
+    .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, organizationId)));
 }

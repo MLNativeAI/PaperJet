@@ -23,7 +23,7 @@ export function useWorkflowExecution(workflowId: string) {
       return executeBulkResponse.json();
     },
     onSuccess: () => {
-      toast.success("Workflow execution completed!");
+      toast.success("Successfully submitted a new execution");
     },
     onError: (error) => {
       toast.error("Failed to execute workflow");

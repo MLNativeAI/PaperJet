@@ -76,7 +76,7 @@ export const file = pgTable("file", {
   createdAt: timestamp("created_at").notNull(),
   ownerId: text("owner_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => organization.id, { onDelete: "cascade" }),
 });
 
 export const workflow = pgTable("workflow", {
@@ -86,8 +86,11 @@ export const workflow = pgTable("workflow", {
   configuration: jsonb("configuration").notNull(),
   ownerId: text("owner_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => organization.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  creatorId: text("creator_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
@@ -108,6 +111,9 @@ export const workflowExecution = pgTable("workflow_execution", {
   createdAt: timestamp("created_at").notNull(),
   ownerId: text("owner_id")
     .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  creatorId: text("creator_id")
+    .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
@@ -119,7 +125,7 @@ export const documentData = pgTable("document_data", {
   workflowExecutionId: text("workflow_execution_id").references(() => workflowExecution.id, { onDelete: "set null" }),
   ownerId: text("owner_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => organization.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -147,6 +153,7 @@ export const usageData = pgTable("usage_data", {
   name: text("name").notNull(),
   model: text("model").notNull(),
   userId: text("user_id"),
+  organizationId: text("organization_id"),
   workflowId: text("workflow_id"),
   executionId: text("execution_id"),
   inputTokens: integer("input_tokens").notNull(),
@@ -179,6 +186,9 @@ export const apikey = pgTable("apikey", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").references(() => organization.id, {
+    onDelete: "cascade",
+  }),
   refillInterval: integer("refill_interval"),
   refillAmount: integer("refill_amount"),
   lastRefillAt: timestamp("last_refill_at"),

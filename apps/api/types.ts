@@ -3,6 +3,7 @@ import type { AdminRoutes } from "./routes/admin";
 import type { ApiKeysRoutes } from "./routes/v1/api-keys";
 import type { ExecutionRoutes } from "./routes/v1/executions";
 import type { WorkflowRoutes } from "./routes/v1/workflows";
+import type { Session } from "better-auth";
 
 export type { ApiKeysRoutes };
 export type { ExecutionRoutes };
@@ -18,4 +19,8 @@ export type UserInvitation = {
   status: InvitationStatus;
   inviterId: string;
   expiresAt: string;
+};
+
+export type SessionWithOrg = Session & {
+  activeOrganizationId: string;
 };
