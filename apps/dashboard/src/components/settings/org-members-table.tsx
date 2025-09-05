@@ -1,12 +1,4 @@
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconDotsVertical,
-  IconEdit,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import {
   type ColumnDef,
   flexRender,
@@ -22,8 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { isOrgInvitation, isOrgMember, type OrgMemberInvitation } from "@/hooks/use-org-members";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +29,19 @@ function InviteOrJoinDate({ invOrMember }: { invOrMember: OrgMemberInvitation })
   }
 }
 
+function InvitationBadge({ invOrMember }: { invOrMember: OrgMemberInvitation }) {
+  if (isOrgInvitation(invOrMember)) {
+    if (invOrMember.status === "pending") {
+      return (
+        <Badge variant="outline" className="h-5 text-xs text-yellow-500">
+          Pending
+        </Badge>
+      );
+    }
+  }
+  return null;
+}
+
 export function OrgMembersTable({ data, isLoading }: { data: OrgMemberInvitation[]; isLoading: boolean }) {
   const columns: ColumnDef<OrgMemberInvitation>[] = [
     {
@@ -47,7 +50,10 @@ export function OrgMembersTable({ data, isLoading }: { data: OrgMemberInvitation
       cell: ({ row }) => (
         <div className="flex flex-col gap-2">
           <div className="text-sm font-semibold">{row.original.email}</div>
-          <InviteOrJoinDate invOrMember={row.original} />
+          <div className="flex gap-2 items-center">
+            <InviteOrJoinDate invOrMember={row.original} />
+            <InvitationBadge invOrMember={row.original} />
+          </div>
         </div>
       ),
       enableHiding: false,
