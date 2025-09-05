@@ -1,5 +1,5 @@
-import BillingPage from "@/pages/settings/billing";
 import { createFileRoute } from "@tanstack/react-router";
+import BillingPage from "@/pages/settings/billing";
 
 export const Route = createFileRoute("/_app/settings/billing")({
   component: BillingPage,

@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin/setup")({
     //     to: "/",
     //   });
     // }
-    
+
     return {
       breadcrumbs: [
         {

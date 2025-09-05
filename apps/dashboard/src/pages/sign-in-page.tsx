@@ -1,7 +1,7 @@
+import { CircleX, Info } from "lucide-react";
 import { SignInForm } from "@/components/sign-in-form";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Route } from "@/routes/auth/sign-in";
-import { Info, CircleX } from "lucide-react";
 
 export default function SignInPage() {
   const { invite, notFound } = Route.useSearch();

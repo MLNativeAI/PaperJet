@@ -1,5 +1,6 @@
 "use client";
 
+import { IconDotsVertical } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, MenuIcon, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -15,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { IconDotsVertical } from "@tabler/icons-react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

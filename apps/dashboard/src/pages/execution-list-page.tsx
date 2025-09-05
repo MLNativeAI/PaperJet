@@ -14,7 +14,6 @@ export default function ExecutionListPage() {
 
   return (
     <div className="w-full px-4 py-8 space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Executions</h1>
@@ -22,7 +21,6 @@ export default function ExecutionListPage() {
         </div>
       </div>
 
-      {/* Runs Data Table */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Recent Runs</h2>

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -19,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { authClient } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
 
 const inviteFormSchema = z.object({
   email: z.string().email("Please enter a valid email address"),

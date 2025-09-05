@@ -1,5 +1,6 @@
 import type { Organization } from "better-auth/plugins/organization";
 import { ChevronsUpDown, Plus } from "lucide-react";
+import OrgLogoWithFallback from "@/components/org-logo-with-fallback";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import OrgLogoWithFallback from "@/components/org-logo-with-fallback";
 
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();

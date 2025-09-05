@@ -1,9 +1,9 @@
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { isAdminSetupRequired } from "@/lib/api/admin";
 import { authClient } from "@/lib/auth-client";
-import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,

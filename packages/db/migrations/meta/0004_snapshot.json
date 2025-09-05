@@ -93,12 +93,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -250,12 +246,8 @@
           "name": "apikey_user_id_user_id_fk",
           "tableFrom": "apikey",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -387,12 +379,8 @@
           "name": "document_data_workflow_id_workflow_id_fk",
           "tableFrom": "document_data",
           "tableTo": "workflow",
-          "columnsFrom": [
-            "workflow_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workflow_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -400,12 +388,8 @@
           "name": "document_data_workflow_execution_id_workflow_execution_id_fk",
           "tableFrom": "document_data",
           "tableTo": "workflow_execution",
-          "columnsFrom": [
-            "workflow_execution_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workflow_execution_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -413,12 +397,8 @@
           "name": "document_data_owner_id_user_id_fk",
           "tableFrom": "document_data",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -470,12 +450,8 @@
           "name": "document_page_document_data_id_document_data_id_fk",
           "tableFrom": "document_page",
           "tableTo": "document_data",
-          "columnsFrom": [
-            "document_data_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_data_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -483,12 +459,8 @@
           "name": "document_page_workflow_execution_id_workflow_execution_id_fk",
           "tableFrom": "document_page",
           "tableTo": "workflow_execution",
-          "columnsFrom": [
-            "workflow_execution_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workflow_execution_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -540,12 +512,8 @@
           "name": "file_owner_id_user_id_fk",
           "tableFrom": "file",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -610,12 +578,8 @@
           "name": "invitation_organization_id_organization_id_fk",
           "tableFrom": "invitation",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -623,12 +587,8 @@
           "name": "invitation_inviter_id_user_id_fk",
           "tableFrom": "invitation",
           "tableTo": "user",
-          "columnsFrom": [
-            "inviter_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["inviter_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -681,12 +641,8 @@
           "name": "member_organization_id_organization_id_fk",
           "tableFrom": "member",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -694,12 +650,8 @@
           "name": "member_user_id_user_id_fk",
           "tableFrom": "member",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -758,9 +710,7 @@
         "organization_slug_unique": {
           "name": "organization_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -838,12 +788,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -851,12 +797,8 @@
           "name": "session_active_organization_id_organization_id_fk",
           "tableFrom": "session",
           "tableTo": "organization",
-          "columnsFrom": [
-            "active_organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["active_organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -866,9 +808,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1108,9 +1048,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1222,12 +1160,8 @@
           "name": "workflow_owner_id_user_id_fk",
           "tableFrom": "workflow",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1311,12 +1245,8 @@
           "name": "workflow_execution_workflow_id_workflow_id_fk",
           "tableFrom": "workflow_execution",
           "tableTo": "workflow",
-          "columnsFrom": [
-            "workflow_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workflow_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1324,12 +1254,8 @@
           "name": "workflow_execution_file_id_file_id_fk",
           "tableFrom": "workflow_execution",
           "tableTo": "file",
-          "columnsFrom": [
-            "file_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["file_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1337,12 +1263,8 @@
           "name": "workflow_execution_owner_id_user_id_fk",
           "tableFrom": "workflow_execution",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1358,28 +1280,17 @@
     "public.modelType": {
       "name": "modelType",
       "schema": "public",
-      "values": [
-        "cloud",
-        "custom"
-      ]
+      "values": ["cloud", "custom"]
     },
     "public.structuredOutputMode": {
       "name": "structuredOutputMode",
       "schema": "public",
-      "values": [
-        "json",
-        "tool"
-      ]
+      "values": ["json", "tool"]
     },
     "public.workflowExecutionStatus": {
       "name": "workflowExecutionStatus",
       "schema": "public",
-      "values": [
-        "Queued",
-        "Processing",
-        "Completed",
-        "Failed"
-      ]
+      "values": ["Queued", "Processing", "Completed", "Failed"]
     }
   },
   "schemas": {},

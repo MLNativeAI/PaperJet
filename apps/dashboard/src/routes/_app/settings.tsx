@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/settings")({
   component: RouteComponent,
