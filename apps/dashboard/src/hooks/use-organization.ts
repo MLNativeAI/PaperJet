@@ -10,10 +10,8 @@ export function useOrganization() {
     queryClient.invalidateQueries();
   };
   const { data: activeOrganization } = authClient.useActiveOrganization();
-  const { data: organizations } = authClient.useListOrganizations();
   return {
     activeOrganization,
-    organizations,
     setActiveOrganization,
   };
 }

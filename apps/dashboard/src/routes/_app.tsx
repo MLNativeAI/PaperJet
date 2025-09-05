@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
-  beforeLoad: async ({ location }) => {
+  beforeLoad: async () => {
     const { isSetupRequired } = await isAdminSetupRequired();
     if (isSetupRequired) {
       throw redirect({
@@ -19,7 +19,8 @@ export const Route = createFileRoute("/_app")({
       throw redirect({
         to: "/auth/sign-in",
         search: {
-          redirect: location.href,
+          invite: "",
+          notFound: "",
         },
       });
     }

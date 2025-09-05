@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { useOrganization } from "@/hooks/use-organization";
+import { authClient } from "@/lib/auth-client";
 
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();
-  const { activeOrganization, setActiveOrganization, organizations } = useOrganization();
+  const { activeOrganization, setActiveOrganization } = useOrganization();
+  const { data: organizations } = authClient.useListOrganizations();
 
   return (
     <SidebarMenu>

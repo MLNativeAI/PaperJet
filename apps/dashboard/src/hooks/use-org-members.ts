@@ -31,17 +31,13 @@ export function isOrgInvitation(item: OrgMemberInvitation): item is OrgInvitatio
 
 export function useOrgMembers() {
   const { data: session } = authClient.useSession();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: orgData, isLoading } = useQuery({
     queryKey: ["organization-members"],
     queryFn: async () => {
-      const activeOrgId = session?.session.activeOrganizationId;
-      if (!activeOrgId) {
-        throw new Error("Active org not found");
-      }
-
       const { data, error } = await authClient.organization.getFullOrganization({
         query: {
-          organizationId: activeOrgId,
+          organizationId: activeOrganization?.id,
         },
       });
 
