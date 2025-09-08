@@ -58,10 +58,10 @@ export function OrgMembersTable({
 }) {
   const queryClient = useQueryClient();
 
-  const handleRemoveMember = async (memberId: string, memberEmail: string) => {
+  const handleRemoveMember = async (memberEmail: string) => {
     try {
       const { error } = await authClient.organization.removeMember({
-        memberIdOrEmail: memberId,
+        memberIdOrEmail: memberEmail,
       });
 
       if (error) {
@@ -129,6 +129,8 @@ export function OrgMembersTable({
         console.error(error);
       } else {
         toast.success("You have left the organization");
+        await authClient.signOut();
+        navigate({ to: "/auth/sign-in" });
         // This would typically log the user out or redirect them
       }
     } catch (err) {
@@ -191,7 +193,7 @@ export function OrgMembersTable({
                   ) : (
                     isAdmin && (
                       <DropdownMenuItem
-                        onClick={() => handleRemoveMember(row.original.id, row.original.email)}
+                        onClick={() => handleRemoveMember(row.original.id)}
                         className="text-destructive"
                       >
                         <IconUserX className="mr-2 h-4 w-4" />

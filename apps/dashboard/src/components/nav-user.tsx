@@ -26,7 +26,7 @@ export function NavUser() {
     try {
       await authClient.signOut();
       toast.success("Signed out successfully");
-      navigate({ to: "/auth/sign-in" });
+      navigate({ to: "/auth/sign-in", search: { notFound: "", invite: "" } });
     } catch (error) {
       toast.error("Failed to sign out");
       console.error("Sign out error:", error);

@@ -1,9 +1,8 @@
-import type { Member } from "better-auth/plugins";
 import { Button } from "@/components/ui/button";
 import { useUserInvitations } from "@/hooks/use-user-invitations";
 import { renderTimestamp } from "@/lib/utils/date";
 
-export default function UserInvitations({ member }: { member: Member | undefined }) {
+export default function UserInvitations() {
   const { invitations, isLoading, acceptInvitation, rejectInvitation } = useUserInvitations();
 
   if (isLoading || !invitations || invitations.length === 0) {
