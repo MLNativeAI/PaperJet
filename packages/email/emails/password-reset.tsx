@@ -20,7 +20,7 @@ export interface ResetPasswordEmailTemplateProps {
 }
 
 export const ResetPasswordEmailTemplate = ({ username, resetUrl }: ResetPasswordEmailTemplateProps) => {
-  const previewText = "Reset your password on CVtoBlind";
+  const previewText = "Reset your password on PaperJet";
 
   return (
     <Html>
@@ -30,10 +30,16 @@ export const ResetPasswordEmailTemplate = ({ username, resetUrl }: ResetPassword
         <Body className="bg-white my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[32px]">
-              <Img src="https://app.cvtoblind.com/logo_cv2b.png" alt="CVToBlind logo" className="my-0 mx-auto" />
+              <Img
+                width={100}
+                height="auto"
+                src="https://staging.getpaperjet.com/logo.png"
+                alt="PaperJet logo"
+                className="my-0 mx-auto"
+              />
             </Section>
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-              Reset your password on <strong>CVtoBlind</strong>
+              Reset your password on <strong>PaperJet</strong>
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">Hello {username},</Text>
             <Text className="text-black text-[14px] leading-[24px]">
@@ -61,8 +67,8 @@ export const ResetPasswordEmailTemplate = ({ username, resetUrl }: ResetPassword
               This password reset request was intended for <span className="text-black">{username}</span>. If you did
               not request this password reset, you can ignore this email. If you are concerned about your account's
               safety, please reach out to{" "}
-              <Link href="mailto:support@cvtoblind.com" className="text-blue-600 no-underline">
-                support@cvtoblind.com
+              <Link href="mailto:support@getpaperjet.com" className="text-blue-600 no-underline">
+                support@getpaperjet.com
               </Link>
             </Text>
           </Container>
