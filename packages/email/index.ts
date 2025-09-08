@@ -7,8 +7,6 @@ export type { MagicLinkEmailProps } from "./emails/magic-link";
 export { MagicLinkEmail } from "./emails/magic-link";
 export type { ResetPasswordEmailTemplateProps } from "./emails/password-reset";
 export { ResetPasswordEmailTemplate } from "./emails/password-reset";
-export type { SignupNotificationEmailProps } from "./emails/signup-notification";
-export { SignupNotificationEmail } from "./emails/signup-notification";
 // Types
 export type { WelcomeEmailProps } from "./emails/welcome";
 export { WelcomeEmail } from "./emails/welcome";
