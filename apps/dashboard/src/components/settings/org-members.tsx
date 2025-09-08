@@ -1,11 +1,10 @@
+import type { Member } from "better-auth/plugins";
 import InviteDialog from "@/components/settings/invite-dialog";
 import { OrgMembersTable } from "@/components/settings/org-members-table";
 import { useOrgMembers } from "@/hooks/use-org-members";
-import { useRole } from "@/hooks/use-role";
 
-export default function OrgMembers() {
+export default function OrgMembers({ member }: { member: Member | undefined }) {
   const { orgMemberInvitations, isLoading } = useOrgMembers();
-  const { member } = useRole();
 
   return (
     <div className="space-y-6">

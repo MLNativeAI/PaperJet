@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
+import type { Member } from "better-auth/plugins";
 
 export function useRole() {
   const { data: member, isLoading } = useQuery({
@@ -9,7 +10,7 @@ export function useRole() {
       if (error) {
         throw new Error("Role not found");
       }
-      return data;
+      return data as Member;
     },
   });
   return { member, isLoading };

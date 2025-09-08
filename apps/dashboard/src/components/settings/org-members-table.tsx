@@ -169,7 +169,6 @@ export function OrgMembersTable({
         if (isOrgMember(row.original)) {
           const isCurrentUser = row.original.id === userId;
           const orgId = row.original.organizationId;
-
           return (
             <div className="flex justify-end">
               <DropdownMenu>

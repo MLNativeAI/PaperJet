@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { Member } from "better-auth/plugins";
 
 const orgNameLogoSchema = z.object({
   name: z.string().min(1, "Organization name is required"),
@@ -16,7 +17,7 @@ const orgNameLogoSchema = z.object({
 
 type OrgNameLogoFormValues = z.infer<typeof orgNameLogoSchema>;
 
-export default function OrgNameLogo() {
+export default function OrgNameLogo({ member }: { member: Member | undefined }) {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
