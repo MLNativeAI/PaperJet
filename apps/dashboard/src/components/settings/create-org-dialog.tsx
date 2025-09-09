@@ -43,10 +43,11 @@ export function CreateOrgDialog({ open, onOpenChange, onSuccess }: CreateOrgDial
 
   const onSubmit = async (values: CreateOrgFormValues) => {
     setIsLoading(true);
+    const { slug } = generateOrgSlug();
     try {
       const { data, error } = await authClient.organization.create({
         name: values.name,
-        slug: generateOrgSlug(),
+        slug: slug,
         keepCurrentActiveOrganization: false,
       });
 

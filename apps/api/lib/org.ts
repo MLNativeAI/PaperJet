@@ -37,7 +37,7 @@ export const getDefaultOrgOrCreate = async (userId: string) => {
           createdAt: new Date(),
           organizationId: id,
           userId: userId,
-          role: "admin",
+          role: "owner",
         });
         logger.info("Org and member created");
         return id;
