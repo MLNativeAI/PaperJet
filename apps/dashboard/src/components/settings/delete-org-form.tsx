@@ -88,7 +88,7 @@ export default function DeleteOrgForm({ member }: DeleteOrgFormProps) {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button variant="destructive" size="sm" disabled={!canDelete}>
                   Delete Organization
                 </Button>

@@ -7,6 +7,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { Fragment } from "react/jsx-runtime";
 
 export function SiteHeader() {
   const context = useRouterState({
@@ -38,12 +39,12 @@ export function SiteHeader() {
             </BreadcrumbItem>
             {elements.map((elem) => {
               return (
-                <>
+                <Fragment key={elem.label}>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem key={elem.label}>
                     <BreadcrumbLink href={elem.link}>{elem.label}</BreadcrumbLink>
                   </BreadcrumbItem>
-                </>
+                </Fragment>
               );
             })}
           </BreadcrumbList>
