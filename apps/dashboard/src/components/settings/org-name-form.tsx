@@ -22,6 +22,8 @@ export default function OrgNameForm({ member }: { member: Member | undefined }) 
 
   const isAdminOrOwner = member?.role === "admin" || member?.role === "owner";
 
+  console.log(activeOrganization);
+
   const form = useForm<OrgNameFormValues>({
     resolver: zodResolver(orgNameSchema),
     defaultValues: {

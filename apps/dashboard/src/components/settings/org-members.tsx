@@ -6,6 +6,8 @@ import { useOrgMembers } from "@/hooks/use-org-members";
 export default function OrgMembers({ member }: { member: Member | undefined }) {
   const { orgMemberInvitations, isLoading } = useOrgMembers();
 
+  const isAdminOrOwner = member?.role === "admin" || member?.role === "owner";
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -13,14 +15,14 @@ export default function OrgMembers({ member }: { member: Member | undefined }) {
           <h2 className="text-xl font-bold">Team Members</h2>
           <p className="text-muted-foreground">Manage who has access to your organization</p>
         </div>
-        {member && member.role === "admin" && <InviteDialog />}
+        {member && isAdminOrOwner && <InviteDialog />}
       </div>
       <div className="pt-4">
         {member?.role && (
           <OrgMembersTable
             data={orgMemberInvitations}
             userId={member.userId}
-            isAdmin={member.role === "admin"}
+            isAdmin={isAdminOrOwner}
             isLoading={isLoading}
           />
         )}
