@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Member } from "better-auth/plugins";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -22,14 +22,19 @@ export default function OrgNameForm({ member }: { member: Member | undefined }) 
 
   const isAdminOrOwner = member?.role === "admin" || member?.role === "owner";
 
-  console.log(activeOrganization);
-
   const form = useForm<OrgNameFormValues>({
     resolver: zodResolver(orgNameSchema),
     defaultValues: {
       name: activeOrganization?.name || "",
     },
   });
+
+  // Update form when activeOrganization loads
+  React.useEffect(() => {
+    if (activeOrganization?.name) {
+      form.reset({ name: activeOrganization.name });
+    }
+  }, [activeOrganization?.name, form]);
 
   const onSubmit = async (values: OrgNameFormValues) => {
     if (!activeOrganization) {
