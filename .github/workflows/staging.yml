@@ -38,17 +38,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract main app metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value={{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}}
+       - name: Extract main app metadata
+         id: meta
+         uses: docker/metadata-action@v5
+         with:
+           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+           tags: |
+             type=ref,event=branch
+             type=ref,event=pr
+             type=sha,prefix=main-
+             type=raw,value=latest,enable={{is_default_branch}}
+             type=raw,value={{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}}
 
       - name: Build and push main app Docker image
         id: build
@@ -86,17 +86,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract ML service metadata
-        id: ml-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value={{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}}
+       - name: Extract ML service metadata
+         id: ml-meta
+         uses: docker/metadata-action@v5
+         with:
+           images: ${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}
+           tags: |
+             type=ref,event=branch
+             type=ref,event=pr
+             type=sha,prefix=main-
+             type=raw,value=latest,enable={{is_default_branch}}
+             type=raw,value={{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}}
 
       - name: Build and push ML service Docker image
         id: ml-build
