@@ -12,9 +12,7 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    secrets: inherit
 
   build-ml:
     name: Build ML Application
@@ -22,9 +20,7 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    secrets: inherit
 
   deploy-core:
     name: Deploy Core Application
@@ -33,13 +29,8 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
-      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
-      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_APP_UUID }}
-      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    secrets: inherit
 
   deploy-ml:
     name: Deploy ML Application
@@ -48,10 +39,5 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
-      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
-      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_ML_APP_UUID }}
-      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    secrets: inherit
