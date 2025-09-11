@@ -53,6 +53,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
+          push: true
           context: .
           file: Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
@@ -99,6 +100,7 @@ jobs:
         id: ml-build
         uses: docker/build-push-action@v5
         with:
+          push: true
           context: ./apps/ml
           file: ./apps/ml/Dockerfile
           tags: ${{ steps.ml-meta.outputs.tags }}
