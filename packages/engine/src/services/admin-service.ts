@@ -72,7 +72,7 @@ export const getValidModelConfig = async () => {
 };
 
 export const isSetupRequired = async () => {
-  const adminUsers = await db.select().from(user).where(eq(user.role, "admin"));
+  const adminUsers = await db.select().from(user).where(eq(user.serverRole, "admin"));
   if (adminUsers.length === 0) {
     return true;
   } else {
