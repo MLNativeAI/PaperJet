@@ -114,7 +114,6 @@ jobs:
   deploy-main-staging:
     name: Deploy Main App to Staging
     needs: build-main
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: development
 
@@ -150,7 +149,6 @@ jobs:
   deploy-ml-staging:
     name: Deploy ML Service to Staging
     needs: build-ml
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: development
 
