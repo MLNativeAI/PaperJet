@@ -1,1 +1,0 @@
-ALTER TABLE "user" RENAME COLUMN "role" TO "server_role";

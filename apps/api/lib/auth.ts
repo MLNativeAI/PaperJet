@@ -50,7 +50,7 @@ export const auth = betterAuth({
               data: {
                 ...user,
                 id: generateId(ID_PREFIXES.user),
-                serverRole: "admin",
+                role: "admin",
                 emailVerified: true,
               },
             };
@@ -58,7 +58,6 @@ export const auth = betterAuth({
             return {
               data: {
                 ...user,
-                serverRole: "user",
                 id: generateId(ID_PREFIXES.user),
               },
             };
