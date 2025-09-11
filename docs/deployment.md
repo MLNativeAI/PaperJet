@@ -30,8 +30,8 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 **Process:**
 
 1. Build two Docker images in parallel:
-   - Main app: `mlnative/paperjet-dev:main-{sha}`
-   - ML service: `mlnative/paperjet-ml-dev:main-{sha}`
+   - Main app: `mlnative/paperjet-dev:{sha}`
+   - ML service: `mlnative/paperjet-ml-dev:{sha}`
 2. Push both images to Docker Hub
 3. Deploy both services to staging in parallel:
    - Main app deployment job
@@ -100,7 +100,7 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 - **Main Application Repository**: `mlnative/paperjet-dev`
 - **ML Service Repository**: `mlnative/paperjet-ml-dev`
 - **Tags**:
-  - `main-{sha}` (each commit)
+  - `{sha}` (each commit - 7-character git hash)
   - `latest` (latest main branch)
   - `{date}-{sha}` (daily builds)
 
