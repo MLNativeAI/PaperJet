@@ -3,6 +3,7 @@ name: Main Branch Build & Deploy
 permissions:
   packages: write
   id-token: write
+  contents: read
 
 on:
   push:
