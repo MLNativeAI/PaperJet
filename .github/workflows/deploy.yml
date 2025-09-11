@@ -1,4 +1,4 @@
-name: Deploy 
+name: Deploy
 
 on:
   workflow_call:
@@ -9,22 +9,20 @@ on:
       image_name:
         required: true
         type: string
-      coolify_url:
-        required: true
-        type: string
-      coolify_app_uuid:
-        required: true
-        type: string
-      coolify_token:
-        required: true
-        type: string
       image_tag:
         required: true
         type: string
+    secrets:
+      coolify_url:
+        required: true
+      coolify_app_uuid:
+        required: true
+      coolify_token:
+        required: true
 
 jobs:
   deploy:
-    name: Deploy 
+    name: Deploy
     runs-on: ubuntu-latest
     environment: development
 
@@ -32,8 +30,8 @@ jobs:
       - name: Deploy to Coolify
         run: |
           curl -X PATCH \
-            "${{ inputs.coolify_url }}/api/v1/applications/${{ inputs.coolify_app_uuid }}" \
-            -H "Authorization: Bearer ${{ inputs.coolify_token }}" \
+            "${{ secrets.coolify_url }}/api/v1/applications/${{ secrets.coolify_app_uuid }}" \
+            -H "Authorization: Bearer ${{ secrets.coolify_token }}" \
             -H "Content-Type: application/json" \
             -d '{
               "docker_registry_image_name": "${{ inputs.image_name }}",
@@ -41,6 +39,6 @@ jobs:
             }'
           
           curl -X GET \
-            "${{ inputs.coolify_url }}/api/v1/deploy?uuid=${{ inputs.coolify_app_uuid }}" \
-            -H "Authorization: Bearer ${{ inputs.coolify_token }}" \
+            "${{ secrets.coolify_url }}/api/v1/deploy?uuid=${{ secrets.coolify_app_uuid }}" \
+            -H "Authorization: Bearer ${{ secrets.coolify_token }}" \
             -H "Content-Type: application/json"
