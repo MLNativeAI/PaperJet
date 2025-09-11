@@ -1,0 +1,256 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Configuration, ConnectionValidationResult } from "@paperjet/engine/types";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useModelConfiguration } from "@/hooks/use-model-configuration";
+
+export default function AdminModelConfigForm({ configuration }: { configuration: Configuration }) {
+  const { updateConfiguration, validateConnection } = useModelConfiguration();
+  const schema = z.object({
+    modelType: z.enum(["cloud", "custom"]),
+    geminiApiKey: z.string().optional(),
+    customModelUrl: z.string().optional(),
+    customModelName: z.string().optional(),
+    customModelToken: z.string().optional(),
+    structuredOutputMode: z.enum(["json", "tool"]).optional(),
+  });
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      ...configuration,
+    },
+  });
+
+  const watchedModelType = form.watch("modelType");
+
+  const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
+  const [editModeEnabled, setEditModeEnabled] = useState(false);
+
+  const runConnectionValidation = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setValidationResult(null);
+    const values = form.getValues();
+    validateConnection.mutate(values, {
+      onSuccess: (result) => {
+        setValidationResult(result);
+      },
+      onError: (error) => {
+        setValidationResult({
+          isValid: false,
+          error: error.message || "Failed to validate connection",
+        });
+      },
+    });
+  };
+
+  const onSubmit = (values: z.infer<typeof schema>) => {
+    updateConfiguration.mutate(values);
+    setEditModeEnabled(false);
+  };
+
+  const onCancel = () => {
+    form.reset(configuration);
+    setValidationResult(null);
+    setEditModeEnabled(false);
+  };
+
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">Model configuration</h2>
+        {
+          <Button
+            variant="outline"
+            disabled={editModeEnabled}
+            onClick={() => {
+              setEditModeEnabled(true);
+            }}
+          >
+            Edit
+          </Button>
+        }
+      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+          <div className="grid gap-3">
+            <FormField
+              control={form.control}
+              name="modelType"
+              render={({ field }) => (
+                <FormItem>
+                  <RadioGroup
+                    onValueChange={(e) => {
+                      setValidationResult(null);
+                      field.onChange(e);
+                    }}
+                    defaultValue={field.value}
+                    className="grid grid-cols-2 gap-4"
+                    disabled={!editModeEnabled}
+                  >
+                    <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors ">
+                      <RadioGroupItem value="cloud" id="cloud" disabled={!editModeEnabled} />
+                      <Label htmlFor="cloud" className="flex items-center gap-2 cursor-pointer flex-1">
+                        <div>
+                          <div className="font-medium">Cloud</div>
+                          <div className="text-sm text-muted-foreground">Use Google Gemini API</div>
+                        </div>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="custom" id="custom" disabled={!editModeEnabled} />
+                      <Label htmlFor="custom" className="flex items-center gap-2 cursor-pointer flex-1">
+                        <div>
+                          <div className="font-medium">Custom</div>
+                          <div className="text-sm text-muted-foreground">
+                            Use an OpenAI-compatbile API server and model
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormItem>
+              )}
+            />
+          </div>
+          {watchedModelType === "cloud" && (
+            <FormField
+              control={form.control}
+              name="geminiApiKey"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gemini API Key</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter your Gemini API Key" disabled={!editModeEnabled} />
+                  </FormControl>
+                  <p className="text-sm text-muted-foreground">Get your API key from the Google AI Studio console</p>
+                </FormItem>
+              )}
+            />
+          )}
+
+          {watchedModelType === "custom" && (
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="customModelUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Model endpoint</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="https://openrouter.ai/api/v1" disabled={!editModeEnabled} />
+                    </FormControl>
+                    <p className="text-sm text-muted-foreground">The base URL for your custom API endpoint</p>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="customModelName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Model name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="ex. mistral-small-3.2:22b" disabled={!editModeEnabled} />
+                    </FormControl>
+                    <p className="text-sm text-muted-foreground">The model identifier</p>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="customModelToken"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Access token (optional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="xyz" disabled={!editModeEnabled} />
+                    </FormControl>
+                    <p className="text-sm text-muted-foreground">Use only if your server requires authentication</p>
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid gap-3">
+                <FormField
+                  control={form.control}
+                  name="structuredOutputMode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Structured output</FormLabel>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || "json"}
+                        className="grid grid-cols-2 gap-4"
+                        disabled={!editModeEnabled}
+                      >
+                        <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="tool" id="tool" disabled={!editModeEnabled} />
+                          <Label htmlFor="tool" className="flex items-center gap-2 cursor-pointer flex-1">
+                            <div>
+                              <div className="font-medium">Tool Mode</div>
+                              <div className="text-sm text-muted-foreground">
+                                Use tool calling for structured output (recommended)
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="json" id="json" disabled={!editModeEnabled} />
+                          <Label htmlFor="json" className="flex items-center gap-2 cursor-pointer flex-1">
+                            <div>
+                              <div className="font-medium">JSON Mode</div>
+                              <div className="text-sm text-muted-foreground">
+                                Standard JSON output. Use only if a model doesn't support tools.
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <div className="flex gap-2 items-center">
+                <Button
+                  variant="outline"
+                  disabled={validateConnection.isPending || !editModeEnabled}
+                  className="flex items-center gap-2 bg-transparent"
+                  onClick={runConnectionValidation}
+                >
+                  {validateConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Validate connection
+                </Button>
+                {validationResult?.isValid && <div className="text-green-500 text-sm ">Connection is valid</div>}
+                {validationResult && !validationResult?.isValid && (
+                  <div className="text-red-500 text-sm ">{validationResult.error}</div>
+                )}
+              </div>
+              {editModeEnabled && (
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={onCancel}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={updateConfiguration.isPending}>
+                    Save settings
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </form>
+      </Form>
+    </>
+  );
+}

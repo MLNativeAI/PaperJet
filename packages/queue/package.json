@@ -1,0 +1,18 @@
+{
+  "name": "@paperjet/queue",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "dependencies": {
+    "@paperjet/db": "workspace:*",
+    "@paperjet/engine": "workspace:*",
+    "@paperjet/shared": "workspace:*",
+    "bullmq": "^5.56.9",
+    "ioredis": "^5.7.0",
+    "zod": "^3.25.49"
+  }
+}

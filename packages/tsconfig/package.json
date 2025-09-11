@@ -1,8 +1,8 @@
 {
-    "name": "@midday/tsconfig",
-    "private": true,
-    "version": "1.0.0",
-    "files": [
-        "base.json"
-    ]
+  "name": "@paperjet/tsconfig",
+  "private": true,
+  "version": "1.0.0",
+  "files": [
+    "base.json"
+  ]
 }

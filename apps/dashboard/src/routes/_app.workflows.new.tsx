@@ -1,6 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import WorkflowCreatorPage from "@/pages/workflow-creator-page";
+import WorkflowCreatePage from "@/pages/workflow-create-page";
 
 export const Route = createFileRoute("/_app/workflows/new")({
-    component: WorkflowCreatorPage,
+  component: RouteComponent,
+  loader: ({ context }) => {
+    context.breadcrumbs = [
+      {
+        link: "/workflows",
+        label: "Workflows",
+      },
+      {
+        link: "/workflows/new",
+        label: "New workflow",
+      },
+    ];
+  },
 });
+
+function RouteComponent() {
+  return <WorkflowCreatePage />;
+}

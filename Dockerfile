@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
 # Pruner stage - create minimal workspace for API, dashboard, and engine
 FROM base AS pruner
 COPY . .
-RUN turbo prune api dashboard --docker
+RUN turbo prune @paperjet/api @paperjet/dashboard --docker
 
 # Installer stage - install dependencies using pruned lockfile
 FROM base AS installer
@@ -33,7 +33,7 @@ COPY --from=pruner /usr/src/app/out/full/ .
 COPY --from=installer /usr/src/app/ .
 
 # Build both the API and dashboard using turbo
-RUN turbo build --filter=api --filter=dashboard
+RUN turbo build --filter=@paperjet/api --filter=@paperjet/dashboard
 
 # Final production image
 FROM base AS release

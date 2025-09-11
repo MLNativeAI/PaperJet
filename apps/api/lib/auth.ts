@@ -1,157 +1,214 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
-import { MagicLinkEmail, render } from "@paperjet/email";
-import { generateId, ID_PREFIXES } from "@paperjet/engine";
-import { logger } from "@paperjet/shared";
-import { betterAuth, type User } from "better-auth";
+import { organization as dbOrganization, user } from "@paperjet/db/schema";
+import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
+import { envVars, logger } from "@paperjet/shared";
+import { betterAuth, type Session, type User } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink } from "better-auth/plugins";
+import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
-import { Resend } from "resend";
-import { envVars } from "./env";
+import { sendInvitationEmail, sendMagicLink } from "@/lib/email";
+import { getDefaultOrgOrCreate } from "@/lib/org";
+import type { SessionWithOrg } from "@/types";
 
 const publicRoutes = ["/api/health", "/api/auth/**"];
 
-const resend = envVars.RESEND_API_KEY ? new Resend(envVars.RESEND_API_KEY) : null;
-
 export const auth = betterAuth({
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
+  },
+  emailAndPassword: {
+    enabled: true,
+  },
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema: schema,
+  }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        input: false,
+      },
+      lastActiveOrgId: {
+        type: "string",
+        input: false,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const isAdminSetupRequired = await isSetupRequired();
+          if (isAdminSetupRequired) {
+            return {
+              data: {
+                ...user,
+                id: generateId(ID_PREFIXES.user),
+                role: "admin",
+                emailVerified: true,
+              },
+            };
+          } else {
+            return {
+              data: {
+                ...user,
+                id: generateId(ID_PREFIXES.user),
+              },
+            };
+          }
+        },
+      },
+    },
     session: {
-        cookieCache: {
-            enabled: true,
-            maxAge: 5 * 60, // Cache duration in seconds
+      create: {
+        before: async (session) => {
+          const orgId = await getDefaultOrgOrCreate(session.userId);
+          if (!orgId) {
+            throw new Error("org not found");
+          }
+          const org = await db.query.organization.findFirst({
+            where: eq(dbOrganization.id, orgId),
+          });
+          if (!org) {
+            throw new Error("org not found");
+          }
+          await db
+            .update(user)
+            .set({
+              lastActiveOrgId: orgId,
+            })
+            .where(eq(user.id, session.userId));
+
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: org.id,
+              id: generateId(ID_PREFIXES.session),
+            },
+          };
         },
+      },
     },
-    database: drizzleAdapter(db, {
-        provider: "pg",
-        schema: schema,
+    account: {
+      create: {
+        before: async (account) => {
+          return {
+            data: {
+              ...account,
+              id: generateId(ID_PREFIXES.account),
+            },
+          };
+        },
+      },
+    },
+    verification: {
+      create: {
+        before: async (verification) => {
+          return {
+            data: {
+              ...verification,
+              id: generateId(ID_PREFIXES.verification),
+            },
+          };
+        },
+      },
+    },
+  },
+  plugins: [
+    admin(),
+    apiKey({
+      rateLimit: {
+        enabled: false,
+      },
     }),
-    databaseHooks: {
-        user: {
-            create: {
-                before: async (user) => {
-                    return {
-                        data: {
-                            ...user,
-                            id: generateId(ID_PREFIXES.user),
-                        },
-                    };
-                },
-            },
-        },
-        session: {
-            create: {
-                before: async (session) => {
-                    return {
-                        data: {
-                            ...session,
-                            id: generateId(ID_PREFIXES.session),
-                        },
-                    };
-                },
-            },
-        },
-        account: {
-            create: {
-                before: async (account) => {
-                    return {
-                        data: {
-                            ...account,
-                            id: generateId(ID_PREFIXES.account),
-                        },
-                    };
-                },
-            },
-        },
-        verification: {
-            create: {
-                before: async (verification) => {
-                    return {
-                        data: {
-                            ...verification,
-                            id: generateId(ID_PREFIXES.verification),
-                        },
-                    };
-                },
-            },
-        },
+    organization({
+      sendInvitationEmail: sendInvitationEmail,
+      cancelPendingInvitationsOnReInvite: true,
+    }),
+    magicLink({
+      sendMagicLink: sendMagicLink,
+    }),
+  ],
+  socialProviders: {
+    google: {
+      prompt: "select_account",
+      enabled: envVars.GOOGLE_CLIENT_ID !== undefined && envVars.GOOGLE_CLIENT_SECRET !== undefined,
+      clientId: envVars.GOOGLE_CLIENT_ID || "",
+      clientSecret: envVars.GOOGLE_CLIENT_SECRET || "",
+      redirectUri: envVars.BASE_URL,
     },
-    plugins: [
-        magicLink({
-            sendMagicLink: async ({ email, token, url }, _request) => {
-                if (!resend) {
-                    console.log(`Magic link for ${email}: ${url}`);
-                    return;
-                }
-
-                try {
-                    logger.info({ email, url }, `Sending magic link to ${email}: ${url}`);
-                    const emailHtml = await render(MagicLinkEmail({ email, url, token }));
-
-                    await resend.emails.send({
-                        from: envVars.FROM_EMAIL,
-                        to: email,
-                        subject: "Sign in to PaperJet",
-                        html: emailHtml,
-                    });
-                } catch (error) {
-                    console.error("Failed to send magic link email:", error);
-                    throw error;
-                }
-            },
-        }),
-    ],
-    socialProviders: {
-        google: {
-            prompt: "select_account",
-            enabled: envVars.GOOGLE_CLIENT_ID !== undefined && envVars.GOOGLE_CLIENT_SECRET !== undefined,
-            clientId: envVars.GOOGLE_CLIENT_ID || "",
-            clientSecret: envVars.GOOGLE_CLIENT_SECRET || "",
-            redirectUri: envVars.BASE_URL,
-        },
-        microsoft: {
-            enabled: envVars.MICROSOFT_CLIENT_ID !== undefined && envVars.MICROSOFT_CLIENT_SECRET !== undefined,
-            clientId: envVars.MICROSOFT_CLIENT_ID || "",
-            clientSecret: envVars.MICROSOFT_CLIENT_SECRET || "",
-            redirectURI: envVars.BASE_URL,
-        },
+    microsoft: {
+      enabled: envVars.MICROSOFT_CLIENT_ID !== undefined && envVars.MICROSOFT_CLIENT_SECRET !== undefined,
+      clientId: envVars.MICROSOFT_CLIENT_ID || "",
+      clientSecret: envVars.MICROSOFT_CLIENT_SECRET || "",
+      redirectURI: envVars.BASE_URL,
     },
-    trustedOrigins: [envVars.BASE_URL],
+  },
+  trustedOrigins: [envVars.BASE_URL],
 });
 
 // Helper function to check if a path matches a pattern with wildcards
 const matchesPattern = (path: string, pattern: string): boolean => {
-    if (pattern.endsWith("/**")) {
-        const prefix = pattern.slice(0, -2); // Remove /** from the end
-        return path.startsWith(prefix);
-    }
-    return path === pattern;
+  if (pattern.endsWith("/**")) {
+    const prefix = pattern.slice(0, -2); // Remove /** from the end
+    return path.startsWith(prefix);
+  }
+  return path === pattern;
 };
 
 // Authentication middleware
 export const requireAuth = async (c: Context, next: Next) => {
-    // Skip auth check for public routes
-    if (publicRoutes.some((pattern) => matchesPattern(c.req.path, pattern))) {
-        return next();
-    }
-
-    const session = await auth.api.getSession({ headers: c.req.raw.headers });
-    if (!session) {
-        return c.json({ message: "Unauthorized" }, 401);
-    }
-
-    c.set("user", session.user);
-    c.set("session", session.session);
+  if (publicRoutes.some((pattern) => matchesPattern(c.req.path, pattern))) {
     return next();
+  }
+
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    logger.info("missing auth");
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  c.set("user", session.user);
+  c.set("session", session.session);
+  return next();
 };
 
 export const authHandler = async (c: Context) => {
-    return auth.handler(c.req.raw);
+  return auth.handler(c.req.raw);
 };
 
-export const getUser = async (c: Context): Promise<User> => {
-    const session = await auth.api.getSession({ headers: c.req.raw.headers });
-    if (!session) {
-        throw new Error("Unauthorized");
-    }
-    return session.user;
+export const getUserIfLoggedIn = async (c: Context): Promise<string | undefined> => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    return undefined;
+  }
+  return session.user.id;
+};
+
+export const getUserSession = async (
+  c: Context,
+): Promise<{
+  user: User;
+  session: SessionWithOrg;
+}> => {
+  const sessionData = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!sessionData) {
+    throw new Error("Unauthorized");
+  }
+  if (!sessionData.session.activeOrganizationId) {
+    throw new Error("Active organization is missing");
+  }
+  return {
+    user: sessionData.user,
+    session: {
+      ...sessionData.session,
+      activeOrganizationId: sessionData.session.activeOrganizationId,
+    },
+  };
 };
