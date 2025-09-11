@@ -35,7 +35,9 @@ jobs:
       registry: docker.io
       image_name: mlnative/paperjet-dev
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-    secrets: inherit
+      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
+      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_APP_UUID }}
+      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
 
   deploy-ml:
     name: Deploy ML Application
@@ -45,4 +47,8 @@ jobs:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-    secrets: inherit
+      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
+      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_ML_APP_UUID }}
+      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
+
+
