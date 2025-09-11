@@ -8,7 +8,7 @@ on:
 jobs:
   build-core:
     name: Build Core Application
-    uses: ./.github/workflows/reusable/build-core.yml
+    uses: ./.github/workflows/build-core.yml
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
