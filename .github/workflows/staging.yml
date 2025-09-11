@@ -3,10 +3,10 @@ name: Staging Build & Deploy
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     branches:
-      - develop
+      - main
   workflow_dispatch:
 
 env:
@@ -111,58 +111,58 @@ jobs:
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64
 
-  deploy-staging:
-    name: Deploy to Staging
-    needs: [build-main, build-ml]
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    environment: development
-    
-    steps:
-      - name: Extract image tags
-        id: image
-        run: |
-          # Extract the short SHA (first 7 characters)
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          IMAGE_TAG="develop-${SHORT_SHA}"
-          echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          echo "name=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
-          echo "ml_name=${{ env.ML_IMAGE_NAME }}" >> $GITHUB_OUTPUT
-          echo "Deploying main app: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
-          echo "Deploying ML service: ${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}:${IMAGE_TAG}"
+deploy-staging:
+  name: Deploy to Staging
+  needs: [build-main, build-ml]
+  if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  environment: development
 
-      - name: Update Coolify main application image
-        run: |
-          curl -X PATCH \
-            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_APP_UUID }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "docker_registry_image_name": "${{ steps.image.outputs.name }}",
-              "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
-            }'
+  steps:
+    - name: Extract image tags
+      id: image
+      run: |
+        # Extract the short SHA (first 7 characters)
+        SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+        IMAGE_TAG="main-${SHORT_SHA}"
+        echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+        echo "name=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
+        echo "ml_name=${{ env.ML_IMAGE_NAME }}" >> $GITHUB_OUTPUT
+        echo "Deploying main app: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+        echo "Deploying ML service: ${{ env.REGISTRY }}/${{ env.ML_IMAGE_NAME }}:${IMAGE_TAG}"
 
-      - name: Deploy main app to Coolify
-        run: |
-          curl -X GET \
-            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_APP_UUID }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
-            -H "Content-Type: application/json"
+    - name: Update Coolify main application image
+      run: |
+        curl -X PATCH \
+          "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_APP_UUID }}" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "docker_registry_image_name": "${{ steps.image.outputs.name }}",
+            "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
+          }'
 
-      - name: Update Coolify ML service image
-        run: |
-          curl -X PATCH \
-            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "docker_registry_image_name": "${{ steps.image.outputs.ml_name }}",
-              "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
-            }'
+    - name: Deploy main app to Coolify
+      run: |
+        curl -X GET \
+          "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_APP_UUID }}" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+          -H "Content-Type: application/json"
 
-      - name: Deploy ML service to Coolify
-        run: |
-          curl -X GET \
-            "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
-            -H "Content-Type: application/json"
+    - name: Update Coolify ML service image
+      run: |
+        curl -X PATCH \
+          "${{ secrets.COOLIFY_DEV_URL }}/api/v1/applications/${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "docker_registry_image_name": "${{ steps.image.outputs.ml_name }}",
+            "docker_registry_image_tag": "${{ steps.image.outputs.tag }}"
+          }'
+
+    - name: Deploy ML service to Coolify
+      run: |
+        curl -X GET \
+          "${{ secrets.COOLIFY_DEV_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_DEV_ML_APP_UUID }}" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_DEV_TOKEN }}" \
+          -H "Content-Type: application/json"
