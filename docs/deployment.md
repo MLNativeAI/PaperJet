@@ -5,15 +5,15 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 ## Pipeline Overview
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Push to Main  │───▶│  Build & Push    │───▶│ Deploy to Staging│
-│                 │    │  Docker Image    │    │   (Coolify)     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌────────────────────────┐    ┌─────────────────┐
+│   Push to Main  │───▶│  Build & Push Two      │───▶│ Deploy to       │
+│                 │    │  Docker Images         │    │ Staging (Coolify)│
+└─────────────────┘    └────────────────────────┘    └─────────────────┘
 
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Semantic Release│───▶│  Build & Push    │───▶│ Update Release  │───▶│ Deploy to Prod  │
-│                 │    │Multi-Arch Images │    │   with Docker   │    │   (Coolify)     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌────────────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Semantic Release│───▶│  Build & Push Two      │───▶│ Update Release  │───▶│ Deploy to Prod  │
+│                 │    │Multi-Arch Images       │    │   with Docker   │    │   (Coolify)     │
+└─────────────────┘    └────────────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ## Workflows
@@ -27,10 +27,12 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 
 **Process:**
 
-1. Build Docker image: `mlnative/paperjet-dev:main-{sha}`
-2. Push to Docker Hub
-3. Update Coolify staging application image tag
-4. Trigger deployment
+1. Build two Docker images:
+   - Main app: `mlnative/paperjet-dev:main-{sha}`
+   - ML service: `mlnative/paperjet-ml-dev:main-{sha}`
+2. Push both images to Docker Hub
+3. Update Coolify staging application image tags for both services
+4. Trigger deployment for both services
 
 **Environment:** `staging`
 
@@ -43,11 +45,13 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 **Process:**
 
 1. Create semantic release (if changes warrant it)
-2. Build multi-platform Docker images: `mlnative/paperjet:{version}`, `mlnative/paperjet:latest`
-3. Push to Docker Hub
-4. Update GitHub release with Docker info
-5. Update Coolify production application image tag
-6. Trigger deployment
+2. Build multi-platform Docker images:
+   - Main app: `mlnative/paperjet:{version}`, `mlnative/paperjet:latest`
+   - ML service: `mlnative/paperjet-ml:{version}`, `mlnative/paperjet-ml:latest`
+3. Push both images to Docker Hub
+4. Update GitHub release with Docker info for both images
+5. Update Coolify production application image tags for both services
+6. Trigger deployment for both services
 
 ## Key Features
 
@@ -82,7 +86,8 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 
 ### Development Images
 
-- **Repository**: `mlnative/paperjet-dev`
+- **Main Application Repository**: `mlnative/paperjet-dev`
+- **ML Service Repository**: `mlnative/paperjet-ml-dev`
 - **Tags**:
   - `main-{sha}` (each commit)
   - `latest` (latest main branch)
@@ -90,7 +95,8 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 
 ### Production Images
 
-- **Repository**: `mlnative/paperjet`
+- **Main Application Repository**: `mlnative/paperjet`
+- **ML Service Repository**: `mlnative/paperjet-ml`
 - **Tags**:
   - `{version}` (e.g., `1.2.3`)
   - `{major}.{minor}` (e.g., `1.2`)

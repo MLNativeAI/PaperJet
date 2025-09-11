@@ -14,15 +14,19 @@ PaperJet uses a fully automated release workflow that:
 
 ## Two-Track Docker Strategy
 
-### Development Images (`mlnative/paperjet-dev`)
+### Development Images
 
+- **Main Application**: `mlnative/paperjet-dev`
+- **ML Service**: `mlnative/paperjet-ml-dev`
 - Built on every push to `main` branch
 - Always available as `latest` tag
 - Additional tags: `main-<commit-sha>`, `<date>-<sha>`
 - Use for testing and development environments
 
-### Release Images (`mlnative/paperjet`)
+### Release Images
 
+- **Main Application**: `mlnative/paperjet`
+- **ML Service**: `mlnative/paperjet-ml`
 - Built only when semantic-release creates a new version
 - `latest` always points to the most recent stable release
 - Version tags: `1.0.0`, `1.0`, `1` (semantic versions)
@@ -124,7 +128,7 @@ Write commits manually following the conventional format. The commit-msg hook wi
 ```
 Monday 9am:
 Push: "feat: add user dashboard"
-→ paperjet-dev:latest updated
+→ paperjet-dev:latest and paperjet-ml-dev:latest updated
 → No release yet (waiting for manual trigger)
 
 Monday 2pm:
@@ -132,62 +136,48 @@ Developer triggers manual release
 → Release v1.1.0 created!
   - Includes: 1 feature
   - paperjet:1.1.0 and paperjet:latest built
+  - paperjet-ml:1.1.0 and paperjet-ml:latest built
   - Changelog generated with all commits
 
 Tuesday 10am:
 Push: "fix: dashboard layout issue"
-→ paperjet-dev:latest updated
+→ paperjet-dev:latest and paperjet-ml-dev:latest updated
 → No release yet (waiting for manual trigger)
 
 Wednesday:
 Developer triggers manual release
 → Release v1.1.1 created!
   - Includes: 1 fix
-  - paperjet:latest now points to v1.1.1
+  - paperjet:latest and paperjet-ml:latest now point to v1.1.1
 ```
-
-Monday 9am:
-Push: "feat: add user dashboard"
-→ paperjet-dev:latest updated
-→ No release yet (waiting for more changes)
-
-Monday 2pm:
-Push: "fix: dashboard layout issue"
-→ paperjet-dev:latest updated
-→ No release yet
-
-Tuesday 10am:
-Push: "docs: update README"
-→ paperjet-dev:latest updated
-→ Release v1.1.0 created automatically!
-
-- Includes: 1 feature + 1 fix + 1 doc update
-- paperjet:1.1.0 and paperjet:latest built
-- Changelog generated with all commits
-
-Wednesday:
-Push: "chore: update dependencies"
-→ paperjet-dev:latest updated
-→ No release (chore doesn't trigger releases)
-
-Thursday:
-Push: "fix: CSV export encoding"
-→ paperjet-dev:latest updated
-→ Release v1.1.1 created automatically!
-
-- paperjet:latest now points to v1.1.1
-
-````
 
 ## Docker Deployment
 
 ### Development/Testing
 
 ```bash
-# Always gets latest development build
+# Pull latest development builds
 docker pull mlnative/paperjet-dev:latest
-docker run -p 3000:3000 mlnative/paperjet-dev:latest
-````
+docker pull mlnative/paperjet-ml-dev:latest
+
+# Run with Docker Compose (recommended)
+docker-compose up -d
+```
+
+### Production
+
+```bash
+# Pull latest stable releases
+docker pull mlnative/paperjet:latest
+docker pull mlnative/paperjet-ml:latest
+
+# Run with Docker Compose (recommended)
+docker-compose up -d
+
+# Pin to specific version
+docker pull mlnative/paperjet:1.2.0
+docker pull mlnative/paperjet-ml:1.2.0
+```
 
 ### Production
 
@@ -254,12 +244,13 @@ Add these to GitHub repository secrets:
 
 ## Benefits
 
-✅ **Zero manual version management**  
+✅ **Manual control over production releases**  
+✅ **Automatic staging deployments for both services**  
 ✅ **Consistent commit messages across team**  
 ✅ **Automatic changelog generation**  
-✅ **Clear separation of dev/production images**  
+✅ **Clear separation of staging/production images**  
 ✅ **Predictable versioning based on changes**  
-✅ **Multi-platform Docker support**  
+✅ **Multi-platform Docker support for both services**  
 ✅ **Enhanced team collaboration through standards**
 
-The system ensures that every meaningful change is properly versioned, documented, and deployed without manual intervention.
+The system ensures that every meaningful change is properly versioned and documented, with controlled deployment to production for both the main application and ML service.
