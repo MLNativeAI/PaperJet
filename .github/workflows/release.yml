@@ -1,9 +1,6 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -99,32 +96,32 @@ jobs:
               repo: context.repo.repo,
               tag: `v${version}`
             });
-            
+
             const dockerInfo = `
 
             ## Docker Images
-            
+
             Multi-platform images are now available:
-            
+
             \`\`\`bash
             # Pull the latest release
             docker pull mlnative/paperjet:latest
-            
+
             # Pull specific version
             docker pull mlnative/paperjet:${version}
-            
+
             # Run the application
             docker run -p 3000:3000 mlnative/paperjet:latest
             \`\`\`
-            
+
             **Available tags:**
             - \`mlnative/paperjet:latest\`
             - \`mlnative/paperjet:${version}\`
             - \`mlnative/paperjet:${version.split('.').slice(0,2).join('.')}\`
             - \`mlnative/paperjet:${version.split('.')[0]}\`
-            
+
             **Architecture support:** AMD64, ARM64`;
-            
+
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -138,7 +135,7 @@ jobs:
     if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     environment: production
-    
+
     steps:
       - name: Extract production image tag
         id: image
