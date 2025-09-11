@@ -1,5 +1,9 @@
 name: Main Branch Build & Deploy
 
+permissions:
+  packages: write
+  id-token: write
+
 on:
   push:
     branches:
