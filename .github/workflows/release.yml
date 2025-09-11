@@ -196,26 +196,23 @@ Main Application:
               body: release.body + dockerInfo
             });
 
-  deploy-production:
-    name: Deploy to Coolify Production
-    needs: [release, docker-release-main, docker-release-ml]
+  deploy-main-production:
+    name: Deploy Main App to Production
+    needs: [release, docker-release-main]
     if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-      - name: Extract production image tags
+      - name: Extract production image tag
         id: image
         run: |
           # Use the specific version tag for production deployments
           VERSION_TAG="${{ needs.release.outputs.version }}"
           IMAGE_NAME="mlnative/paperjet"
-          ML_IMAGE_NAME="mlnative/paperjet-ml"
           echo "tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
           echo "name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
-          echo "ml_name=${ML_IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "Deploying main app: docker.io/${IMAGE_NAME}:${VERSION_TAG}"
-          echo "Deploying ML service: docker.io/${ML_IMAGE_NAME}:${VERSION_TAG}"
 
       - name: Update Coolify production main application image
         run: |
@@ -234,6 +231,24 @@ Main Application:
             "${{ secrets.COOLIFY_PROD_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_PROD_APP_UUID }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_PROD_TOKEN }}" \
             -H "Content-Type: application/json"
+
+  deploy-ml-production:
+    name: Deploy ML Service to Production
+    needs: [release, docker-release-ml]
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Extract production image tag
+        id: image
+        run: |
+          # Use the specific version tag for production deployments
+          VERSION_TAG="${{ needs.release.outputs.version }}"
+          ML_IMAGE_NAME="mlnative/paperjet-ml"
+          echo "tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
+          echo "ml_name=${ML_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "Deploying ML service: docker.io/${ML_IMAGE_NAME}:${VERSION_TAG}"
 
       - name: Update Coolify production ML service image
         run: |

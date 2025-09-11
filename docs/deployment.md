@@ -6,13 +6,15 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 
 ```
 ┌─────────────────┐    ┌────────────────────────┐    ┌─────────────────┐
-│   Push to Main  │───▶│  Build & Push Two      │───▶│ Deploy to       │
-│                 │    │  Docker Images         │    │ Staging (Coolify)│
+│   Push to Main  │───▶│  Build & Push Two      │───▶│ Deploy Both     │
+│                 │    │  Docker Images         │    │ Services in     │
+│                 │    │  (Parallel)            │    │ Parallel        │
 └─────────────────┘    └────────────────────────┘    └─────────────────┘
 
 ┌─────────────────┐    ┌────────────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Semantic Release│───▶│  Build & Push Two      │───▶│ Update Release  │───▶│ Deploy to Prod  │
-│                 │    │Multi-Arch Images       │    │   with Docker   │    │   (Coolify)     │
+│ Semantic Release│───▶│  Build & Push Two      │───▶│ Update Release  │───▶│ Deploy Both     │
+│                 │    │Multi-Arch Images       │    │   with Docker   │    │ Services in     │
+│                 │    │  (Parallel)            │    │                 │    │ Parallel        │
 └─────────────────┘    └────────────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -27,12 +29,13 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 
 **Process:**
 
-1. Build two Docker images:
+1. Build two Docker images in parallel:
    - Main app: `mlnative/paperjet-dev:main-{sha}`
    - ML service: `mlnative/paperjet-ml-dev:main-{sha}`
 2. Push both images to Docker Hub
-3. Update Coolify staging application image tags for both services
-4. Trigger deployment for both services
+3. Deploy both services to staging in parallel:
+   - Main app deployment job
+   - ML service deployment job
 
 **Environment:** `staging`
 
@@ -45,13 +48,14 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 **Process:**
 
 1. Create semantic release (if changes warrant it)
-2. Build multi-platform Docker images:
+2. Build multi-platform Docker images in parallel:
    - Main app: `mlnative/paperjet:{version}`, `mlnative/paperjet:latest`
    - ML service: `mlnative/paperjet-ml:{version}`, `mlnative/paperjet-ml:latest`
 3. Push both images to Docker Hub
 4. Update GitHub release with Docker info for both images
-5. Update Coolify production application image tags for both services
-6. Trigger deployment for both services
+5. Deploy both services to production in parallel:
+   - Main app deployment job
+   - ML service deployment job
 
 ## Key Features
 
@@ -75,6 +79,13 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 - Deployment only triggers on successful image builds
 - PR builds don't trigger deployments
 - Comprehensive error reporting
+
+### ✅ Parallel Deployments
+
+- Main app and ML service deploy simultaneously
+- Faster deployment times through parallelization
+- Independent failure handling for each service
+- Reduced overall deployment duration
 
 ### ✅ Security
 
@@ -106,7 +117,8 @@ This document provides an overview of the enhanced CI/CD pipeline with automatic
 ## Benefits
 
 1. **Faster Deployments**: Automatic deployment reduces time from code to production
-2. **Consistency**: Same process for every deployment reduces human error
-3. **Traceability**: Clear mapping between commits, images, and deployments
-4. **Rollback Capability**: Easy to revert to previous image versions
-5. **Monitoring**: All deployments logged in GitHub Actions
+2. **Parallel Processing**: Main app and ML service deploy simultaneously for speed
+3. **Consistency**: Same process for every deployment reduces human error
+4. **Traceability**: Clear mapping between commits, images, and deployments
+5. **Rollback Capability**: Easy to revert to previous image versions
+6. **Monitoring**: All deployments logged in GitHub Actions
