@@ -29,7 +29,7 @@ jobs:
   deploy-core:
     name: Deploy Core Application
     needs: build-core
-    uses: ./.github/workflows/reusable/deploy-core.yml
+    uses: ./.github/workflows/reusable/deploy.yml
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
@@ -44,7 +44,7 @@ jobs:
   deploy-ml:
     name: Deploy ML Application
     needs: build-ml
-    uses: ./.github/workflows/reusable/deploy-ml.yml
+    uses: ./.github/workflows/reusable/deploy.yml
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
