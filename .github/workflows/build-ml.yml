@@ -60,8 +60,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        context: ./ml
-        file: ./ml/Dockerfile
+        context: ./apps/ml
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=registry,ref=${{ inputs.registry }}/${{ inputs.image_name }}:latest
