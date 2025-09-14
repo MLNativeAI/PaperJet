@@ -1,12 +1,11 @@
 import { otel } from "@hono/otel";
+import { type auth, authHandler, requireAuth } from "@paperjet/auth";
 import { envVars, logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
-import { type auth, authHandler, requireAuth } from "./lib/auth";
 import { corsMiddleware } from "./lib/cors";
-import { withContext } from "./lib/with-context";
 import { type AdminRoutes, adminRouter } from "./routes/admin";
 import { type ApiKeysRoutes, v1ApiKeyRouter } from "./routes/v1/api-keys";
 import { type ExecutionRoutes, v1ExecutionRouter } from "./routes/v1/executions";
@@ -28,7 +27,6 @@ app.use(
 );
 app.use("/api/*", corsMiddleware);
 app.use("/api/v1/*", requireAuth);
-app.use("/api/*", withContext);
 app.on(["POST", "GET"], "/api/auth/*", authHandler);
 
 app.get("/api/health", async (c) => {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/lib/auth-client";
 import type { Member } from "better-auth/plugins";
+import { authClient } from "@/lib/auth-client";
 
 export function useRole() {
   const { data: member, isLoading } = useQuery({

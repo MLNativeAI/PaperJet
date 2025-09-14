@@ -4,6 +4,7 @@ export function generateOrgSlug() {
   const fullId = uuid.replace(/-/g, "").substring(0, 12);
   return { slug: `org_${shortId}`, id: fullId };
 }
+
 export function generateId(prefix: string): string {
   const uuid = crypto.randomUUID();
   const shortId = uuid.replace(/-/g, "").substring(0, 12);

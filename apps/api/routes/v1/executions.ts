@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { getUserSession } from "@paperjet/auth";
 import {
   exportExecution,
   getAllWorkflowExecutions,
@@ -9,7 +10,6 @@ import {
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { getUserSession } from "@/lib/auth";
 import { workflowExecutionIdSchema } from "@/lib/validation";
 
 const app = new Hono();
@@ -60,7 +60,7 @@ const router = app
       try {
         const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const execution = await getWorkflowExecutionStatus(executionId, session.id);
+        const execution = await getWorkflowExecutionStatus(executionId, session.activeOrganizationId);
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");
@@ -83,7 +83,7 @@ const router = app
       try {
         const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const documentUrl = await getPresignedFileUrl(executionId, session.id);
+        const documentUrl = await getPresignedFileUrl(executionId, session.activeOrganizationId);
         return c.json(documentUrl);
       } catch (error) {
         logger.error(error, "Get document url error");
@@ -113,7 +113,7 @@ const router = app
         const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
         const { mode } = c.req.valid("query");
-        const result = await exportExecution(executionId, mode, session.id);
+        const result = await exportExecution(executionId, mode, session.activeOrganizationId);
 
         c.header("Content-Type", result.contentType);
         c.header("Content-Disposition", `attachment; filename="${result.filename}"`);

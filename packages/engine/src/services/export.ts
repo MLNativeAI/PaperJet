@@ -11,7 +11,7 @@ export async function exportData(
   mode: "json" | "csv",
   executionId: string,
 ): Promise<ExportResult> {
-  const timestamp = new Date().toISOString().split("T")[0].replace(/-/g, "");
+  const timestamp = new Date().toISOString().split("T")[0]?.replace(/-/g, "");
   const baseFilename = `${executionId}_${timestamp}`;
 
   if (mode === "json") {

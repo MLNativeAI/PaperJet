@@ -1,16 +1,18 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "lint": {},
+    "typecheck": {},
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["DATABASE_URL"],
+      "inputs": ["$TURBO_DEFAULT$", ".env.production.local", ".env.local", ".env.production", ".env"]
     },
     "test:e2e": {
       "cache": false,
@@ -29,18 +31,15 @@
       "outputs": ["drizzle/**"]
     },
     "db:migrate": {
-      "cache": false,
-      "dependsOn": ["db:generate"]
+      "cache": false
     },
     "db:push": {
-      "cache": false,
-      "dependsOn": ["db:generate"]
+      "cache": false
     },
     "db:studio": {
       "cache": false,
       "persistent": true
     },
-
     "db:seed": {
       "cache": false,
       "persistent": true

@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { getUserSession } from "@paperjet/auth";
 import {
   createWorkflowFromApi,
   deleteWorkflow,
@@ -14,7 +15,6 @@ import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { getUserSession } from "@/lib/auth";
 import { workflowExecutionIdSchema, workflowIdSchema } from "@/lib/validation";
 
 const app = new Hono();
@@ -118,7 +118,7 @@ const router = app
     ),
     async (c) => {
       try {
-        const { session, user } = await getUserSession(c);
+        const { session } = await getUserSession(c);
         const { workflowId } = c.req.valid("param");
         const { file } = c.req.valid("form");
         const execution = await uploadFileAndCreateExecution(

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev --parallel",
-    "lint": "biome check --write",
+    "lint": "turbo lint",
     "test:e2e": "turbo test:e2e",
     "test:e2e:smoke": "turbo test:e2e:smoke",
     "test:e2e:acc": "turbo test:e2e:acc",

@@ -1,6 +1,7 @@
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
 import OrgLogoWithFallback from "@/components/org-logo-with-fallback";
+import { CreateOrgDialog } from "@/components/settings/create-org-dialog";
 import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { CreateOrgDialog } from "@/components/settings/create-org-dialog";
 import { useOrganization } from "@/hooks/use-organization";
 import { authClient } from "@/lib/auth-client";
 

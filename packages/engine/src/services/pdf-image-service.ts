@@ -1,10 +1,10 @@
 import { db } from "@paperjet/db";
 import { documentData, documentPage, file, workflowExecution } from "@paperjet/db/schema";
 import { envVars, logger } from "@paperjet/shared";
+import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import type { PdfSplitResult } from "../types";
-import { generateId, ID_PREFIXES } from "../utils/id";
 
 export async function splitPdfIntoImages(workflowExecutionId: string) {
   const result = await db

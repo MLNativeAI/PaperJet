@@ -7,6 +7,10 @@
     ".": "./index.ts",
     "./types": "./src/types.ts"
   },
+  "scripts": {
+    "lint": "biome check --write",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

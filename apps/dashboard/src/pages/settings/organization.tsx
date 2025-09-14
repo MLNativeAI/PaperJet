@@ -1,6 +1,6 @@
+import DeleteOrgForm from "@/components/settings/delete-org-form";
 import OrgMembers from "@/components/settings/org-members";
 import OrgNameForm from "@/components/settings/org-name-form";
-import DeleteOrgForm from "@/components/settings/delete-org-form";
 import UserInvitations from "@/components/settings/user-invitations";
 import { useRole } from "@/hooks/use-role";
 
