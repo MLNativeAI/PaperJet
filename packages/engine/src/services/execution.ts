@@ -100,7 +100,7 @@ export async function getWorkflowExecutionWithExtractedData(
 
 export async function getWorkflowExecutionStatus(
   workflowExecutionId: string,
-  userId: string,
+  organizationId: string,
 ): Promise<ExecutionStatusResponse> {
   const result = await db
     .select({
@@ -115,7 +115,7 @@ export async function getWorkflowExecutionStatus(
       createdAt: workflowExecution.createdAt,
     })
     .from(workflowExecution)
-    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)));
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, organizationId)));
 
   const execution = result[0];
   if (!execution) {
@@ -141,14 +141,14 @@ export async function exportExecution(workflowExecutionId: string, mode: "csv" |
   return exportData(data, mode, workflowExecutionId);
 }
 
-export async function getPresignedFileUrl(workflowExecutionId: string, userId: string) {
+export async function getPresignedFileUrl(workflowExecutionId: string, organizationId: string) {
   const result = await db
     .select({
       filePath: file.filePath,
     })
     .from(file)
     .leftJoin(workflowExecution, eq(workflowExecution.fileId, file.id))
-    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(file.ownerId, userId)))
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(file.ownerId, organizationId)))
     .limit(1);
 
   if (result.length === 0 || !result[0]?.filePath) {
