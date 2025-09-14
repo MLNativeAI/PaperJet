@@ -29,7 +29,7 @@ export async function listUserInvitations(c: Context<BlankEnv, "/invitations", B
 
   const organizationMap = new Map(organizations.map((org) => [org.id, org]));
 
-  const invitationsWithOrgNames: UserInvitation = pendingInvitations.map((invitation) => ({
+  const invitationsWithOrgNames: UserInvitation[] = pendingInvitations.map((invitation) => ({
     ...invitation,
     organizationName: organizationMap.get(invitation.organizationId)?.name || "Unknown",
     expiresAt: invitation.expiresAt.toISOString(),

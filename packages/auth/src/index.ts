@@ -1,7 +1,6 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
-import { isSetupRequired } from "@paperjet/engine";
 import { envVars, logger } from "@paperjet/shared";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { betterAuth, type User } from "better-auth";
@@ -212,4 +211,13 @@ export const getUserSession = async (
       activeOrganizationId: sessionData.session.activeOrganizationId,
     },
   };
+};
+
+export const isSetupRequired = async () => {
+  const adminUsers = await db.select().from(user).where(eq(user.role, "admin"));
+  if (adminUsers.length === 0) {
+    return true;
+  } else {
+    return false;
+  }
 };

@@ -6,6 +6,7 @@
     "build": "turbo build",
     "dev": "turbo dev --parallel",
     "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
     "test:e2e": "turbo test:e2e",
     "test:e2e:smoke": "turbo test:e2e:smoke",
     "test:e2e:acc": "turbo test:e2e:acc",

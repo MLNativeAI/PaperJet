@@ -5,11 +5,11 @@ import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import { asc, eq } from "drizzle-orm";
 import z from "zod";
-import { extractionQueue } from "../jobs/extraction";
-import { markdownQueue } from "../jobs/markdown";
-import { splitPdfQueue } from "../jobs/split-pdf";
-import { redisConnection } from "../redis";
-import { QUEUE_NAMES } from "../types";
+import { extractionQueue } from "../jobs/extraction.ts";
+import { markdownQueue } from "../jobs/markdown.ts";
+import { splitPdfQueue } from "../jobs/split-pdf.ts";
+import { redisConnection } from "../redis.ts";
+import { QUEUE_NAMES } from "../types.ts";
 
 export const workflowExecutionQueue = new Queue(QUEUE_NAMES.EXTRACTION_WORKFLOW, {
   connection: redisConnection,

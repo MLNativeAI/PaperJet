@@ -1,10 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
+import { isSetupRequired } from "@paperjet/auth";
 import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
 import {
   getConfiguration,
   getUsageData,
   getUsageStats,
-  isSetupRequired,
   updateConfiguration,
   validateConnection,
 } from "@paperjet/engine";

@@ -71,15 +71,6 @@ export const getValidModelConfig = async () => {
   return validateModelConfiguration(configuration);
 };
 
-export const isSetupRequired = async () => {
-  const adminUsers = await db.select().from(user).where(eq(user.role, "admin"));
-  if (adminUsers.length === 0) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
 export const validateModelConfiguration = (config: Configuration): ValidModelConfig => {
   if (config.modelType === "cloud" && config.geminiApiKey) {
     return {
