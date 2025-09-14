@@ -1,6 +1,7 @@
 import { db } from "@paperjet/db";
 import { documentData, documentPage, file, workflowExecution } from "@paperjet/db/schema";
-import { envVars, generateId, ID_PREFIXES, logger } from "@paperjet/shared";
+import { envVars, logger } from "@paperjet/shared";
+import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import type { PdfSplitResult } from "../types";

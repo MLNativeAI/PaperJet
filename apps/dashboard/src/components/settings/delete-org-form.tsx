@@ -22,7 +22,7 @@ interface DeleteOrgFormProps {
 }
 
 export default function DeleteOrgForm({ member }: DeleteOrgFormProps) {
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 

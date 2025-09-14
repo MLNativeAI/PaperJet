@@ -1,8 +1,14 @@
 {
   "name": "@paperjet/shared",
+  "type": "module",
+  "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "id": "./src/id.ts"
+    "./id": "./src/id.ts"
+  },
+  "scripts": {
+    "lint": "biome check --write",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@axiomhq/pino": "^0.1.0",

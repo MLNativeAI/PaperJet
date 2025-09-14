@@ -118,7 +118,7 @@ const router = app
     ),
     async (c) => {
       try {
-        const { session, user } = await getUserSession(c);
+        const { session } = await getUserSession(c);
         const { workflowId } = c.req.valid("param");
         const { file } = c.req.valid("form");
         const execution = await uploadFileAndCreateExecution(

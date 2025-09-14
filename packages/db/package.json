@@ -10,7 +10,9 @@
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:seed": "bun run seed.ts"
+    "db:seed": "bun run seed.ts",
+    "lint": "biome check --write",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "~5.7.2"

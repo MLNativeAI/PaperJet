@@ -5,6 +5,10 @@
     "./organizaion": "./src/org.ts",
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "lint": "biome check --write",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@paperjet/db": "workspace:*",
     "@paperjet/email": "workspace:*",

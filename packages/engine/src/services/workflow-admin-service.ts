@@ -1,6 +1,6 @@
 import { db } from "@paperjet/db";
 import { file, workflow, workflowExecution } from "@paperjet/db/schema";
-import { generateId, ID_PREFIXES } from "@paperjet/shared";
+import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
 import { s3Client } from "../lib/s3";
 import { type Workflow, type WorkflowConfiguration, WorkflowExecutionStatus } from "../types";

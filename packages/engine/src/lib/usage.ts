@@ -1,7 +1,6 @@
 import { db } from "@paperjet/db";
 import { usageData, usageModelPrice } from "@paperjet/db/schema";
 import type { DbUsageModelPrice } from "@paperjet/db/types";
-import { getExecutionContext } from "@paperjet/shared/src/context";
 import type { LanguageModelUsage } from "ai";
 import { desc, eq } from "drizzle-orm";
 
@@ -55,7 +54,6 @@ const calculateCost = (
 };
 
 export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
-  const context = getExecutionContext();
   const modelPrice = await getModelPrice(model);
 
   const inputCost = usage.promptTokens && modelPrice ? calculateCost(modelPrice, usage).inputCost : 0;
@@ -72,9 +70,6 @@ export async function trackUsage(name: string, model: string, usage: LanguageMod
     totalTokens: usage.totalTokens || 0,
     totalCost: totalCost.toFixed(2),
     durationMs,
-    userId: context?.userId,
-    workflowId: context?.workflowId,
-    executionId: context?.executionId,
     createdAt: new Date(),
     updatedAt: new Date(),
   });

@@ -1,7 +1,7 @@
 import { InvitationEmail, MagicLinkEmail, render } from "@paperjet/email";
 import { envVars, logger } from "@paperjet/shared";
 import type { User } from "better-auth";
-import type { Invitation, Member, Organization } from "better-auth/plugins";
+import type { Member, Organization } from "better-auth/plugins";
 
 import { Resend } from "resend";
 

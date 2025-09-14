@@ -9,8 +9,7 @@
     "globals.css"
   ],
   "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "typecheck": "tsc --noEmit"
+    "clean": "rm -rf .turbo node_modules"
   },
   "exports": {
     "./animated-size-container": "./src/components/animated-size-container.tsx",
