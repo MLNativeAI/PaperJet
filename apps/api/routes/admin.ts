@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/organizaion";
+import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
 import {
   getConfiguration,
   getUsageData,

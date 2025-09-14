@@ -1,9 +1,9 @@
 {
   "name": "@paperjet/auth",
   "exports": {
+    ".": "./src/index.ts",
     "./types": "./src/types.ts",
-    "./organizaion": "./src/org.ts",
-    ".": "./src/index.ts"
+    "./invitations": "./src/organization/invitations.ts"
   },
   "scripts": {
     "lint": "biome check --write",

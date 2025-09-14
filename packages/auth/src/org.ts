@@ -2,12 +2,12 @@ import { auth } from "@paperjet/auth/index";
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
-import { envVars, logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import type { BlankEnv, BlankInput } from "hono/types";
 import { COMMON_EMAIL_PROVIDERS } from "./const";
-import type { UserInvitation } from "./types";
+import { generateOrgSlug } from "@paperjet/shared/id";
+import { envVars, logger } from "@paperjet/shared";
 
 export const getDefaultOrgOrCreate = async (userId: string) => {
   try {
@@ -99,34 +99,4 @@ export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-inv
     logger.error(error, "Unknown invitation error, redirecting to sign-up");
     return c.redirect(`${envVars.BASE_URL}/auth/sign-up`);
   }
-}
-
-export async function listUserInvitations(c: Context<BlankEnv, "/invitations", BlankInput>) {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  if (!session) {
-    return c.redirect("/auth/sign-in");
-  }
-
-  const invitations = await auth.api.listUserInvitations({
-    query: {
-      email: session.user.email,
-    },
-  });
-
-  const pendingInvitations = invitations.filter((inv) => inv.status === "pending");
-
-  const organizationIds = pendingInvitations.map((invitation) => invitation.organizationId);
-  const organizations = await db.query.organization.findMany({
-    where: (organization, { inArray }) => inArray(organization.id, organizationIds),
-  });
-
-  const organizationMap = new Map(organizations.map((org) => [org.id, org]));
-
-  const invitationsWithOrgNames: UserInvitation = pendingInvitations.map((invitation) => ({
-    ...invitation,
-    organizationName: organizationMap.get(invitation.organizationId)?.name || "Unknown",
-    expiresAt: invitation.expiresAt.toISOString(),
-  }));
-
-  return c.json(invitationsWithOrgNames);
 }
