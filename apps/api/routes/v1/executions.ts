@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { getUserSession } from "@paperjet/auth";
 import {
   exportExecution,
   getAllWorkflowExecutions,
@@ -9,7 +10,6 @@ import {
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { getUserSession } from "@/lib/auth";
 import { workflowExecutionIdSchema } from "@/lib/validation";
 
 const app = new Hono();

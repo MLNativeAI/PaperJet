@@ -47,7 +47,6 @@ export async function sendInvitationEmail({
   role: string;
   email: string;
   organization: Organization;
-  invitation: Invitation;
   inviter: Member & {
     user: User;
   };

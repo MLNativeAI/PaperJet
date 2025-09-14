@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { generateOrgSlug } from "@paperjet/shared/id";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -14,9 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
-import { generateOrgSlug } from "../../../../../packages/engine/src/utils/id";
 import { useOrganization } from "@/hooks/use-organization";
+import { authClient } from "@/lib/auth-client";
 
 const createOrgFormSchema = z.object({
   name: z.string().min(1, "Organization name is required").max(100, "Name must be less than 100 characters"),

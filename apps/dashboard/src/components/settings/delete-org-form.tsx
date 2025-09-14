@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useNavigate } from "@tanstack/react-router";
+import type { Member } from "better-auth/plugins";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +13,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { authClient } from "@/lib/auth-client";
-import { useOrganization } from "@/hooks/use-organization";
-import type { Member } from "better-auth/plugins";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useOrganization } from "@/hooks/use-organization";
+import { authClient } from "@/lib/auth-client";
 
 interface DeleteOrgFormProps {
   member: Member | undefined;

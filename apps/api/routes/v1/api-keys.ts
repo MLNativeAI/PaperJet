@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { auth, getUserSession } from "@paperjet/auth";
 import { db } from "@paperjet/db";
 import { apikey } from "@paperjet/db/schema";
 import type { ApiKey } from "@paperjet/engine/types";
@@ -6,7 +7,6 @@ import { logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { auth, getUserSession } from "@/lib/auth";
 
 const app = new Hono();
 

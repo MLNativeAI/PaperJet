@@ -1,16 +1,16 @@
 import { db } from "@paperjet/db";
 import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
-import { generateId, ID_PREFIXES, isSetupRequired } from "@paperjet/engine";
-import { envVars, logger } from "@paperjet/shared";
-import { betterAuth, type Session, type User } from "better-auth";
+import { isSetupRequired } from "@paperjet/engine";
+import { envVars, generateId, ID_PREFIXES, logger } from "@paperjet/shared";
+import { betterAuth, type User } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import type { Context, Next } from "hono";
-import { sendInvitationEmail, sendMagicLink } from "@/lib/email";
-import { getDefaultOrgOrCreate } from "@/lib/org";
-import type { SessionWithOrg } from "@/types";
+import { sendInvitationEmail, sendMagicLink } from "./email";
+import { getDefaultOrgOrCreate } from "./org";
+import type { SessionWithOrg } from "./types";
 
 const publicRoutes = ["/api/health", "/api/auth/**"];
 

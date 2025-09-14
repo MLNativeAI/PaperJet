@@ -1,14 +1,13 @@
 import { db } from "@paperjet/db";
+import { auth } from "@paperjet/db/index";
 import * as schema from "@paperjet/db/schema";
 import { organization as dbOrganization, user } from "@paperjet/db/schema";
-import { generateOrgSlug } from "@paperjet/engine";
-import { envVars, logger } from "@paperjet/shared";
+import { envVars, generateOrgSlug, logger } from "@paperjet/shared";
 import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import type { BlankEnv, BlankInput } from "hono/types";
-import { auth } from "@/lib/auth";
-import { COMMON_EMAIL_PROVIDERS } from "@/lib/const";
-import type { UserInvitation } from "@/types";
+import { COMMON_EMAIL_PROVIDERS } from "./const";
+import type { UserInvitation } from "./types";
 
 export const getDefaultOrgOrCreate = async (userId: string) => {
   try {
