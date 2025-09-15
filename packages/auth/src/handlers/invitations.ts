@@ -1,8 +1,5 @@
-import { db } from "@paperjet/db";
-import * as schema from "@paperjet/db/schema";
-import { user } from "@paperjet/db/schema";
+import { getOrganizationsByIds, getUserByEmail, getUserInvitations } from "@paperjet/db";
 import { envVars, logger } from "@paperjet/shared";
-import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import type { BlankEnv, BlankInput } from "hono/types";
 import { auth } from "../index";
@@ -23,13 +20,10 @@ export async function listUserInvitations(c: Context<BlankEnv, "/invitations", B
   const pendingInvitations = invitations.filter((inv) => inv.status === "pending");
 
   const organizationIds = pendingInvitations.map((invitation) => invitation.organizationId);
-  const organizations = await db.query.organization.findMany({
-    where: (organization, { inArray }) => inArray(organization.id, organizationIds),
-  });
-
+  const organizations = await getOrganizationsByIds({ organizationIds: organizationIds });
   const organizationMap = new Map(organizations.map((org) => [org.id, org]));
 
-  const invitationsWithOrgNames: UserInvitation = pendingInvitations.map((invitation) => ({
+  const invitationsWithOrgNames: UserInvitation[] = pendingInvitations.map((invitation) => ({
     ...invitation,
     organizationName: organizationMap.get(invitation.organizationId)?.name || "Unknown",
     expiresAt: invitation.expiresAt.toISOString(),
@@ -45,16 +39,13 @@ export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-inv
     return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);
   }
   try {
-    const invitationResponse = await db.query.invitation.findFirst({
-      where: eq(schema.invitation.id, invitationId),
-    });
+    const invitationResponse = await getUserInvitations({ invitationId: invitationId });
+
     if (!invitationResponse) {
       return c.redirect(`${envVars.BASE_URL}/auth/sign-up?notFound=true`);
     }
     const email = invitationResponse?.email;
-    const userData = await db.query.user.findFirst({
-      where: eq(user.email, email),
-    });
+    const userData = await getUserByEmail({ email: email });
     if (!userData) {
       logger.debug(`User not found, redirecting to sign up`);
       return c.redirect(`${envVars.BASE_URL}/auth/sign-up?invite=true`);

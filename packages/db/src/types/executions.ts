@@ -1,4 +1,7 @@
-import type { WorkflowExecutionStatus } from "../types";
+import z from "zod";
+
+export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);
+export type WorkflowExecutionStatus = z.infer<typeof WorkflowExecutionStatus>;
 
 export type WorkflowExecutionRow = {
   status: WorkflowExecutionStatus;

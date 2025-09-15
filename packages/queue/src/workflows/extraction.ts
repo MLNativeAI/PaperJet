@@ -1,9 +1,7 @@
-import { db } from "@paperjet/db";
-import { documentData, documentPage, workflowExecution } from "@paperjet/db/schema";
-import { WorkflowExecutionStatus } from "@paperjet/engine/types";
+import { getDocumentPagesByWorkflowExecutionId, updateDocumentMarkdown, updateExecutionStatus } from "@paperjet/db";
+import { WorkflowExecutionStatus } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
-import { asc, eq } from "drizzle-orm";
 import z from "zod";
 import { extractionQueue } from "../jobs/extraction";
 import { markdownQueue } from "../jobs/markdown";
@@ -99,19 +97,21 @@ export const extractionWorkflowWorker = new Worker(
 extractionWorkflowWorker.on("failed", async (job, _) => {
   if (job?.data.workflowExecutionId) {
     logger.error(`parent job ${job?.data.workflowExecutionId} failed`);
-    await db
-      .update(workflowExecution)
-      .set({ status: WorkflowExecutionStatus.enum.Failed, completedAt: new Date() })
-      .where(eq(workflowExecution.id, job.data.workflowExecutionId));
+    await updateExecutionStatus({
+      workflowExecutionId: job.data.workflowExecutionId,
+      status: WorkflowExecutionStatus.enum.Failed,
+      isCompleted: true,
+    });
   }
 });
 
 async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
   const { workflowExecutionId } = job.data;
-  await db
-    .update(workflowExecution)
-    .set({ status: WorkflowExecutionStatus.enum.Processing })
-    .where(eq(workflowExecution.id, workflowExecutionId));
+  await updateExecutionStatus({
+    workflowExecutionId: job.data.workflowExecutionId,
+    status: WorkflowExecutionStatus.enum.Processing,
+    isCompleted: false,
+  });
 
   if (!job.id) {
     throw new Error("Fatal error, job ID missing");
@@ -132,10 +132,7 @@ async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
   const { workflowExecutionId } = job.data;
-  const pageData = await db.query.documentPage.findMany({
-    where: eq(documentPage.workflowExecutionId, workflowExecutionId),
-    orderBy: [asc(documentPage.pageNumber)],
-  });
+  const pageData = await getDocumentPagesByWorkflowExecutionId({ workflowExecutionId });
   const bulkJobData = pageData.map((pageEntry) => {
     if (!job.id) {
       logger.error("Fatal error, job ID missing");
@@ -177,14 +174,11 @@ async function addExtractionJob(job: Job<WorkflowExtractionData>) {
 
 async function finalizeWorkflow(job: Job<WorkflowExtractionData>) {
   logger.info("Workflow execution completed");
-  const { workflowExecutionId } = job.data;
-  await db
-    .update(workflowExecution)
-    .set({
-      completedAt: new Date(),
-      status: WorkflowExecutionStatus.enum.Completed,
-    })
-    .where(eq(workflowExecution.id, workflowExecutionId));
+  await updateExecutionStatus({
+    workflowExecutionId: job.data.workflowExecutionId,
+    status: WorkflowExecutionStatus.enum.Completed,
+    isCompleted: true,
+  });
 }
 
 async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionData>, jobName: string, token?: string) {
@@ -208,10 +202,8 @@ async function checkChildJobsCompletedSuccessfully(job: Job<WorkflowExtractionDa
 
 async function assembleFullDocument(job: Job<WorkflowExtractionData>) {
   logger.info("Assembling full markdown document");
-  const { workflowExecutionId } = job.data;
-  const allPageData = await db.query.documentPage.findMany({
-    where: eq(documentPage.workflowExecutionId, workflowExecutionId),
-    orderBy: [asc(documentPage.pageNumber)],
+  const allPageData = await getDocumentPagesByWorkflowExecutionId({
+    workflowExecutionId: job.data.workflowExecutionId,
   });
 
   // Debug logging
@@ -233,12 +225,10 @@ async function assembleFullDocument(job: Job<WorkflowExtractionData>) {
     .filter((markdown) => markdown != null && markdown.trim() !== "")
     .join("\n\n---\n\n"); // Add page separator for clarity
 
-  await db
-    .update(documentData)
-    .set({
-      rawMarkdown: fullMarkdownDocument,
-    })
-    .where(eq(documentData.workflowExecutionId, workflowExecutionId));
+  await updateDocumentMarkdown({
+    rawMarkdown: fullMarkdownDocument,
+    workflowExecutionId: job.data.workflowExecutionId,
+  });
 
   logger.info(
     {

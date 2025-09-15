@@ -1,12 +1,10 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "./schema";
-
-const queryClient = postgres(
-  Bun.env.DATABASE_URL ||
-    (() => {
-      throw new Error("DATABASE_URL is not defined");
-    })(),
-);
-
-export const db = drizzle({ client: queryClient, schema });
+export * from "./src/queries/admin";
+export * from "./src/queries/api-keys";
+export * from "./src/queries/configuration";
+export * from "./src/queries/document-data";
+export * from "./src/queries/executions";
+export * from "./src/queries/file";
+export * from "./src/queries/organization";
+export * from "./src/queries/usage";
+export * from "./src/queries/user";
+export * from "./src/queries/workflows";

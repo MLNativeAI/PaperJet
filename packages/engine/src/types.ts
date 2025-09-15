@@ -1,6 +1,5 @@
-import type { DbWorkflowExecution } from "@paperjet/db/types";
+import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
 import z from "zod";
-import type { WorkflowConfiguration } from "./types/workflow-config";
 
 export type ConnectionValidationResult = {
   isValid: boolean;
@@ -113,6 +112,7 @@ export const zodWorkflowObject = z.object({
   name: z.string(),
   fields: z.array(zodWorkflowField),
 });
+
 export type Workflow = {
   id: string;
   name: string;
@@ -122,9 +122,6 @@ export type Workflow = {
   updatedAt: string;
   ownerId: string;
 };
-
-export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);
-export type WorkflowExecutionStatus = z.infer<typeof WorkflowExecutionStatus>;
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {
   filename: string;
@@ -153,16 +150,3 @@ export type UsageStats = {
   users: number;
   executions: number;
 };
-
-export type ApiKey = {
-  id: string;
-  name: string | null;
-  key: string;
-  userId: string;
-  enabled: boolean;
-  createdAt: string;
-  lastRequest: string | null;
-};
-
-export * from "./types/executions";
-export * from "./types/workflow-config";

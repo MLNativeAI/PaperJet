@@ -1,4 +1,4 @@
-import type { ExtractedDataType } from "../types";
+import type { ExtractedDataType } from "@paperjet/db/types";
 
 export interface ExportResult {
   content: string;

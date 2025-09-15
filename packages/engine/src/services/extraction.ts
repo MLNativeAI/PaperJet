@@ -1,9 +1,7 @@
-import { db } from "@paperjet/db";
-import { documentData, workflow } from "@paperjet/db/schema";
+import { getDocumentData, getWorkflow, updateDocumentData } from "@paperjet/db";
+import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
-import { eq } from "drizzle-orm";
 import { generateObject } from "../lib/ai-sdk-wrapper";
-import type { WorkflowConfiguration } from "../types";
 import { buildExtractionSchema } from "../utils/build-extraction-schema";
 
 export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
@@ -14,26 +12,19 @@ export async function extractDataFromMarkdown(workflowId: string, workflowExecut
     },
     "Extracting data from markdown",
   );
-  const dataDoc = await db.query.documentData.findFirst({
-    where: eq(documentData.workflowExecutionId, workflowExecutionId),
+  const documentData = await getDocumentData({
+    workflowExecutionId,
   });
-  if (!dataDoc || !dataDoc.rawMarkdown) {
+  if (!documentData || !documentData.rawMarkdown) {
     throw new Error("Fatal error, document data not found");
   }
-  const workflowData = await db.query.workflow.findFirst({
-    where: eq(workflow.id, workflowId),
-  });
+  const workflowData = await getWorkflow({ workflowId });
   if (!workflowData) {
     throw new Error("Fatal error, workflow not found");
   }
   const validConfig = workflowData.configuration as WorkflowConfiguration;
-  const extractionResult = await runDocumentExtraction(dataDoc.rawMarkdown, validConfig);
-  await db
-    .update(documentData)
-    .set({
-      extractedData: extractionResult,
-    })
-    .where(eq(documentData.id, dataDoc.id));
+  const extractionResult = await runDocumentExtraction(documentData.rawMarkdown, validConfig);
+  await updateDocumentData({ documentDataId: documentData.id, extractedData: extractionResult });
   logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
 

@@ -1,7 +1,5 @@
-import { db } from "@paperjet/db";
-import { documentPage } from "@paperjet/db/schema";
+import { getDocumentPageById, updateDocumentPageData } from "@paperjet/db";
 import { logger } from "@paperjet/shared";
-import { eq } from "drizzle-orm";
 import { generateText } from "../lib/ai-sdk-wrapper";
 import { s3Client } from "../lib/s3";
 
@@ -11,24 +9,12 @@ export type MarkdownDocument = {
 };
 
 export const convertPageToMarkdown = async (workflowExecutionId: string, documentPageId: string): Promise<void> => {
-  const pageData = await db.query.documentPage.findFirst({
-    where: eq(documentPage.id, documentPageId),
-  });
-  if (!pageData) {
-    throw new Error(`Page ID ${documentPageId} not found`);
-  }
+  const pageData = await getDocumentPageById({ documentPageId });
   const pageFilePath = `executions/${workflowExecutionId}/pages/page-${pageData.pageNumber}.png`;
   const pageBuffer = await s3Client.file(pageFilePath).arrayBuffer();
   logger.info(`Converting page ${pageData.pageNumber} to markdown`);
   const markdownPage = await extractMarkdownFromPageImage(pageBuffer);
-
-  await db
-    .update(documentPage)
-    .set({
-      rawMarkdown: markdownPage,
-    })
-    .where(eq(documentPage.id, documentPageId));
-
+  await updateDocumentPageData({ rawMarkdown: markdownPage, documentPageId });
   logger.info(`Converted page ${pageData.pageNumber} to markdown`);
 };
 

@@ -1,21 +1,20 @@
 import { zValidator } from "@hono/zod-validator";
-import { getUserSession } from "@paperjet/auth";
+import { getUserSession } from "@paperjet/auth/session";
 import {
-  createWorkflowFromApi,
+  createWorkflow,
   deleteWorkflow,
-  getWorkflow,
+  getWorkflowByOwner,
   getWorkflowExecutionWithExtractedData,
-  getWorkflows,
   updateExecutionJobId,
   updateWorkflow,
-  uploadFileAndCreateExecution,
-} from "@paperjet/engine";
-import { WorkflowConfigurationSchema } from "@paperjet/engine/types";
+} from "@paperjet/db";
+import { WorkflowConfigurationSchema } from "@paperjet/db/types";
+import { getWorkflows, uploadFileAndCreateExecution } from "@paperjet/engine";
 import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { workflowExecutionIdSchema, workflowIdSchema } from "@/lib/validation";
+import { workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
 
 const app = new Hono();
 
@@ -70,13 +69,13 @@ const router = app
       const createWorkflowData = c.req.valid("json");
       const { session } = await getUserSession(c);
       logger.info({ data: createWorkflowData }, `Creating new workflow via API`);
-      const { workflowId } = await createWorkflowFromApi(
-        createWorkflowData.name,
-        createWorkflowData.description,
-        createWorkflowData.configuration,
-        session.activeOrganizationId,
-        session.userId,
-      );
+      const { id: workflowId } = await createWorkflow({
+        name: createWorkflowData.name,
+        description: createWorkflowData.description,
+        configuration: createWorkflowData.configuration,
+        organizationId: session.activeOrganizationId,
+        userId: session.userId,
+      });
       logger.info({ workflowId, name: createWorkflowData.name }, "Workflow created");
       return c.json({ workflowId: workflowId, message: "Workflow created" }, 201);
     } catch (error) {
@@ -132,7 +131,7 @@ const router = app
           workflowExecutionId: execution.workflowExecutionId,
         });
         const jobId = job.id;
-        await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
+        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: jobId || "" });
         return c.json({
           ...execution,
         });
@@ -182,8 +181,10 @@ const router = app
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
           });
-          const jobId = job.id;
-          await updateExecutionJobId(execution.workflowExecutionId, jobId || "");
+          if (!job.id) {
+            throw new Error("job id not found");
+          }
+          await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: job.id });
           executions.push(execution);
         }
 
@@ -211,8 +212,8 @@ const router = app
     async (c) => {
       const { session } = await getUserSession(c);
       const { workflowId } = c.req.valid("param");
-      const execution = await getWorkflow(workflowId, session.activeOrganizationId);
-      return c.json(execution);
+      const workflowData = await getWorkflowByOwner({ workflowId, organizationId: session.activeOrganizationId });
+      return c.json(workflowData);
     },
   )
   .put(
@@ -230,13 +231,13 @@ const router = app
         const updateWorkflowData = c.req.valid("json");
         const { session } = await getUserSession(c);
         logger.info({ data: updateWorkflowData }, `Updating workflow ${workflowId}`);
-        await updateWorkflow(
+        await updateWorkflow({
           workflowId,
-          updateWorkflowData.name,
-          updateWorkflowData.description,
-          updateWorkflowData.configuration,
-          session.activeOrganizationId,
-        );
+          name: updateWorkflowData.name,
+          description: updateWorkflowData.description,
+          configuration: updateWorkflowData.configuration,
+          organizationId: session.activeOrganizationId,
+        });
         logger.info({ workflowId, name: updateWorkflowData.name }, "Workflow updated");
         return c.json({ workflowId, message: "Workflow updated" }, 200);
       } catch (error) {
@@ -272,7 +273,10 @@ const router = app
     async (c) => {
       const { session } = await getUserSession(c);
       const { workflowExecutionId } = c.req.valid("param");
-      const execution = await getWorkflowExecutionWithExtractedData(workflowExecutionId, session.activeOrganizationId);
+      const execution = await getWorkflowExecutionWithExtractedData({
+        workflowExecutionId,
+        organizationId: session.activeOrganizationId,
+      });
       return c.json(execution);
     },
   )
@@ -289,7 +293,7 @@ const router = app
         const { session } = await getUserSession(c);
         const { workflowId } = c.req.valid("param");
 
-        await deleteWorkflow(workflowId, session.activeOrganizationId);
+        await deleteWorkflow({ workflowId, organizationId: session.activeOrganizationId });
 
         return c.json({ message: "Workflow deleted successfully" });
       } catch (error) {

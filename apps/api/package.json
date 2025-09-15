@@ -1,22 +1,18 @@
 {
   "name": "@paperjet/api",
-  "module": "index.ts",
-  "type": "module",
   "private": true,
   "exports": {
-    "./routes": "./routes.ts",
-    "./types": "./types.ts"
+    "./routes": "./src/routes.ts"
   },
   "scripts": {
-    "dev": "bun --watch index.ts",
-    "start": "bun index.ts",
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
     "lint": "biome check --write",
     "typecheck": "tsc --noEmit",
-    "build": "bun build --target=bun index.ts --outdir=dist"
+    "build": "bun build --target=bun ./src/index.ts --outdir=dist"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.11",
-    "drizzle-kit": "^0.31.0"
+    "@types/bun": "^1.2.11"
   },
   "peerDependencies": {
     "typescript": "^5"
