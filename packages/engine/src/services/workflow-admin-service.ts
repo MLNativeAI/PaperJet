@@ -41,7 +41,7 @@ export async function uploadFileAndCreateExecution(
     filePath: filePath,
     organizationId: organizationId,
   });
-  createWorkflowExecution({
+  await createWorkflowExecution({
     executionId,
     workflowId,
     fileId,
