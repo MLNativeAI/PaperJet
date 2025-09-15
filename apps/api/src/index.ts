@@ -1,7 +1,7 @@
 import { allWorkers } from "@paperjet/queue";
 import { envVars, logger } from "@paperjet/shared";
 import "./instrumentation";
-import { app } from "./routes.ts";
+import { app } from "./routes";
 
 const server = Bun.serve({
   port: envVars.PORT,

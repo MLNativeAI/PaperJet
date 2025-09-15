@@ -1,6 +1,6 @@
 import { getDocumentDataByOwner, getFile } from "@paperjet/db";
 import type { ExtractedDataType } from "@paperjet/db/types";
-import { s3Client } from "../lib/s3.ts";
+import { s3Client } from "../lib/s3";
 import { exportData } from "./export.ts";
 
 export async function exportExecution(workflowExecutionId: string, mode: "csv" | "json", organizationId: string) {

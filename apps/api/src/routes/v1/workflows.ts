@@ -14,7 +14,7 @@ import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation.ts";
+import { workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
 
 const app = new Hono();
 

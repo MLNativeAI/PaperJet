@@ -9,7 +9,7 @@ import { exportExecution, getPresignedFileUrl } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { workflowExecutionIdSchema } from "../../lib/validation.ts";
+import { workflowExecutionIdSchema } from "../../lib/validation";
 
 const app = new Hono();
 

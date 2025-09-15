@@ -4,9 +4,9 @@ import { logger } from "@paperjet/shared";
 import type { CoreMessage, GenerateObjectResult, LanguageModelV1, Message } from "ai";
 import { generateObject as aiGenerateObject, generateText as aiGenerateText } from "ai";
 import type { z } from "zod";
-import { getValidModelConfig } from "../services/admin-service.ts";
-import type { ValidModelConfig } from "../types.ts";
-import { trackUsage } from "./usage.ts";
+import { getValidModelConfig } from "../services/admin-service";
+import type { ValidModelConfig } from "../types";
+import { trackUsage } from "./usage";
 
 export type GenerateObjectOptions<T extends z.ZodType> = {
   schema: T;
