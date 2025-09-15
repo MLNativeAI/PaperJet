@@ -1,10 +1,10 @@
-import { generateObject } from "@engine/lib/ai-sdk-wrapper.ts";
-import type { Configuration, ConnectionValidationResult, ValidModelConfig } from "@engine/types.ts";
 import { getConfiguration } from "@paperjet/db";
-import { DbConfiguration } from "@paperjet/db/types";
+import type { DbConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { AISDKError } from "ai";
 import { z } from "zod";
+import { generateObject } from "../lib/ai-sdk-wrapper.ts";
+import type { ConnectionValidationResult, ValidModelConfig } from "../types.ts";
 
 export const validateConnection = async (configuration: DbConfiguration): Promise<ConnectionValidationResult> => {
   try {

@@ -1,8 +1,8 @@
-import { documentData, documentPage } from "../schema";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "../db";
-import { DbDocumentData } from "../types/tables";
+import { documentData, documentPage } from "../schema";
+import type { DbDocumentData } from "../types/tables";
 
 export async function createDocumentData({
   workflowExecutionId,
@@ -61,6 +61,20 @@ export async function updateDocumentData({
     .where(eq(documentData.id, documentDataId));
 }
 
+export async function updateDocumentMarkdown({
+  rawMarkdown,
+  workflowExecutionId,
+}: {
+  rawMarkdown: string;
+  workflowExecutionId: string;
+}) {
+  await db
+    .update(documentData)
+    .set({
+      rawMarkdown: rawMarkdown,
+    })
+    .where(eq(documentData.workflowExecutionId, workflowExecutionId));
+}
 export async function updateDocumentPageData({
   documentPageId,
   rawMarkdown,
@@ -74,6 +88,14 @@ export async function updateDocumentPageData({
       rawMarkdown: rawMarkdown,
     })
     .where(eq(documentPage.id, documentPageId));
+}
+
+export async function getDocumentPagesByWorkflowExecutionId({ workflowExecutionId }: { workflowExecutionId: string }) {
+  const pageData = await db.query.documentPage.findMany({
+    where: eq(documentPage.workflowExecutionId, workflowExecutionId),
+    orderBy: [asc(documentPage.pageNumber)],
+  });
+  return pageData;
 }
 
 export async function getDocumentPageById({ documentPageId }: { documentPageId: string }) {

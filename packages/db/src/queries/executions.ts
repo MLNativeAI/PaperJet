@@ -34,6 +34,21 @@ export async function createWorkflowExecution({
   });
 }
 
+export async function updateExecutionStatus({
+  status,
+  workflowExecutionId,
+  isCompleted,
+}: {
+  status: WorkflowExecutionStatus;
+  isCompleted: boolean;
+  workflowExecutionId: string;
+}) {
+  await db
+    .update(workflowExecution)
+    .set({ status: status, completedAt: isCompleted ? new Date() : null })
+    .where(eq(workflowExecution.id, workflowExecutionId));
+}
+
 export async function updateExecutionJobId({ executionId, jobId }: { executionId: string; jobId: string }) {
   await db
     .update(workflowExecution)
