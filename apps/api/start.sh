@@ -9,4 +9,5 @@ bunx drizzle-kit migrate
 
 # Start the application with correct path to node_modules
 cd /usr/src/app/apps/api
-NODE_PATH=/usr/src/app/node_modules exec bun index.ts
+NODE_PATH=/usr/src/app/node_modules exec bun src/index.ts
+

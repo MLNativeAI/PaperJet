@@ -49,13 +49,19 @@ export async function updateExecutionStatus({
     .where(eq(workflowExecution.id, workflowExecutionId));
 }
 
-export async function updateExecutionJobId({ executionId, jobId }: { executionId: string; jobId: string }) {
+export async function updateExecutionJobId({
+  workflowExecutionId,
+  jobId,
+}: {
+  workflowExecutionId: string;
+  jobId: string;
+}) {
   await db
     .update(workflowExecution)
     .set({
       jobId,
     })
-    .where(eq(workflowExecution.id, executionId));
+    .where(eq(workflowExecution.id, workflowExecutionId));
 }
 
 export async function getWorkflowExecutionById({
@@ -74,7 +80,11 @@ export async function getWorkflowExecutionById({
   return exeuction;
 }
 
-export async function getAllWorkflowExecutions({ userId }: { userId: string }): Promise<WorkflowExecutionRow[]> {
+export async function getAllWorkflowExecutions({
+  organizationId,
+}: {
+  organizationId: string;
+}): Promise<WorkflowExecutionRow[]> {
   const executions = await db
     .select({
       id: workflowExecution.id,
@@ -93,7 +103,7 @@ export async function getAllWorkflowExecutions({ userId }: { userId: string }): 
     .from(workflowExecution)
     .leftJoin(workflow, eq(workflowExecution.workflowId, workflow.id))
     .leftJoin(file, eq(workflowExecution.fileId, file.id))
-    .where(eq(workflowExecution.ownerId, userId))
+    .where(eq(workflowExecution.ownerId, organizationId))
     .orderBy(desc(workflowExecution.createdAt));
 
   return executions.map((execution) => ({
@@ -108,10 +118,10 @@ export async function getAllWorkflowExecutions({ userId }: { userId: string }): 
 
 export async function getWorkflowExecutionWithExtractedData({
   workflowExecutionId,
-  userId,
+  organizationId,
 }: {
   workflowExecutionId: string;
-  userId: string;
+  organizationId: string;
 }): Promise<WorkflowExecutionData> {
   const result = await db
     .select({
@@ -133,7 +143,7 @@ export async function getWorkflowExecutionWithExtractedData({
     .leftJoin(workflow, eq(workflowExecution.workflowId, workflow.id))
     .leftJoin(file, eq(workflowExecution.fileId, file.id))
     .leftJoin(documentData, eq(documentData.workflowExecutionId, workflowExecution.id))
-    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)));
+    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, organizationId)));
 
   const execution = result[0];
   if (!execution) {

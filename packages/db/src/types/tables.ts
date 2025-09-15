@@ -3,6 +3,7 @@ import type {
   configuration,
   documentData,
   file,
+  organization,
   usageData,
   usageModelPrice,
   workflow,
@@ -10,6 +11,8 @@ import type {
 } from "../schema";
 
 export type DbFile = typeof file.$inferSelect;
+
+export type DbOrganization = typeof organization.$inferSelect;
 
 export type DbWorkflow = typeof workflow.$inferSelect;
 

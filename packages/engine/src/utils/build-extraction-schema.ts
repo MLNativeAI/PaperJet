@@ -1,4 +1,4 @@
-import { WorkflowConfiguration } from "@paperjet/db/types";
+import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { z } from "zod";
 
 export function buildExtractionSchema(configuration: WorkflowConfiguration) {

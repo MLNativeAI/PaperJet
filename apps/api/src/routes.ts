@@ -5,11 +5,11 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
-import { corsMiddleware } from "./lib/cors";
-import { type AdminRoutes, adminRouter } from "./routes/admin";
-import { type ApiKeysRoutes, v1ApiKeyRouter } from "./routes/v1/api-keys";
-import { type ExecutionRoutes, v1ExecutionRouter } from "./routes/v1/executions";
-import { v1WorkflowRouter, type WorkflowRoutes } from "./routes/v1/workflows";
+import { corsMiddleware } from "./lib/cors.ts";
+import { type AdminRoutes, adminRouter } from "./routes/admin.ts";
+import { type ApiKeysRoutes, v1ApiKeyRouter } from "./routes/v1/api-keys.ts";
+import { type ExecutionRoutes, v1ExecutionRouter } from "./routes/v1/executions.ts";
+import { v1WorkflowRouter, type WorkflowRoutes } from "./routes/v1/workflows.ts";
 
 export const app = new Hono<{
   Variables: {

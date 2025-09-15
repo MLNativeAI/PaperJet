@@ -1,16 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
-import { getUserSession } from "@paperjet/auth";
+import { getUserSession } from "@paperjet/auth/session";
 import {
-  exportExecution,
   getAllWorkflowExecutions,
-  getPresignedFileUrl,
   getWorkflowExecutionStatus,
   getWorkflowExecutionWithExtractedData,
-} from "@paperjet/engine";
+} from "@paperjet/db";
+import { exportExecution, getPresignedFileUrl } from "@paperjet/engine";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { workflowExecutionIdSchema } from "@/lib/validation";
+import { workflowExecutionIdSchema } from "../../lib/validation.ts";
 
 const app = new Hono();
 
@@ -18,7 +17,7 @@ const router = app
   .get("/", async (c) => {
     try {
       const { session } = await getUserSession(c);
-      const executions = await getAllWorkflowExecutions(session.activeOrganizationId);
+      const executions = await getAllWorkflowExecutions({ organizationId: session.activeOrganizationId });
       return c.json(executions);
     } catch (error) {
       logger.error(error, "Get all executions error:");
@@ -37,7 +36,10 @@ const router = app
       try {
         const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const execution = await getWorkflowExecutionWithExtractedData(executionId, session.activeOrganizationId);
+        const execution = await getWorkflowExecutionWithExtractedData({
+          workflowExecutionId: executionId,
+          organizationId: session.activeOrganizationId,
+        });
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");
@@ -60,7 +62,10 @@ const router = app
       try {
         const { session } = await getUserSession(c);
         const { executionId } = c.req.valid("param");
-        const execution = await getWorkflowExecutionStatus(executionId, session.activeOrganizationId);
+        const execution = await getWorkflowExecutionStatus({
+          workflowExecutionId: executionId,
+          organizationId: session.activeOrganizationId,
+        });
         return c.json(execution);
       } catch (error) {
         logger.error(error, "Get execution by ID error:");

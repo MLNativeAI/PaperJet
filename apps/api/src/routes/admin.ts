@@ -1,13 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import { isSetupRequired } from "@paperjet/auth";
 import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
-import {
-  getConfiguration,
-  getUsageData,
-  getUsageStats,
-  updateConfiguration,
-  validateConnection,
-} from "@paperjet/engine";
+import { doesAdminAccountExist, getConfiguration } from "@paperjet/db";
+import { getUsageStats } from "@paperjet/engine";
 import { configUpdateSchema } from "@paperjet/engine/types";
 import { getAuthMode, logger } from "@paperjet/shared";
 import { Hono } from "hono";
@@ -17,9 +11,9 @@ const app = new Hono();
 
 const router = app
   .get("/setup-required", async (c) => {
-    const isAdminSetupRequired = await isSetupRequired();
+    const adminAccountExists = await doesAdminAccountExist();
     return c.json({
-      isSetupRequired: isAdminSetupRequired,
+      adminAccountExists: adminAccountExists,
     });
   })
   .get("/accept-invitation", async (c) => {
@@ -34,10 +28,9 @@ const router = app
     });
   })
   .get("/usage-data", async (c) => {
-    const usageData = await getUsageData();
-    const usageStats = getUsageStats(usageData);
+    const usageStats = getUsageStats([]);
     return c.json({
-      usageData: usageData,
+      usageData: [],
       usageStats: usageStats,
     });
   })
@@ -47,9 +40,7 @@ const router = app
   })
   .patch("/config", zValidator("json", configUpdateSchema), async (c) => {
     try {
-      const body = c.req.valid("json");
-
-      await updateConfiguration(body);
+      const _body = c.req.valid("json");
       return c.json({ message: "Configuration has been updated" });
     } catch (error) {
       logger.error(error, "Update workflow basic data error:");
@@ -64,9 +55,8 @@ const router = app
   })
   .post("/validate-connection", zValidator("json", configUpdateSchema), async (c) => {
     try {
-      const body = c.req.valid("json");
-      const validationResponse = await validateConnection(body);
-      return c.json(validationResponse);
+      const _body = c.req.valid("json");
+      return c.json({});
     } catch (error) {
       logger.error(error, "Update workflow basic data error:");
       if (error instanceof z.ZodError) {

@@ -4,12 +4,11 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./routes": "./routes.ts",
-    "./types": "./types.ts"
+    "./routes": "./src/routes.ts"
   },
   "scripts": {
-    "dev": "bun --watch index.ts",
-    "start": "bun index.ts",
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
     "lint": "biome check --write",
     "typecheck": "tsc --noEmit",
     "build": "bun build --target=bun index.ts --outdir=dist"

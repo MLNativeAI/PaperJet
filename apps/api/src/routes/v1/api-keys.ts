@@ -1,10 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
-import { auth, getUserSession } from "@paperjet/auth";
-import { db } from "@paperjet/db";
-import { apikey } from "@paperjet/db/schema";
-import type { ApiKey } from "@paperjet/engine/types";
+import { auth } from "@paperjet/auth";
+import { getUserSession } from "@paperjet/auth/session";
+import { getApiKey, getApiKeys, updateApiKeyOwner } from "@paperjet/db";
 import { logger } from "@paperjet/shared";
-import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -14,21 +12,7 @@ const router = app
   .get("/", async (c) => {
     try {
       const { session } = await getUserSession(c);
-      const data = await db.query.apikey.findMany({
-        where: eq(apikey.organizationId, session.activeOrganizationId),
-      });
-
-      const apiKeys: ApiKey[] = data.map((fullKey) => {
-        return {
-          id: fullKey.id,
-          name: fullKey.name,
-          userId: fullKey.userId,
-          enabled: fullKey.enabled || true,
-          key: `${fullKey.start}*****`,
-          lastRequest: fullKey.lastRequest ? fullKey.lastRequest.toISOString() : null,
-          createdAt: fullKey.createdAt.toISOString(),
-        };
-      });
+      const apiKeys = await getApiKeys({ organizationId: session.activeOrganizationId });
       return c.json(apiKeys);
     } catch (error) {
       logger.error(error, "Failed to get api keys");
@@ -46,12 +30,7 @@ const router = app
         headers: c.req.raw.headers,
       });
 
-      await db
-        .update(apikey)
-        .set({
-          organizationId: session.activeOrganizationId,
-        })
-        .where(eq(apikey.id, newKey.id));
+      await updateApiKeyOwner({ apiKeyId: newKey.id, organizationId: session.activeOrganizationId });
 
       return c.json({
         id: newKey.id,
@@ -68,10 +47,9 @@ const router = app
       const { id } = c.req.param();
       const { session } = await getUserSession(c);
 
-      const apiKey = await db.query.apikey.findFirst({
-        where: eq(apikey.organizationId, session.activeOrganizationId),
-      });
-      if (!apiKey) {
+      try {
+        await getApiKey({ organizationId: session.activeOrganizationId });
+      } catch (_) {
         return c.json({ error: "Key not found" }, 404);
       }
       await auth.api.updateApiKey({
