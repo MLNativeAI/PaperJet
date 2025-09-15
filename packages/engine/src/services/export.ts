@@ -1,4 +1,4 @@
-import type { ExtractedDataType } from "../types";
+import type { ExtractedDataType } from "@engine/types/executions.ts";
 
 export interface ExportResult {
   content: string;

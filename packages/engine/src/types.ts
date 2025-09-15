@@ -1,6 +1,4 @@
-import type { DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
-import type { WorkflowConfiguration } from "./types/workflow-config";
 
 export type ConnectionValidationResult = {
   isValid: boolean;
@@ -122,9 +120,6 @@ export type Workflow = {
   updatedAt: string;
   ownerId: string;
 };
-
-export const WorkflowExecutionStatus = z.enum(["Queued", "Processing", "Failed", "Completed"]);
-export type WorkflowExecutionStatus = z.infer<typeof WorkflowExecutionStatus>;
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {
   filename: string;

@@ -1,10 +1,14 @@
-import { s3Client } from "@engine/lib/s3.ts";
-import { db } from "@paperjet/db";
-import { documentData, file, workflow, workflowExecution } from "@paperjet/db/schema";
+import { db } from "@db/db";
+import { documentData, file, workflow, workflowExecution } from "@db/schema";
+import type {
+  ExecutionStatusResponse,
+  ExtractedDataType,
+  WorkflowExecutionData,
+  WorkflowExecutionRow,
+} from "@db/types/executions";
 import { and, desc, eq } from "drizzle-orm";
-import type { ExecutionStatusResponse, ExtractedDataType, WorkflowExecutionData, WorkflowExecutionRow } from "../types";
 
-export async function updateExecutionJobId(executionId: string, jobId: string) {
+export async function updateExecutionJobId({ executionId, jobId }: { executionId: string; jobId: string }) {
   await db
     .update(workflowExecution)
     .set({
@@ -125,38 +129,5 @@ export async function getWorkflowExecutionStatus(
     ...execution,
     startedAt: execution.startedAt.toISOString(),
     completedAt: execution.completedAt?.toISOString() || null,
-  };
-}
-
-export async function exportExecution(workflowExecutionId: string, mode: "csv" | "json", userId: string) {
-  const executionData = await db.query.documentData.findFirst({
-    where: and(eq(documentData.workflowExecutionId, workflowExecutionId), eq(documentData.ownerId, userId)),
-  });
-
-  if (!executionData) {
-    throw new Error("Workflow execution data not found");
-  }
-  const data: ExtractedDataType = executionData.extractedData as unknown as ExtractedDataType;
-  return exportData(data, mode, workflowExecutionId);
-}
-
-export async function getPresignedFileUrl(workflowExecutionId: string, organizationId: string) {
-  const result = await db
-    .select({
-      filePath: file.filePath,
-    })
-    .from(file)
-    .leftJoin(workflowExecution, eq(workflowExecution.fileId, file.id))
-    .where(and(eq(workflowExecution.id, workflowExecutionId), eq(file.ownerId, organizationId)))
-    .limit(1);
-
-  if (result.length === 0 || !result[0]?.filePath) {
-    throw new Error("File not found");
-  }
-
-  const presignedUrl = s3Client.presign(result[0]?.filePath);
-
-  return {
-    documentUrl: presignedUrl,
   };
 }
