@@ -1,7 +1,7 @@
 import { getDocumentPageById, updateDocumentPageData } from "@paperjet/db";
 import { logger } from "@paperjet/shared";
-import { generateText } from "../lib/ai-sdk-wrapper.ts";
-import { s3Client } from "../lib/s3.ts";
+import { generateText } from "../lib/ai-sdk-wrapper";
+import { s3Client } from "../lib/s3";
 
 export type MarkdownDocument = {
   pages: string[];

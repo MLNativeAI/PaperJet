@@ -3,7 +3,7 @@ import type { DbConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { AISDKError } from "ai";
 import { z } from "zod";
-import { generateObject } from "../lib/ai-sdk-wrapper.ts";
+import { generateObject } from "../lib/ai-sdk-wrapper.js";
 import type { ConnectionValidationResult, ValidModelConfig } from "../types.ts";
 
 export const validateConnection = async (configuration: DbConfiguration): Promise<ConnectionValidationResult> => {

@@ -1,7 +1,7 @@
 import { createDocumentData, createDocumentPage, getFileByWorkflowExecutionId } from "@paperjet/db";
 import { envVars, logger } from "@paperjet/shared";
-import { s3Client } from "../lib/s3.ts";
-import type { PdfSplitResult } from "../types.ts";
+import { s3Client } from "../lib/s3";
+import type { PdfSplitResult } from "../types";
 
 export async function splitPdfIntoImages(workflowExecutionId: string) {
   const fileData = await getFileByWorkflowExecutionId({ workflowExecutionId });

@@ -1,8 +1,8 @@
 import { getDocumentData, getWorkflow, updateDocumentData } from "@paperjet/db";
 import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
-import { generateObject } from "../lib/ai-sdk-wrapper.ts";
-import { buildExtractionSchema } from "../utils/build-extraction-schema.ts";
+import { generateObject } from "../lib/ai-sdk-wrapper";
+import { buildExtractionSchema } from "../utils/build-extraction-schema";
 
 export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
   logger.debug(

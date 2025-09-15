@@ -1,9 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { generateOrgSlug } from "@paperjet/shared/id";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { member, organization } from "../schema";
 import type { DbOrganization } from "../types/tables";
-import { randomUUID } from "node:crypto";
 
 export async function getUserOrganizations({ userId }: { userId: string }) {
   const userOrgs = await db.query.member.findMany({

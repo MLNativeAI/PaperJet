@@ -1,5 +1,5 @@
 import { subDays } from "date-fns";
-import type { UsageData, UsageStats } from "../types.ts";
+import type { UsageData, UsageStats } from "../types";
 
 export const getUsageStats = (usageData: UsageData[]): UsageStats => {
   const timePeriod = subDays(new Date(), 30);
