@@ -14,8 +14,7 @@
     "build": "bun build --target=bun /src/index.ts --outdir=dist"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.11",
-    "drizzle-kit": "^0.31.0"
+    "@types/bun": "^1.2.11"
   },
   "peerDependencies": {
     "typescript": "^5"

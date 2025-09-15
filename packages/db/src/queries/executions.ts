@@ -63,23 +63,6 @@ export async function updateExecutionJobId({
     })
     .where(eq(workflowExecution.id, workflowExecutionId));
 }
-
-export async function getWorkflowExecutionById({
-  workflowExecutionId,
-  userId,
-}: {
-  workflowExecutionId: string;
-  userId: string;
-}) {
-  const exeuction = await db.query.workflowExecution.findFirst({
-    where: and(eq(workflowExecution.id, workflowExecutionId), eq(workflowExecution.ownerId, userId)),
-  });
-  if (!exeuction) {
-    throw new Error("not found");
-  }
-  return exeuction;
-}
-
 export async function getAllWorkflowExecutions({
   organizationId,
 }: {

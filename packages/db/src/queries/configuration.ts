@@ -18,7 +18,7 @@ export const getConfiguration = async (): Promise<DbConfiguration> => {
   throw new Error("Configuration not found");
 };
 
-// TODO we will restore this soon
+//TODO: we will restore this soon
 // export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {
 //   await db.update(configuration).set({
 //     customModelName: configUpdate.customModelName,

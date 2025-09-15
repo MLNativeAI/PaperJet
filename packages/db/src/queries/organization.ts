@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { member, organization } from "../schema";
 import type { DbOrganization } from "../types/tables";
+import { randomUUID } from "node:crypto";
 
 export async function getUserOrganizations({ userId }: { userId: string }) {
   const userOrgs = await db.query.member.findMany({
@@ -38,7 +39,7 @@ export async function createOrganizationMember({
   userId: string;
 }) {
   await db.insert(member).values({
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     createdAt: new Date(),
     organizationId: organizationId,
     userId: userId,

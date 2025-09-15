@@ -14,7 +14,7 @@ export async function getApiKeys({ organizationId }: { organizationId: string })
       id: fullKey.id,
       name: fullKey.name,
       userId: fullKey.userId,
-      enabled: fullKey.enabled || true,
+      enabled: fullKey.enabled ?? true,
       key: `${fullKey.start}*****`,
       lastRequest: fullKey.lastRequest ? fullKey.lastRequest.toISOString() : null,
       createdAt: fullKey.createdAt.toISOString(),
