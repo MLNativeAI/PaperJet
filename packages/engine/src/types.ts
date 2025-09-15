@@ -1,3 +1,4 @@
+import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
 import z from "zod";
 
 export type ConnectionValidationResult = {
@@ -111,6 +112,7 @@ export const zodWorkflowObject = z.object({
   name: z.string(),
   fields: z.array(zodWorkflowField),
 });
+
 export type Workflow = {
   id: string;
   name: string;
@@ -158,6 +160,3 @@ export type ApiKey = {
   createdAt: string;
   lastRequest: string | null;
 };
-
-export * from "./types/executions";
-export * from "./types/workflow-config";

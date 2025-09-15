@@ -1,5 +1,5 @@
+import { WorkflowConfiguration } from "@paperjet/db/types";
 import { z } from "zod";
-import type { WorkflowConfiguration } from "../types";
 
 export function buildExtractionSchema(configuration: WorkflowConfiguration) {
   const objectSchemas: Record<string, any> = {};

@@ -9,7 +9,7 @@ import type {
   workflowExecution,
 } from "@db/schema";
 
-export type FileData = typeof file.$inferSelect;
+export type DbFile = typeof file.$inferSelect;
 
 export type DbWorkflow = typeof workflow.$inferSelect;
 
