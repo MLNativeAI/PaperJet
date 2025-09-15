@@ -1,8 +1,8 @@
 import { extractDataFromMarkdown } from "@paperjet/engine";
 import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
-import { redisConnection } from "../redis";
-import { QUEUE_NAMES } from "../types";
+import { redisConnection } from "../redis.ts";
+import { QUEUE_NAMES } from "../types.ts";
 
 export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
   connection: redisConnection,

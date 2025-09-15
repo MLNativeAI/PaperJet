@@ -1,6 +1,3 @@
-import { db } from "@paperjet/db";
-import { documentData, documentPage, workflowExecution } from "@paperjet/db/schema";
-import { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import { asc, eq } from "drizzle-orm";
@@ -99,6 +96,7 @@ export const extractionWorkflowWorker = new Worker(
 extractionWorkflowWorker.on("failed", async (job, _) => {
   if (job?.data.workflowExecutionId) {
     logger.error(`parent job ${job?.data.workflowExecutionId} failed`);
+    await updateExecutionStatus({});
     await db
       .update(workflowExecution)
       .set({ status: WorkflowExecutionStatus.enum.Failed, completedAt: new Date() })
