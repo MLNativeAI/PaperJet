@@ -1,4 +1,4 @@
-import type { ExtractedDataType } from "@engine/types/executions.ts";
+import type { ExtractedDataType } from "@paperjet/db/types";
 
 export interface ExportResult {
   content: string;

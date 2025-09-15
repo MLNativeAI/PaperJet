@@ -1,8 +1,5 @@
-import { db } from "@paperjet/db";
-import { usageData, usageModelPrice } from "@paperjet/db/schema";
-import type { DbUsageModelPrice } from "@paperjet/db/types";
+import { getUsagePrices, insertUsage } from "@paperjet/db";
 import type { LanguageModelUsage } from "ai";
-import { desc, eq } from "drizzle-orm";
 
 const cache = new Map<string, UsagePrice>();
 
@@ -16,12 +13,7 @@ async function getModelPrice(model: string): Promise<UsagePrice | null> {
     return cache.get(model) ?? null;
   }
 
-  const modelPrices: DbUsageModelPrice[] = await db
-    .select()
-    .from(usageModelPrice)
-    .where(eq(usageModelPrice.model, model))
-    .orderBy(desc(usageModelPrice.createdAt))
-    .limit(1);
+  const modelPrices = await getUsagePrices({ model: model });
 
   if (modelPrices.length > 0 && modelPrices[0]) {
     const usagePrice = {
@@ -55,22 +47,8 @@ const calculateCost = (
 
 export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
   const modelPrice = await getModelPrice(model);
-
   const inputCost = usage.promptTokens && modelPrice ? calculateCost(modelPrice, usage).inputCost : 0;
   const outputCost = usage.completionTokens && modelPrice ? calculateCost(modelPrice, usage).outputCost : 0;
   const totalCost = inputCost + outputCost;
-
-  await db.insert(usageData).values({
-    name,
-    model,
-    inputTokens: usage.promptTokens || 0,
-    inputCost: inputCost.toFixed(2),
-    outputTokens: usage.completionTokens || 0,
-    outputCost: outputCost.toFixed(2),
-    totalTokens: usage.totalTokens || 0,
-    totalCost: totalCost.toFixed(2),
-    durationMs,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+  await insertUsage({ name, model, usage, inputCost, outputCost, totalCost, durationMs });
 }

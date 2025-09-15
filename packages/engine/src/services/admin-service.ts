@@ -1,11 +1,9 @@
-import { db } from "@paperjet/db";
-import { configuration, user } from "@paperjet/db/schema";
+import { generateObject } from "@engine/lib/ai-sdk-wrapper.ts";
+import type { Configuration, ConnectionValidationResult, ValidModelConfig } from "@engine/types.ts";
+import { getConfiguration } from "@paperjet/db";
 import { logger } from "@paperjet/shared";
 import { AISDKError } from "ai";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { generateObject } from "../lib/ai-sdk-wrapper";
-import type { Configuration, ConfigurationUpdate, ConnectionValidationResult, ValidModelConfig } from "../types";
 
 export const validateConnection = async (configuration: Configuration): Promise<ConnectionValidationResult> => {
   try {
@@ -88,31 +86,4 @@ export const validateModelConfiguration = (config: Configuration): ValidModelCon
     };
   }
   throw new Error("Model configuration is invalid. Please check if all required fields are set.");
-};
-
-export const getConfiguration = async (): Promise<Configuration> => {
-  const configEntries = await db.select().from(configuration).limit(1);
-  if (configEntries[0]) {
-    const config = configEntries[0];
-    return {
-      ...config,
-      geminiApiKey: config.geminiApiKey || undefined,
-      customModelToken: config.customModelToken || undefined,
-      customModelName: config.customModelName || undefined,
-      customModelUrl: config.customModelUrl || undefined,
-      structuredOutputMode: config.structuredOutputMode || "json",
-    };
-  }
-  throw new Error("Configuration not found");
-};
-
-export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {
-  await db.update(configuration).set({
-    customModelName: configUpdate.customModelName,
-    customModelToken: configUpdate.customModelToken,
-    customModelUrl: configUpdate.customModelUrl,
-    modelType: configUpdate.modelType,
-    geminiApiKey: configUpdate.geminiApiKey,
-    structuredOutputMode: configUpdate.structuredOutputMode,
-  });
 };

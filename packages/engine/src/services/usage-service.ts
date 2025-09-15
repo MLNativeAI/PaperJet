@@ -1,38 +1,5 @@
-import { db } from "@paperjet/db";
-import { usageData, user } from "@paperjet/db/schema";
+import { UsageData, UsageStats } from "@engine/types.ts";
 import { subDays } from "date-fns";
-import { desc, eq } from "drizzle-orm";
-import type { UsageData, UsageStats } from "../types";
-
-export const getUsageData = async (): Promise<UsageData[]> => {
-  const data = await db
-    .select({
-      id: usageData.id,
-      name: usageData.name,
-      model: usageData.model,
-      userId: usageData.userId,
-      userEmail: user.email,
-      workflowId: usageData.workflowId,
-      executionId: usageData.executionId,
-      totalTokens: usageData.totalTokens,
-      totalCost: usageData.totalCost,
-      durationMs: usageData.durationMs,
-      createdAt: usageData.createdAt,
-    })
-    .from(usageData)
-    .leftJoin(user, eq(user.id, usageData.userId))
-    .orderBy(desc(usageData.createdAt));
-  const fixedData = data.map((usageEntry) => {
-    return {
-      ...usageEntry,
-      totalCost: Number(usageEntry.totalCost) ? Number(usageEntry.totalCost) : 0.0,
-      durationMs: Number(usageEntry.durationMs) ? Number(usageEntry.durationMs) : 0.0,
-      createdAt: usageEntry.createdAt.toLocaleString(),
-    };
-  });
-
-  return fixedData;
-};
 
 export const getUsageStats = (usageData: UsageData[]): UsageStats => {
   const timePeriod = subDays(new Date(), 30);
