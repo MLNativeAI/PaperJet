@@ -1,9 +1,9 @@
-import { db } from "@db/db";
-import { workflow } from "@db/schema";
-import type { DbWorkflow } from "@db/types/tables";
-import type { WorkflowConfiguration } from "@db/types/workflow-config";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
+import { db } from "../db";
+import { workflow } from "../schema";
+import type { DbWorkflow } from "../types/tables";
+import type { WorkflowConfiguration } from "../types/workflow-config";
 
 export async function updateWorkflow({
   workflowId,

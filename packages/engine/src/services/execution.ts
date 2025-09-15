@@ -1,6 +1,6 @@
 import { s3Client } from "@engine/lib/s3.ts";
 import { exportData } from "@engine/services/export.ts";
-import { getDocumentData, getFile } from "@paperjet/db";
+import { getDocumentData, getDocumentDataByOwner, getFile } from "@paperjet/db";
 import { ExtractedDataType } from "@paperjet/db/types";
 import { and, desc, eq } from "drizzle-orm";
 //
@@ -129,7 +129,7 @@ import { and, desc, eq } from "drizzle-orm";
 // }
 //
 export async function exportExecution(workflowExecutionId: string, mode: "csv" | "json", organizationId: string) {
-  const executionData = await getDocumentData({ workflowExecutionId, organizationId });
+  const executionData = await getDocumentDataByOwner({ workflowExecutionId, organizationId });
   const data: ExtractedDataType = executionData.extractedData as unknown as ExtractedDataType;
   return exportData(data, mode, workflowExecutionId);
 }

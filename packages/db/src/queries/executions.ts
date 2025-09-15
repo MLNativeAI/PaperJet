@@ -1,13 +1,13 @@
-import { db } from "@db/db";
-import { documentData, file, workflow, workflowExecution } from "@db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { db } from "../db";
+import { documentData, file, workflow, workflowExecution } from "../schema";
 import {
   type ExecutionStatusResponse,
   type ExtractedDataType,
   type WorkflowExecutionData,
   type WorkflowExecutionRow,
   WorkflowExecutionStatus,
-} from "@db/types/executions";
-import { and, desc, eq } from "drizzle-orm";
+} from "../types/executions";
 
 export async function createWorkflowExecution({
   executionId,

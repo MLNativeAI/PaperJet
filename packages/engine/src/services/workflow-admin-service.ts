@@ -36,7 +36,7 @@ export async function uploadFileAndCreateExecution(
   const executionId = generateId(ID_PREFIXES.workflowExecution);
   const filePath = `executions/${executionId}/${uploadedFile.name}`;
   await s3Client.file(filePath).write(await uploadedFile.arrayBuffer());
-  const { fileId } = await createFile({
+  const { id: fileId } = await createFile({
     fileName: uploadedFile.name,
     filePath: filePath,
     organizationId: organizationId,

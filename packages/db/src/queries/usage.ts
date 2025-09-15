@@ -1,7 +1,7 @@
-import { db } from "@db/db";
-import { usageData, usageModelPrice } from "@db/schema";
-import type { DbUsageModelPrice } from "@db/types/tables";
 import { desc, eq } from "drizzle-orm";
+import { db } from "../db";
+import { usageData, usageModelPrice } from "../schema";
+import type { DbUsageModelPrice } from "../types/tables";
 
 export async function getUsagePrices({ model }: { model: string }) {
   const modelPrices: DbUsageModelPrice[] = await db

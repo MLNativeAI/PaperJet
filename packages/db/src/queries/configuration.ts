@@ -1,6 +1,6 @@
-import { db } from "@db/db";
-import { configuration } from "@db/schema";
-import type { DbConfiguration } from "@db/types/tables";
+import { db } from "../db";
+import { configuration } from "../schema";
+import type { DbConfiguration } from "../types/tables";
 
 export const getConfiguration = async (): Promise<DbConfiguration> => {
   const configEntries = await db.select().from(configuration).limit(1);

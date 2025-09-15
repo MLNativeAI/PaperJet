@@ -1,8 +1,8 @@
-import { db } from "@db/db";
 import { documentData, documentPage } from "../schema";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
-import { DbDocumentData } from "@db/types/tables";
+import { db } from "../db";
+import { DbDocumentData } from "../types/tables";
 
 export async function createDocumentData({
   workflowExecutionId,

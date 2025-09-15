@@ -7,7 +7,7 @@ import type {
   usageModelPrice,
   workflow,
   workflowExecution,
-} from "@db/schema";
+} from "../schema";
 
 export type DbFile = typeof file.$inferSelect;
 

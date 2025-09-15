@@ -23,11 +23,5 @@
 {
   "extends": "@paperjet/tsconfig/base.json",
   "include": ["src/**/*"],
-  "exclude": ["node_modules"],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@db/*": ["./src/*"]
-    }
-  }
+  "exclude": ["node_modules"]
 }

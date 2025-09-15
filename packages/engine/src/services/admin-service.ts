@@ -1,11 +1,12 @@
 import { generateObject } from "@engine/lib/ai-sdk-wrapper.ts";
 import type { Configuration, ConnectionValidationResult, ValidModelConfig } from "@engine/types.ts";
 import { getConfiguration } from "@paperjet/db";
+import { DbConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { AISDKError } from "ai";
 import { z } from "zod";
 
-export const validateConnection = async (configuration: Configuration): Promise<ConnectionValidationResult> => {
+export const validateConnection = async (configuration: DbConfiguration): Promise<ConnectionValidationResult> => {
   try {
     const validModelConfig = validateModelConfiguration(configuration);
 
@@ -69,7 +70,7 @@ export const getValidModelConfig = async () => {
   return validateModelConfiguration(configuration);
 };
 
-export const validateModelConfiguration = (config: Configuration): ValidModelConfig => {
+export const validateModelConfiguration = (config: DbConfiguration): ValidModelConfig => {
   if (config.modelType === "cloud" && config.geminiApiKey) {
     return {
       type: config.modelType,
@@ -80,7 +81,7 @@ export const validateModelConfiguration = (config: Configuration): ValidModelCon
     return {
       type: config.modelType,
       customModelName: config.customModelName,
-      customModelToken: config.customModelToken,
+      customModelToken: config.customModelToken || undefined,
       customModelUrl: config.customModelUrl,
       structuredOutputMode: config.structuredOutputMode || "tool",
     };

@@ -1,8 +1,8 @@
-import { db } from "@db/db";
-import { file, workflowExecution } from "@db/schema";
-import type { DbFile } from "@db/types/tables";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
+import { db } from "../db";
+import { file, workflowExecution } from "../schema";
+import type { DbFile } from "../types/tables";
 
 export async function createFile({
   fileName,
