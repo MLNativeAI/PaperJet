@@ -1,5 +1,11 @@
 name: PR & Branch Build
 
+
+permissions:
+  packages: write
+  id-token: write
+  contents: read
+
 on:
   pull_request:
     branches:

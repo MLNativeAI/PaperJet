@@ -12,9 +12,14 @@ on:
 
 
 jobs:
+  verify:
+    name: Verify
+    uses: ./.github/workflows/verify.yml
+
   build-core:
     name: Build Core Application
     uses: ./.github/workflows/build-core.yml
+    needs: verify
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
@@ -23,6 +28,7 @@ jobs:
   build-ml:
     name: Build ML Application
     uses: ./.github/workflows/build-ml.yml
+    needs: verify
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
