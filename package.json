@@ -14,9 +14,7 @@
     "db:migrate": "turbo db:migrate",
     "db:push": "turbo db:push",
     "db:studio": "turbo db:studio",
-    "db:seed": "turbo db:seed",
-    "commit": "cz",
-    "prepare": "husky"
+    "db:seed": "turbo db:seed"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
