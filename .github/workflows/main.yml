@@ -14,16 +14,18 @@ jobs:
   lint-typecheck:
     uses: ./.github/workflows/lint-typecheck.yml
 
-
   release:
-    name: Semantic Release
-    id: release
-    needs: [build-core, build-ml]
-    uses: cycjimmy/semantic-release-action@v4
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      semantic_version: 24
+    steps:
+      - name: Semantic release
+        release:
+          name: Semantic Release
+          id: release
+          needs: [build-core, build-ml]
+          uses: cycjimmy/semantic-release-action@v4
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            semantic_version: 24
 
   build-core:
     name: Build Core Application
