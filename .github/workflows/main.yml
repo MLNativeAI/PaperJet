@@ -14,13 +14,25 @@ jobs:
   lint-typecheck:
     uses: ./.github/workflows/lint-typecheck.yml
 
+
+  release:
+    name: Semantic Release
+    id: release
+    needs: [build-core, build-ml]
+    uses: cycjimmy/semantic-release-action@v4
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      semantic_version: 24
+
   build-core:
     name: Build Core Application
     uses: ./.github/workflows/build-core.yml
     needs: lint-typecheck
     with:
       registry: docker.io
-      image_name: mlnative/paperjet-dev
+      image_name: mlnative/paperjet
+      image_tag: ${{ steps.release.outputs.new_release_version }} 
     secrets: inherit
 
   build-ml:
@@ -29,33 +41,36 @@ jobs:
     needs: lint-typecheck
     with:
       registry: docker.io
-      image_name: mlnative/paperjet-ml-dev
+      image_name: mlnative/paperjet-ml
+      image_tag: ${{ steps.release.outputs.new_release_version }} 
     secrets: inherit
 
   deploy-core:
-    name: Deploy Core Application
-    needs: build-core
+    name: Deploy Core to Production
+    needs: release
     uses: ./.github/workflows/deploy.yml
+    if: needs.release.outputs.released == 'true'
     with:
       registry: docker.io
-      image_name: mlnative/paperjet-dev
+      image_name: mlnative/paperjet
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-      environment: development
+      environment: production
     secrets:
-      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
-      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_APP_UUID }}
-      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
+      coolify_url: ${{ secrets.COOLIFY_PROD_URL }}
+      coolify_app_uuid: ${{ secrets.COOLIFY_PROD_APP_UUID }}
+      coolify_token: ${{ secrets.COOLIFY_PROD_TOKEN }}
 
   deploy-ml:
-    name: Deploy ML Application
-    needs: build-ml
+    name: Deploy ML to Production
+    needs: [build-core, build-ml]
     uses: ./.github/workflows/deploy.yml
+    if: needs.release.outputs.released == 'true'
     with:
       registry: docker.io
-      image_name: mlnative/paperjet-ml-dev
+      image_name: mlnative/paperjet-ml
       image_tag: ${{ needs.build-core.outputs.image_tag }}
-      environment: development
+      environment: production
     secrets:
-      coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
-      coolify_app_uuid: ${{ secrets.COOLIFY_DEV_ML_APP_UUID }}
-      coolify_token: ${{ secrets.COOLIFY_DEV_TOKEN }}
+      coolify_url: ${{ secrets.COOLIFY_PROD_URL }}
+      coolify_app_uuid: ${{ secrets.COOLIFY_PROD_ML_APP_UUID }}
+      coolify_token: ${{ secrets.COOLIFY_PROD_TOKEN }}
