@@ -12,50 +12,65 @@ on:
 
 jobs:
   lint-typecheck:
+    name: Lint & Typecheck
     uses: ./.github/workflows/lint-typecheck.yml
 
   release:
+    name: Semantic Release
+    needs: lint-typecheck
+    runs-on: ubuntu-latest
+    outputs:
+      new_release_version: ${{ steps.release.outputs.new_release_version }}
+      released: ${{ steps.release.outputs.released }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Semantic release
-        release:
-          name: Semantic Release
-          id: release
-          needs: [build-core, build-ml]
-          uses: cycjimmy/semantic-release-action@v4
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            semantic_version: 24
+        id: release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          semantic_version: 24
 
   build-core:
     name: Build Core Application
+    needs: release
     uses: ./.github/workflows/build-core.yml
-    needs: lint-typecheck
     with:
       registry: docker.io
       image_name: mlnative/paperjet
-      image_tag: ${{ steps.release.outputs.new_release_version }} 
+      image_tag: ${{ needs.release.outputs.new_release_version }}
     secrets: inherit
 
   build-ml:
     name: Build ML Application
+    needs: release
     uses: ./.github/workflows/build-ml.yml
-    needs: lint-typecheck
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml
-      image_tag: ${{ steps.release.outputs.new_release_version }} 
+      image_tag: ${{ needs.release.outputs.new_release_version }}
     secrets: inherit
 
   deploy-core:
     name: Deploy Core to Production
-    needs: release
-    uses: ./.github/workflows/deploy.yml
+    needs: [build-core, release]
     if: needs.release.outputs.released == 'true'
+    uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
       image_name: mlnative/paperjet
-      image_tag: ${{ needs.build-core.outputs.image_tag }}
+      image_tag: ${{ needs.release.outputs.new_release_version }}
       environment: production
     secrets:
       coolify_url: ${{ secrets.COOLIFY_PROD_URL }}
@@ -64,13 +79,13 @@ jobs:
 
   deploy-ml:
     name: Deploy ML to Production
-    needs: [build-core, build-ml]
-    uses: ./.github/workflows/deploy.yml
+    needs: [build-ml, release]
     if: needs.release.outputs.released == 'true'
+    uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml
-      image_tag: ${{ needs.build-core.outputs.image_tag }}
+      image_tag: ${{ needs.release.outputs.new_release_version }}
       environment: production
     secrets:
       coolify_url: ${{ secrets.COOLIFY_PROD_URL }}
