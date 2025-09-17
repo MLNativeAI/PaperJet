@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { generateOrgSlug } from "@paperjet/shared/id";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,6 +23,17 @@ const createOrgFormSchema = z.object({
 
 type CreateOrgFormValues = z.infer<typeof createOrgFormSchema>;
 
+const slugify = (text: string): string => {
+  const baseSlug = text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const randomSuffix = Math.random().toString(36).substring(2, 8);
+  return `${baseSlug}-${randomSuffix}`;
+};
+
 interface CreateOrgDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,7 +53,7 @@ export function CreateOrgDialog({ open, onOpenChange, onSuccess }: CreateOrgDial
 
   const onSubmit = async (values: CreateOrgFormValues) => {
     setIsLoading(true);
-    const { slug } = generateOrgSlug();
+    const slug = slugify(values.name);
     try {
       const { data, error } = await authClient.organization.create({
         name: values.name,

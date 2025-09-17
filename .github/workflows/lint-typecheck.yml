@@ -1,4 +1,4 @@
-name: Verify
+name: Lint & Typecheck
 
 on:
   workflow_call:
