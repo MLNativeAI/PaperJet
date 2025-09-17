@@ -12,6 +12,9 @@ on:
       image_tag:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
     secrets:
       coolify_url:
         required: true
@@ -24,7 +27,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: development
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Deploy to Coolify
@@ -37,7 +40,7 @@ jobs:
               "docker_registry_image_name": "${{ inputs.image_name }}",
               "docker_registry_image_tag": "${{ inputs.image_tag }}"
             }'
-          
+
           curl -X GET \
             "${{ secrets.coolify_url }}/api/v1/deploy?uuid=${{ secrets.coolify_app_uuid }}" \
             -H "Authorization: Bearer ${{ secrets.coolify_token }}" \
