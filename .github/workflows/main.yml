@@ -12,7 +12,6 @@ on:
 
 jobs:
   lint-typecheck:
-    name: Verify 
     uses: ./.github/workflows/lint-typecheck.yml
 
   release:
@@ -49,7 +48,6 @@ jobs:
           semantic_version: 24
 
   build-core:
-    name: Build Core Application
     needs: release
     uses: ./.github/workflows/build-core.yml
     with:
@@ -59,7 +57,6 @@ jobs:
     secrets: inherit
 
   build-ml:
-    name: Build ML Application
     needs: release
     uses: ./.github/workflows/build-ml.yml
     with:
