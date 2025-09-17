@@ -3,7 +3,7 @@ name: Main Branch Build & Deploy
 permissions:
   packages: write
   id-token: write
-  contents: read
+  contents: write
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
         id: release
         uses: cycjimmy/semantic-release-action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           semantic_version: 24
 
