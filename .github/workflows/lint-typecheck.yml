@@ -4,8 +4,8 @@ on:
   workflow_call:
 
 jobs:
-  build:
-    name: Verify
+  lint-typecheck:
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
     permissions:
       contents: read

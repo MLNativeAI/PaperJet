@@ -12,7 +12,7 @@ on:
 
 jobs:
   lint-typecheck:
-    name: Lint & Typecheck
+    name: Verify 
     uses: ./.github/workflows/lint-typecheck.yml
 
   release:
@@ -44,7 +44,7 @@ jobs:
         id: release
         uses: cycjimmy/semantic-release-action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           semantic_version: 24
 
