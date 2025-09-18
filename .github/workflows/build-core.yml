@@ -53,6 +53,7 @@ jobs:
             type=raw,value=${{ steps.tag.outputs.tag }}
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value={{date 'YYYYMMDD'}}-${{ steps.tag.outputs.tag }},enable={{is_default_branch}}
+            type=raw,value=${{ inputs.image_tag }},enable=${{ inputs.image_tag != '' }}
 
       - name: Build and push main app Docker image
         id: build
