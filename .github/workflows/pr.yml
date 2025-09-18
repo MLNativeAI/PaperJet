@@ -1,4 +1,4 @@
-name: PR & Branch Build
+name: Branch Build & Deploy
 
 
 permissions:
@@ -7,9 +7,9 @@ permissions:
   contents: read
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - !main
 
 jobs:
   lint-typecheck:
