@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/MLNativeAI/PaperJet/compare/v1.0.2...v1.1.0) (2025-09-18)
+
+
+### Features
+
+* branch ci completed ([95eb161](https://github.com/MLNativeAI/PaperJet/commit/95eb16126b24f6015a0dab746a6f4229f1495117))
+
 ## [1.0.2](https://github.com/MLNativeAI/PaperJet/compare/v1.0.1...v1.0.2) (2025-09-18)
 
 
