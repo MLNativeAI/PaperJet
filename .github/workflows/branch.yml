@@ -40,7 +40,7 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-dev
-      image_tag: ${{ needs.build-core.outputs.image_tag }}
+      image_tag: sha-${{ github.sha }}
       environment: development
     secrets:
       coolify_url: ${{ secrets.COOLIFY_DEV_URL }}
@@ -54,7 +54,7 @@ jobs:
     with:
       registry: docker.io
       image_name: mlnative/paperjet-ml-dev
-      image_tag: ${{ needs.build-core.outputs.image_tag }}
+      image_tag: sha-${{ github.sha }}
       environment: development
     secrets:
       coolify_url: ${{ secrets.COOLIFY_DEV_URL }}

@@ -4,7 +4,6 @@ permissions:
   packages: write
   id-token: write
   contents: write
-
 on:
   push:
     branches:
@@ -20,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_release_version: ${{ steps.release.outputs.new_release_version }}
-      new_release_published: ${{ steps.release.outputs.new_release_published }}
+      released: ${{ steps.release.outputs.released }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,7 +67,7 @@ jobs:
   deploy-core:
     name: Deploy Core to Production
     needs: [build-core, release]
-    if: needs.release.outputs.new_release_published == 'true'
+    if: needs.release.outputs.released == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
@@ -83,7 +82,7 @@ jobs:
   deploy-ml:
     name: Deploy ML to Production
     needs: [build-ml, release]
-    if: needs.release.outputs.new_release_published == 'true'
+    if: needs.release.outputs.released == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
