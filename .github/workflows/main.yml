@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_release_version: ${{ steps.release.outputs.new_release_version }}
-      released: ${{ steps.release.outputs.released }}
+      new_release_published: ${{ steps.release.outputs.new_release_published }} 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
