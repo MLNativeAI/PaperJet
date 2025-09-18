@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/MLNativeAI/PaperJet/compare/v1.1.4...v1.1.5) (2025-09-18)
+
+
+### Bug Fixes
+
+* add one more tag to push ([90992fe](https://github.com/MLNativeAI/PaperJet/commit/90992fedd0bb347237569eb8d76d9892aba9e6cd))
+
 ## [1.1.4](https://github.com/MLNativeAI/PaperJet/compare/v1.1.3...v1.1.4) (2025-09-18)
 
 
