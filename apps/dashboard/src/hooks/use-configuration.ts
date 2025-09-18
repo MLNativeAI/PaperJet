@@ -15,11 +15,11 @@ export function useConfiguration() {
   } = useQuery({
     queryKey: ["config"],
     queryFn: async () => {
-      const response = await adminClient.config.$get({});
-      if (!response.ok) {
-        throw new Error("Failed to fetch configuration");
-      }
-      return response.json();
+      // const response = await adminClient.config.$get({});
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch configuration");
+      // }
+      // return response.json();
     },
   });
 

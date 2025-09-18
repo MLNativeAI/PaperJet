@@ -1,16 +1,13 @@
 import RuntimeModelsConfig from "@/components/admin/runtime-models-config";
-import { useConfiguration } from "@/hooks/use-configuration";
 
 export default function AdminConfigPage() {
-  const { configuration, isLoading } = useConfiguration();
-
-  if (isLoading || !configuration) {
-    return <div>Loading...</div>;
-  }
-
+  // we need to fetch both all the model configs and the runtime config
+  // so that we can select them in the runtime model selector
+  // so should we have two separate hooks/ calls or one?
   return (
     <div className="space-y-17 pt-8">
       <RuntimeModelsConfig />
+
       <div className="space-y-6">
         {/* <div className="flex gap-4"> */}
         {/* <AdminModelConfigForm configuration={configuration} /> */}

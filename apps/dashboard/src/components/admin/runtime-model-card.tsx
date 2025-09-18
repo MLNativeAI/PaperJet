@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardDescription, CardTitle, CardAction, CardFooter } from "@/components/ui/card";
 import { BrainIcon, RocketIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RuntimeModelCard({
   modelType,
