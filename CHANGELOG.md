@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/MLNativeAI/PaperJet/compare/v1.1.0...v1.1.1) (2025-09-18)
+
+
+### Bug Fixes
+
+* trigger a test CI release ([ade6e27](https://github.com/MLNativeAI/PaperJet/commit/ade6e27afb4b964d42ef650a5a22963671967ac3))
+
 # [1.1.0](https://github.com/MLNativeAI/PaperJet/compare/v1.0.2...v1.1.0) (2025-09-18)
 
 
