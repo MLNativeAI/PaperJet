@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_release_version: ${{ steps.release.outputs.new_release_version }}
-      released: ${{ steps.release.outputs.released }}
+      new_release_published: ${{ steps.release.outputs.new_release_published }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
   deploy-core:
     name: Deploy Core to Production
     needs: [build-core, release]
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
@@ -83,7 +83,7 @@ jobs:
   deploy-ml:
     name: Deploy ML to Production
     needs: [build-ml, release]
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
