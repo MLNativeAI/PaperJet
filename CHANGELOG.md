@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/MLNativeAI/PaperJet/compare/v1.1.1...v1.1.2) (2025-09-18)
+
+
+### Bug Fixes
+
+* correct release filter arg ([b8e92d8](https://github.com/MLNativeAI/PaperJet/commit/b8e92d888cf46ccbad2bdc6c39138410519186e0))
+
 ## [1.1.1](https://github.com/MLNativeAI/PaperJet/compare/v1.1.0...v1.1.1) (2025-09-18)
 
 
