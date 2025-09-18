@@ -43,7 +43,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Do something when a new release published 2
+      - name: Do something when a new release published
         run: |
           echo ${{ steps.release.outputs }}
           echo ${{ steps.release.outputs.new_release_version }}
@@ -72,7 +72,7 @@ jobs:
   deploy-core:
     name: Deploy Core to Production
     needs: [build-core, release]
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.new_release_version == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
@@ -87,7 +87,7 @@ jobs:
   deploy-ml:
     name: Deploy ML to Production
     needs: [build-ml, release]
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.new_release_version == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
