@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/MLNativeAI/PaperJet/compare/v1.0.1...v1.0.2) (2025-09-18)
+
+
+### Bug Fixes
+
+* added drizzle-kit ([4a6933e](https://github.com/MLNativeAI/PaperJet/commit/4a6933e3e80f4337c741cc0c44a3b8353c63d391))
+
 ## [1.0.1](https://github.com/MLNativeAI/PaperJet/compare/v1.0.0...v1.0.1) (2025-09-18)
 
 
