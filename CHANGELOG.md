@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/MLNativeAI/PaperJet/compare/v1.0.0...v1.0.1) (2025-09-18)
+
+
+### Bug Fixes
+
+* branch exclude filtering ([6fa4466](https://github.com/MLNativeAI/PaperJet/commit/6fa4466ee5457e377763659d6f36f2b4115dd1c9))
+
 # 1.0.0 (2025-09-17)
 
 
