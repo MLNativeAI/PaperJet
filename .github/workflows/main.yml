@@ -45,11 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Do something when a new release published
         run: |
-          echo ${{ steps.release.outputs }}
           echo ${{ steps.release.outputs.new_release_version }}
-          echo ${{ steps.release.outputs.new_release_major_version }}
-          echo ${{ steps.release.outputs.new_release_minor_version }}
-          echo ${{ steps.release.outputs.new_release_patch_version }}
+          echo ${{ steps.release.outputs.new_release_published }}
 
   build-core:
     needs: release
@@ -72,7 +69,7 @@ jobs:
   deploy-core:
     name: Deploy Core to Production
     needs: [build-core, release]
-    if: needs.release.outputs.new_release_version == 'true'
+    if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
@@ -87,7 +84,7 @@ jobs:
   deploy-ml:
     name: Deploy ML to Production
     needs: [build-ml, release]
-    if: needs.release.outputs.new_release_version == 'true'
+    if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       registry: docker.io
