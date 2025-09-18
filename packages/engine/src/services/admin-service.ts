@@ -1,12 +1,11 @@
-import { getConfiguration } from "@paperjet/db";
-import type { DbConfiguration } from "@paperjet/db/types";
+import type { DbModelConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { AISDKError } from "ai";
 import { z } from "zod";
 import { generateObject } from "../lib/ai-sdk-wrapper.js";
 import type { ConnectionValidationResult, ValidModelConfig } from "../types.ts";
 
-export const validateConnection = async (configuration: DbConfiguration): Promise<ConnectionValidationResult> => {
+export const validateConnection = async (configuration: DbModelConfiguration): Promise<ConnectionValidationResult> => {
   try {
     const validModelConfig = validateModelConfiguration(configuration);
 
@@ -66,11 +65,16 @@ export const validateConnection = async (configuration: DbConfiguration): Promis
 };
 
 export const getValidModelConfig = async () => {
-  const configuration = await getConfiguration();
-  return validateModelConfiguration(configuration);
+  // TODO
+  // const configuration = await getConfiguration();
+  // return validateModelConfiguration(configuration);
+  return {
+    type: "cloud" as "cloud",
+    geminiApiKey: "",
+  };
 };
 
-export const validateModelConfiguration = (config: DbConfiguration): ValidModelConfig => {
+export const validateModelConfiguration = (config: DbModelConfiguration): ValidModelConfig => {
   if (config.modelType === "cloud" && config.geminiApiKey) {
     return {
       type: config.modelType,

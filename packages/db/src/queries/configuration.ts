@@ -1,22 +1,19 @@
 import { db } from "../db";
-import { configuration } from "../schema";
-import type { DbConfiguration } from "../types/tables";
+import { modelConfiguration } from "../schema";
+import type { DbModelConfiguration } from "../types/tables";
 
-export const getConfiguration = async (): Promise<DbConfiguration> => {
-  const configEntries = await db.select().from(configuration).limit(1);
-  if (configEntries[0]) {
-    const config = configEntries[0];
-    return {
-      ...config,
-      geminiApiKey: config.geminiApiKey,
-      customModelToken: config.customModelToken,
-      customModelName: config.customModelName,
-      customModelUrl: config.customModelUrl,
-      structuredOutputMode: config.structuredOutputMode || "json",
-    };
-  }
-  throw new Error("Configuration not found");
+export type RuntimeModelType = "fast" | "accurate";
+
+export type RuntimeConfiguration = {
+  fastModel: any;
+  accurateModel: any;
 };
+
+export const listModels = async (): Promise<DbModelConfiguration[]> => {
+  return await db.query.modelConfiguration.findMany();
+};
+
+export const addNewModel = async () => {};
 
 //TODO: we will restore this soon
 // export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {

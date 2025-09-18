@@ -167,7 +167,13 @@ export const usageData = pgTable("usage_data", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const configuration = pgTable("configuration", {
+export const runtimeConfiguration = pgTable("runtime_configuration", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  large_model_id: text("model_id").references(() => modelConfiguration.id),
+  fast_model_id: text("model_id").references(() => modelConfiguration.id),
+});
+
+export const modelConfiguration = pgTable("model_configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
   modelType: modeTypeEnum().notNull().default("cloud"),
   geminiApiKey: text("gemini_api_key"),
