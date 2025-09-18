@@ -1,3 +1,11 @@
+## [1.1.4](https://github.com/MLNativeAI/PaperJet/compare/v1.1.3...v1.1.4) (2025-09-18)
+
+
+### Bug Fixes
+
+* another ci var update ([cfba3ad](https://github.com/MLNativeAI/PaperJet/commit/cfba3ade97618fab0d41e3d03834a7c3146fc8bf))
+* cleanup echos ([03a5a22](https://github.com/MLNativeAI/PaperJet/commit/03a5a2248a7008fb95326ab2ef223ec3e2f2f3d4))
+
 ## [1.1.3](https://github.com/MLNativeAI/PaperJet/compare/v1.1.2...v1.1.3) (2025-09-18)
 
 
