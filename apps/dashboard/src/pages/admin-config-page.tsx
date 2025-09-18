@@ -1,4 +1,4 @@
-import AdminModelConfigForm from "@/components/forms/admin-model-config-form";
+import RuntimeModelsConfig from "@/components/admin/runtime-models-config";
 import { useConfiguration } from "@/hooks/use-configuration";
 
 export default function AdminConfigPage() {
@@ -9,17 +9,11 @@ export default function AdminConfigPage() {
   }
 
   return (
-    <div className="w-full px-4 py-8 space-y-8 max-w-4xl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Configuration</h1>
-          <p className="text-muted-foreground mt-2">
-            Configure your PaperJet instance. These settings apply to all accounts.
-          </p>
-        </div>
-      </div>
+    <div className="space-y-17 pt-8">
+      <RuntimeModelsConfig />
       <div className="space-y-6">
-        <AdminModelConfigForm configuration={configuration} />
+        {/* <div className="flex gap-4"> */}
+        {/* <AdminModelConfigForm configuration={configuration} /> */}
       </div>
     </div>
   );

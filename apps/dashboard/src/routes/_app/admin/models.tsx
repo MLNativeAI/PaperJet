@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import AdminConfigPage from "@/pages/admin-config-page";
 
-export const Route = createFileRoute("/_app/admin/config")({
-  component: RouteComponent,
+export const Route = createFileRoute("/_app/admin/models")({
+  component: AdminConfigPage,
   beforeLoad: () => {
     return {
       breadcrumbs: [
@@ -11,14 +11,10 @@ export const Route = createFileRoute("/_app/admin/config")({
           label: "Admin",
         },
         {
-          link: "/admin/config",
-          label: "Configuration",
+          link: "/admin/models",
+          label: "Model Configuration",
         },
       ],
     };
   },
 });
-
-function RouteComponent() {
-  return <AdminConfigPage />;
-}
