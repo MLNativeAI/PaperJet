@@ -6,15 +6,6 @@ export type ConnectionValidationResult = {
   error: string | null;
 };
 
-export type Configuration = {
-  modelType: ModelType;
-  geminiApiKey?: string;
-  customModelUrl?: string;
-  customModelName?: string;
-  customModelToken?: string;
-  structuredOutputMode?: "json" | "tool";
-};
-
 export type ValidModelConfig =
   | {
       type: "cloud";

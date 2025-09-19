@@ -33,7 +33,7 @@ export function ModelListTable({ data }: { data: DbModelConfiguration[] }) {
   const columns: ColumnDef<DbModelConfiguration>[] = [
     {
       accessorKey: "displayName",
-      header: "Name",
+      header: "Display Name",
       cell: ({ row }) => <div className="font-medium">{row.original.displayName}</div>,
       enableHiding: false,
     },
