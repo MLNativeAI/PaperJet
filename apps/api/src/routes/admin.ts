@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
-import { doesAdminAccountExist } from "@paperjet/db";
+import { doesAdminAccountExist, listModels } from "@paperjet/db";
 import { getUsageStats } from "@paperjet/engine";
 import { configUpdateSchema } from "@paperjet/engine/types";
 import { getAuthMode, logger } from "@paperjet/shared";
@@ -33,6 +33,10 @@ const router = app
       usageData: [],
       usageStats: usageStats,
     });
+  })
+  .get("/models", async (c) => {
+    const models = await listModels();
+    return c.json(models);
   })
   // .get("/config", async (c) => {
   //   const configuration = await getConfiguration();

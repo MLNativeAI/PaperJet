@@ -175,11 +175,11 @@ export const runtimeConfiguration = pgTable("runtime_configuration", {
 
 export const modelConfiguration = pgTable("model_configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  modelType: modeTypeEnum().notNull().default("cloud"),
-  geminiApiKey: text("gemini_api_key"),
-  customModelUrl: text("custom_model_url"),
-  customModelName: text("custom_model_name"),
-  customModelToken: text("custom_model_token"),
+  provider: text("provider"),
+  providerApiKey: text("provider_api_key"),
+  modelName: text("model_name"),
+  displayName: text("display_name"),
+  baseUrl: text("base_url"),
   structuredOutputMode: structuredOutputModeEnum().notNull().default("tool"),
 });
 

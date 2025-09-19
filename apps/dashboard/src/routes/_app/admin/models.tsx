@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AdminConfigPage from "@/pages/admin-config-page";
+import AdminModelsPage from "@/pages/admin/models-page";
 
 export const Route = createFileRoute("/_app/admin/models")({
-  component: AdminConfigPage,
+  component: AdminModelsPage,
   beforeLoad: () => {
     return {
       breadcrumbs: [
