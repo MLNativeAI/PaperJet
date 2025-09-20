@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import AddModelForm from "@/components/admin/add-model-form";
+import AddEditModelForm from "@/components/admin/add-model-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +28,7 @@ export function AddModelDialog() {
           <DialogTitle>Add Model Configuration</DialogTitle>
           <DialogDescription>Configure a new AI model for your organization.</DialogDescription>
         </DialogHeader>
-        <AddModelForm setDialogOpen={setDialogOpen} />
+        <AddEditModelForm setDialogOpen={setDialogOpen} />
       </DialogContent>
     </Dialog>
   );

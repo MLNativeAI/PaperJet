@@ -11,7 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { PencilIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,14 +20,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EditModelDialog } from "@/components/admin/edit-model-dialog";
+import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
 export function ModelListTable({ data }: { data: DbModelConfiguration[] }) {
-  function onDeleteModelConfiguration(modelConfig: DbModelConfiguration) {
-    console.log("Delete model config:", modelConfig.id);
-  }
+  const { deleteModel } = useModelConfiguration();
 
-  function onEditModelConfiguration(modelConfig: DbModelConfiguration) {
-    console.log("Delete model config:", modelConfig.id);
+  function onDeleteModelConfiguration(modelConfig: DbModelConfiguration) {
+    if (confirm(`Are you sure you want to delete the model "${modelConfig.displayName}"?`)) {
+      deleteModel.mutate(modelConfig.id, {
+        onSuccess: () => {
+          toast.success("Model configuration deleted successfully");
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to delete model configuration");
+        },
+      });
+    }
   }
 
   const columns: ColumnDef<DbModelConfiguration>[] = [
@@ -66,11 +75,8 @@ export function ModelListTable({ data }: { data: DbModelConfiguration[] }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              <EditModelDialog model={row.original} />
               <DropdownMenuItem onClick={() => onDeleteModelConfiguration(row.original)} className="text-destructive">
-                <PencilIcon className="h-4 w-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEditModelConfiguration(row.original)} className="text-destructive">
                 <IconTrash className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>

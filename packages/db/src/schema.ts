@@ -169,8 +169,8 @@ export const usageData = pgTable("usage_data", {
 
 export const runtimeConfiguration = pgTable("runtime_configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  large_model_id: text("model_id").references(() => modelConfiguration.id),
-  fast_model_id: text("model_id").references(() => modelConfiguration.id),
+  accurateModelId: text("accurate_model_id").references(() => modelConfiguration.id),
+  fastModelId: text("fast_model_id").references(() => modelConfiguration.id),
 });
 
 export const modelConfiguration = pgTable("model_configuration", {

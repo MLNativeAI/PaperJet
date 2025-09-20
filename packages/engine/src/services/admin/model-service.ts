@@ -6,7 +6,7 @@ import { AISDKError, generateObject, type LanguageModel } from "ai";
 import z from "zod";
 import type { ConnectionValidationResult, ModelConfigParams } from "../../types";
 
-export const validateConnection = async (modelConfig: ModelConfigParams): Promise<ConnectionValidationResult> => {
+export async function validateConnection(modelConfig: ModelConfigParams): Promise<ConnectionValidationResult> {
   const modelInstance = await getModelInstance(modelConfig);
 
   try {
@@ -49,7 +49,7 @@ export const validateConnection = async (modelConfig: ModelConfigParams): Promis
       };
     }
   }
-};
+}
 
 export async function getModelInstance(modelConfig: ModelConfigParams): Promise<LanguageModel> {
   switch (modelConfig.provider) {

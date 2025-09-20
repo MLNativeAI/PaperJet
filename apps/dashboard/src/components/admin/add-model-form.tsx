@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { DbModelConfiguration } from "@paperjet/db/types";
 import { type ConnectionValidationResult, type ModelConfigParams, modelConfigSchema } from "@paperjet/engine/types";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,11 +12,17 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
-export default function AddModelForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+export default function AddEditModelForm({
+  setDialogOpen,
+  model,
+}: {
+  setDialogOpen: (open: boolean) => void;
+  model?: DbModelConfiguration;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
 
-  const { validateConnection, addModel } = useModelConfiguration();
+  const { validateConnection, addModel, updateModel } = useModelConfiguration();
 
   const form = useForm<ModelConfigParams>({
     resolver: zodResolver(modelConfigSchema),
@@ -23,6 +30,18 @@ export default function AddModelForm({ setDialogOpen }: { setDialogOpen: (open: 
       provider: "google",
     },
   });
+
+  useEffect(() => {
+    if (model) {
+      form.reset({
+        provider: (model.provider as "google" | "openai" | "custom") || "google",
+        providerApiKey: model.providerApiKey || "",
+        modelName: model.modelName || "",
+        displayName: model.displayName || "",
+        baseUrl: model.baseUrl || "",
+      });
+    }
+  }, [model, form]);
   const watchedProvider = form.watch("provider");
 
   const runConnectionValidation = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,13 +65,19 @@ export default function AddModelForm({ setDialogOpen }: { setDialogOpen: (open: 
   const onSubmit = async (values: ModelConfigParams) => {
     setIsLoading(true);
     try {
-      console.log("Creating model configuration:", values);
-      addModel.mutate(values);
-      toast.success("Model configuration added successfully");
-      form.reset();
+      if (model) {
+        console.log("Updating model configuration:", model.id, values);
+        updateModel.mutate({ id: model.id, config: values });
+        toast.success("Model configuration updated successfully");
+      } else {
+        console.log("Creating model configuration:", values);
+        addModel.mutate(values);
+        toast.success("Model configuration added successfully");
+        form.reset();
+      }
       setDialogOpen(false);
     } catch (err) {
-      toast.error("Failed to add model configuration");
+      toast.error(`Failed to ${model ? "update" : "add"} model configuration`);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -160,7 +185,7 @@ export default function AddModelForm({ setDialogOpen }: { setDialogOpen: (open: 
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Adding..." : "Add Model"}
+                {isLoading ? (model ? "Updating..." : "Adding...") : model ? "Update Model" : "Add Model"}
               </Button>
             </div>
           </div>

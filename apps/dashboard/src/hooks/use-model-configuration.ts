@@ -43,8 +43,48 @@ export function useModelConfiguration() {
     },
   });
 
+  const updateModel = useMutation({
+    mutationFn: async ({ id, config }: { id: string; config: ModelConfigParams }) => {
+      const response = await adminClient.models.update.$put({
+        json: { id, ...config },
+      });
+
+      if (!response.ok) {
+        const error = (await response.json()) as { error?: string };
+        console.error(error);
+        throw new Error(error.error || "Failed to update model");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+    },
+  });
+
+  const deleteModel = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await adminClient.models.delete.$delete({
+        json: { id },
+      });
+
+      if (!response.ok) {
+        const error = (await response.json()) as { error?: string };
+        console.error(error);
+        throw new Error(error.error || "Failed to delete model");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+    },
+  });
+
   return {
     validateConnection,
     addModel,
+    updateModel,
+    deleteModel,
   };
 }
