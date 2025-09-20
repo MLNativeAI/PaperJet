@@ -1,25 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type ConnectionValidationResult, type ModelConfigParams, modelConfigSchema } from "@paperjet/engine/types";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useValidateConnection } from "@/hooks/use-validate-connection";
-import { ModelConfigParams, modelConfigSchema, type ConnectionValidationResult } from "@paperjet/engine/types";
+import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
-type AddModelFormValues = z.infer<typeof modelConfigSchema>;
-export default function AddModelForm() {
+export default function AddModelForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
 
-  const { validateConnection } = useValidateConnection();
+  const { validateConnection, addModel } = useModelConfiguration();
 
   const form = useForm<ModelConfigParams>({
     resolver: zodResolver(modelConfigSchema),
@@ -47,14 +43,14 @@ export default function AddModelForm() {
     });
   };
 
-  const onSubmit = async (values: AddModelFormValues) => {
+  const onSubmit = async (values: ModelConfigParams) => {
     setIsLoading(true);
     try {
-      // TODO: Implement mutation to create model configuration
       console.log("Creating model configuration:", values);
-
+      addModel.mutate(values);
       toast.success("Model configuration added successfully");
       form.reset();
+      setDialogOpen(false);
     } catch (err) {
       toast.error("Failed to add model configuration");
       console.error(err);

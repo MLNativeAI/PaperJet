@@ -13,16 +13,21 @@ export const listModels = async (): Promise<DbModelConfiguration[]> => {
   return await db.query.modelConfiguration.findMany();
 };
 
-export const addNewModel = async () => {};
-
-//TODO: we will restore this soon
-// export const updateConfiguration = async (configUpdate: ConfigurationUpdate) => {
-//   await db.update(configuration).set({
-//     customModelName: configUpdate.customModelName,
-//     customModelToken: configUpdate.customModelToken,
-//     customModelUrl: configUpdate.customModelUrl,
-//     modelType: configUpdate.modelType,
-//     geminiApiKey: configUpdate.geminiApiKey,
-//     structuredOutputMode: configUpdate.structuredOutputMode,
-//   });
-// };
+export const addNewModel = async (modelConfig: {
+  provider: string;
+  providerApiKey: string;
+  modelName: string;
+  displayName?: string;
+  baseUrl?: string;
+}) => {
+  return await db
+    .insert(modelConfiguration)
+    .values({
+      provider: modelConfig.provider,
+      providerApiKey: modelConfig.providerApiKey,
+      modelName: modelConfig.modelName,
+      displayName: modelConfig.displayName || `${modelConfig.provider}/${modelConfig.modelName}`,
+      baseUrl: modelConfig.baseUrl,
+    })
+    .returning();
+};
