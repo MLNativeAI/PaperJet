@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useModelConfiguration } from "@/hooks/use-validate-connection";
+import { useValidateConnection } from "@/hooks/use-validate-connection";
 import { ModelConfigParams, modelConfigSchema, type ConnectionValidationResult } from "@paperjet/engine/types";
 
 type AddModelFormValues = z.infer<typeof modelConfigSchema>;
@@ -19,7 +19,7 @@ export default function AddModelForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
 
-  const { validateConnection } = useModelConfiguration();
+  const { validateConnection } = useValidateConnection();
 
   const form = useForm<ModelConfigParams>({
     resolver: zodResolver(modelConfigSchema),

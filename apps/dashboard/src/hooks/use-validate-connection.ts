@@ -1,16 +1,14 @@
 import type { AdminRoutes } from "@paperjet/api/routes";
-import type { ConfigurationUpdate, ConnectionValidationResult } from "@paperjet/engine/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ConnectionValidationResult, ModelConfigParams } from "@paperjet/engine/types";
+import { useMutation } from "@tanstack/react-query";
 import { hc } from "hono/client";
 
 const adminClient = hc<AdminRoutes>("/api/admin");
 
-export function useModelConfiguration() {
-  const queryClient = useQueryClient();
-
+export function useValidateConnection() {
   const validateConnection = useMutation({
-    mutationFn: async (config: ConfigurationUpdate) => {
-      const response = await adminClient["validate-connection"].$post({
+    mutationFn: async (config: ModelConfigParams) => {
+      const response = await adminClient.models["validate-connection"].$post({
         json: config,
       });
 
