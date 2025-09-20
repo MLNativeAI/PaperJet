@@ -1,6 +1,6 @@
 import type { DbModelConfiguration, RuntimeModel } from "@paperjet/db/types";
 import { BrainIcon, RocketIcon } from "lucide-react";
-import ModelSelectorDialog from "@/components/admin/model-selector-dialog";
+import ModelSelectorDropdown from "@/components/admin/model-selector-dropdown";
 import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RuntimeModelCardProps {
@@ -37,8 +37,7 @@ export default function RuntimeModelCard({
           {displayName}
         </CardTitle>
         <CardAction>
-          <ModelSelectorDialog
-            modelType={modelType}
+          <ModelSelectorDropdown
             currentModel={model}
             availableModels={availableModels}
             onSelectModel={(modelId: string) => onSetModel({ type: modelType, modelId })}

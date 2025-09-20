@@ -1,5 +1,7 @@
+import type { DbModelConfiguration } from "@paperjet/db/types";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
+import AddEditModelForm from "@/components/admin/add-model-form";
 import EditModelForm from "@/components/admin/edit-model-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { DbModelConfiguration } from "@paperjet/db/types";
-import AddEditModelForm from "@/components/admin/add-model-form";
 
 export function EditModelDialog({ model }: { model: DbModelConfiguration }) {
   const [isDialogOpen, setDialogOpen] = useState(false);

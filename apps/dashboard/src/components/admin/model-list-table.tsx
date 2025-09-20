@@ -12,6 +12,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { toast } from "sonner";
+import { EditModelDialog } from "@/components/admin/edit-model-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EditModelDialog } from "@/components/admin/edit-model-dialog";
 import { useModelConfiguration } from "@/hooks/use-model-configuration";
 
 export function ModelListTable({ data }: { data: DbModelConfiguration[] }) {
