@@ -1,8 +1,8 @@
 import { getDocumentData, getWorkflow, updateDocumentData } from "@paperjet/db";
 import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
-import { generateObject } from "../lib/ai-sdk-wrapper";
 import { buildExtractionSchema } from "../utils/build-extraction-schema";
+import { generateObject } from "ai";
 
 export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
   logger.debug(
@@ -74,25 +74,26 @@ Instructions:
 - For tables, extract all rows found
 - Maintain data accuracy and completeness
 - Structure the output to match the object hierarchy shown above`;
-  const result = await generateObject("document-extraction", {
-    schema: schemaObj,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: prompt,
-          },
-          {
-            type: "text",
-            text: markdownDocument,
-          },
-        ],
-      },
-    ],
-  });
+  // const result = await generateObject("document-extraction", {
+  //   schema: schemaObj,
+  //   messages: [
+  //     {
+  //       role: "user",
+  //       content: [
+  //         {
+  //           type: "text",
+  //           text: prompt,
+  //         },
+  //         {
+  //           type: "text",
+  //           text: markdownDocument,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // });
 
+  throw new Error("fixme");
   logger.info("Data extraction completed successfully");
 
   return result.object;

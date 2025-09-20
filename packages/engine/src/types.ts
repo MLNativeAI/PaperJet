@@ -21,16 +21,17 @@ export type ValidModelConfig =
 
 export type ModelType = "cloud" | "custom";
 
-export const configUpdateSchema = z.object({
-  modelType: z.enum(["cloud", "custom"]),
-  geminiApiKey: z.string().optional(),
-  customModelName: z.string().optional(),
-  customModelToken: z.string().optional(),
-  customModelUrl: z.string().optional(),
-  structuredOutputMode: z.enum(["json", "tool"]).optional(),
+const availableProviders = z.enum(["google", "openai", "custom"]);
+
+export const modelConfigSchema = z.object({
+  provider: availableProviders,
+  providerApiKey: z.string().min(1, "API key is required"),
+  modelName: z.string().min(1, "Model name is required"),
+  displayName: z.string().optional(),
+  baseUrl: z.string().optional(),
 });
 
-export type ConfigurationUpdate = z.infer<typeof configUpdateSchema>;
+export type ModelConfigParams = z.infer<typeof modelConfigSchema>;
 
 export type PdfSplitResult = {
   success: boolean;

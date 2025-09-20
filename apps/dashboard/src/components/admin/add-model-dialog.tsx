@@ -14,34 +14,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import AddModelForm from "@/components/admin/add-model-form";
-
-const availableProviders = z.enum(["google", "openai", "custom"]);
-
-const addModelFormSchema = z.object({
-  provider: availableProviders,
-  providerApiKey: z.string().min(1, "API key is required"),
-  modelName: z.string().min(1, "Model name is required"),
-  displayName: z.string().min(1, "Display name is required"),
-  baseUrl: z.string().optional(),
-  structuredOutputMode: z.enum(["tool", "json"]),
-});
-
-type AddModelFormValues = z.infer<typeof addModelFormSchema>;
+import { ModelConfigParams, modelConfigSchema } from "@paperjet/engine/types";
 
 export function AddModelDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<AddModelFormValues>({
-    resolver: zodResolver(addModelFormSchema),
+  const form = useForm<ModelConfigParams>({
+    resolver: zodResolver(modelConfigSchema),
     defaultValues: {
       provider: "custom",
       structuredOutputMode: "tool",
     },
   });
-
-  const watchedProvider = form.watch("provider");
-
-  const onSubmit = async (values: AddModelFormValues) => {
+  const onSubmit = async (values: ModelConfigParams) => {
     setIsLoading(true);
     try {
       // TODO: Implement mutation to create model configuration

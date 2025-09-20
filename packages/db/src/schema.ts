@@ -180,7 +180,6 @@ export const modelConfiguration = pgTable("model_configuration", {
   modelName: text("model_name"),
   displayName: text("display_name"),
   baseUrl: text("base_url"),
-  structuredOutputMode: structuredOutputModeEnum().notNull().default("tool"),
 });
 
 export const apikey = pgTable("apikey", {

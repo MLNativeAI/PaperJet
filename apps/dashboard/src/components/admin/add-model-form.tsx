@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -10,30 +11,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useModelConfiguration } from "@/hooks/use-validate-connection";
+import { ModelConfigParams, modelConfigSchema, type ConnectionValidationResult } from "@paperjet/engine/types";
 
-const availableProviders = z.enum(["google", "openai", "custom"]);
-
-const addModelFormSchema = z.object({
-  provider: availableProviders,
-  baseUrl: z.string().optional(),
-  providerApiKey: z.string().min(1, "API key is required"),
-  modelName: z.string().min(1, "Model name is required"),
-  displayName: z.string().min(1, "Display name is required"),
-});
-
-type AddModelFormValues = z.infer<typeof addModelFormSchema>;
-
+type AddModelFormValues = z.infer<typeof modelConfigSchema>;
 export default function AddModelForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [validationResult, setValidationResult] = useState<ConnectionValidationResult | null>(null);
 
-  const form = useForm<AddModelFormValues>({
-    resolver: zodResolver(addModelFormSchema),
+  const { validateConnection } = useModelConfiguration();
+
+  const form = useForm<ModelConfigParams>({
+    resolver: zodResolver(modelConfigSchema),
     defaultValues: {
-      provider: "custom",
+      provider: "google",
     },
   });
-
   const watchedProvider = form.watch("provider");
+
+  const runConnectionValidation = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setValidationResult(null);
+    const values = form.getValues();
+
+    validateConnection.mutate(values, {
+      onSuccess: (result) => {
+        setValidationResult(result);
+      },
+      onError: (error) => {
+        setValidationResult({
+          isValid: false,
+          error: error.message || "Failed to validate connection",
+        });
+      },
+    });
+  };
 
   const onSubmit = async (values: AddModelFormValues) => {
     setIsLoading(true);
@@ -132,7 +144,21 @@ export default function AddModelForm() {
         />
         <DialogFooter>
           <div className="flex justify-between w-full">
-            <Button variant="outline">Validate connection</Button>
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="outline"
+                disabled={validateConnection.isPending || isLoading}
+                className="flex items-center gap-2 bg-transparent"
+                onClick={runConnectionValidation}
+              >
+                {validateConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Validate connection
+              </Button>
+              {validationResult?.isValid && <div className="text-green-500 text-sm">Connection is valid</div>}
+              {validationResult && !validationResult?.isValid && (
+                <div className="text-red-500 text-sm">{validationResult.error}</div>
+              )}
+            </div>
             <div className="flex gap-2">
               <Button type="button" variant="outline" disabled={isLoading}>
                 Cancel

@@ -1,6 +1,5 @@
 import { getDocumentPageById, updateDocumentPageData } from "@paperjet/db";
 import { logger } from "@paperjet/shared";
-import { generateText } from "../lib/ai-sdk-wrapper";
 import { s3Client } from "../lib/s3";
 
 export type MarkdownDocument = {
@@ -22,23 +21,24 @@ const extractMarkdownFromPageImage = async (pageBuffer: ArrayBuffer) => {
   const prompt =
     "You're an expert in document processing. Please convert this document page into markdown. Reply only with the markdown, make sure to preserve all of the original content of the document page.";
 
-  const result = await generateText("convert-to-markdown", {
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: prompt,
-          },
-          {
-            type: "image",
-            image: pageBuffer,
-          },
-        ],
-      },
-    ],
-  });
+  // const result = await generateText("convert-to-markdown", {
+  //   messages: [
+  //     {
+  //       role: "user",
+  //       content: [
+  //         {
+  //           type: "text",
+  //           text: prompt,
+  //         },
+  //         {
+  //           type: "image",
+  //           image: pageBuffer,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // });
+  throw new Error("fixme");
 
   return result;
 };
