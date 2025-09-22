@@ -128,6 +128,34 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
   });
 }
 
+async function addNativeOcrJob(job: Job<WorkflowExtractionData>) {
+  const { workflowExecutionId } = job.data;
+  await updateExecutionStatus({
+    workflowExecutionId: job.data.workflowExecutionId,
+    status: WorkflowExecutionStatus.enum.Processing,
+    isCompleted: false,
+  });
+
+  if (!job.id) {
+    throw new Error("Fatal error, job ID missing");
+  }
+
+  await mlServiceQueue.add(
+    workflowExecutionId,
+    {
+      ...job.data,
+      operation: "ocr",
+    },
+    {
+      parent: {
+        id: job.id,
+        queue: job.queueQualifiedName,
+      },
+      failParentOnFailure: true,
+    },
+  );
+}
+
 async function addMarkdownJobs(job: Job<WorkflowExtractionData>) {
   if (!job.id) {
     logger.error("Fatal error, job ID missing");
