@@ -1,5 +1,4 @@
-import { getUsagePrices, insertUsage } from "@paperjet/db";
-import type { LanguageModelUsage } from "ai";
+import { getUsagePrices } from "@paperjet/db";
 
 const cache = new Map<string, UsagePrice>();
 
@@ -28,27 +27,27 @@ async function getModelPrice(model: string): Promise<UsagePrice | null> {
   return null;
 }
 
-const calculateCost = (
-  usagePrice: UsagePrice,
-  usage: LanguageModelUsage,
-): {
-  inputCost: number;
-  outputCost: number;
-  totalCost: number;
-} => {
-  const inputCost = (usagePrice.inputCost * usage.promptTokens) / 1000000;
-  const outputCost = (usagePrice.outputCost * usage.completionTokens) / 1000000;
-  return {
-    inputCost,
-    outputCost,
-    totalCost: inputCost + outputCost,
-  };
-};
-
-export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
-  const modelPrice = await getModelPrice(model);
-  const inputCost = usage.promptTokens && modelPrice ? calculateCost(modelPrice, usage).inputCost : 0;
-  const outputCost = usage.completionTokens && modelPrice ? calculateCost(modelPrice, usage).outputCost : 0;
-  const totalCost = inputCost + outputCost;
-  await insertUsage({ name, model, usage, inputCost, outputCost, totalCost, durationMs });
-}
+// const calculateCost = (
+//   usagePrice: UsagePrice,
+//   usage: LanguageModelUsage,
+// ): {
+//   inputCost: number;
+//   outputCost: number;
+//   totalCost: number;
+// } => {
+//   const inputCost = (usagePrice.inputCost * usage.promptTokens) / 1000000;
+//   const outputCost = (usagePrice.outputCost * usage.completionTokens) / 1000000;
+//   return {
+//     inputCost,
+//     outputCost,
+//     totalCost: inputCost + outputCost,
+//   };
+// };
+//
+// export async function trackUsage(name: string, model: string, usage: LanguageModelUsage, durationMs?: number) {
+//   const modelPrice = await getModelPrice(model);
+//   const inputCost = usage.promptTokens && modelPrice ? calculateCost(modelPrice, usage).inputCost : 0;
+//   const outputCost = usage.completionTokens && modelPrice ? calculateCost(modelPrice, usage).outputCost : 0;
+//   const totalCost = inputCost + outputCost;
+//   await insertUsage({ name, model, usage, inputCost, outputCost, totalCost, durationMs });
+// }
