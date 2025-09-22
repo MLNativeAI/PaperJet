@@ -1,9 +1,9 @@
 import path from "node:path";
 import { test } from "@playwright/test";
 import dotenv from "dotenv";
-import { energyConfig } from "fixtures/energy/config";
-import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecution } from "helpers/test-helpers";
-import { verifyExtractionAccuracy } from "helpers/verify";
+import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecution } from "../../helpers/test-helpers";
+import { verifyExtractionAccuracy } from "../../helpers/verify";
+import { energyConfig } from "../../fixtures/energy/config";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 

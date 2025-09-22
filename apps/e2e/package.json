@@ -1,8 +1,5 @@
 {
   "name": "@paperjet/e2e",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
   "scripts": {
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test --project=smoke",
@@ -21,5 +18,8 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2"
   }
 }

@@ -1,9 +1,9 @@
 import path from "node:path";
 import { test } from "@playwright/test";
 import dotenv from "dotenv";
-import { bloodWorkflowConfig } from "fixtures/blood/config";
-import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecution } from "helpers/test-helpers";
-import { verifyExtractionAccuracy } from "helpers/verify";
+import { bloodWorkflowConfig } from "../../fixtures/blood/config";
+import { awaitWorkflowExecutionCompleted, createNewWorkflow, startWorkflowExecution } from "../../helpers/test-helpers";
+import { verifyExtractionAccuracy } from "../../helpers/verify";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 

@@ -1,10 +1,6 @@
 import { sql } from "drizzle-orm";
 import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
-
-export const structuredOutputModeEnum = pgEnum("structuredOutputMode", ["json", "tool"]);
-
 export const workflowExecutionStatusEnum = pgEnum("workflowExecutionStatus", [
   "Queued",
   "Processing",

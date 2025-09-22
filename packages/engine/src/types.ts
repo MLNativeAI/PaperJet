@@ -6,21 +6,6 @@ export type ConnectionValidationResult = {
   error: string | null;
 };
 
-export type ValidModelConfig =
-  | {
-      type: "cloud";
-      geminiApiKey: string;
-    }
-  | {
-      type: "custom";
-      customModelUrl: string;
-      customModelName: string;
-      customModelToken?: string;
-      structuredOutputMode: "json" | "tool";
-    };
-
-export type ModelType = "cloud" | "custom";
-
 const availableProviders = z.enum(["google", "openai", "custom"]);
 
 export const modelConfigSchema = z.object({

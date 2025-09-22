@@ -1,6 +1,6 @@
 import fs from "node:fs";
-import { type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { expect, type Page } from "@playwright/test";
+import { WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/db/types";
 
 export async function createNewWorkflow(name: string, description: string, config: WorkflowConfiguration, page: Page) {
   const payload = {

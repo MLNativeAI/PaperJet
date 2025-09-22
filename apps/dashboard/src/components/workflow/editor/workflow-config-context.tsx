@@ -17,10 +17,12 @@ interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
   name: string;
   description: string;
+  modelType: "fast" | "accurate";
   setName: (name: string) => void;
   setDescription: (description: string) => void;
-  createWorkflow: UseMutationResult<never, Error, void, unknown>;
-  updateWorkflow: UseMutationResult<never, Error, void, unknown>;
+  setModelType: (type: "fast" | "accurate") => void;
+  createWorkflow: UseMutationResult<{ workflowId: string; message: string }, Error, void, unknown>;
+  updateWorkflow: UseMutationResult<{ workflowId: string; message: string }, Error, void, unknown>;
   addAnObject: (initialValues?: { name?: string; description?: string }) => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
@@ -47,7 +49,10 @@ export function WorkflowConfigProvider({
 }) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
+  const [modelType, setModelType] = useState<"fast" | "accurate">("fast");
+  const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({
+    objects: [],
+  });
   const queryClient = useQueryClient();
 
   const createWorkflow = useMutation({
@@ -101,7 +106,9 @@ export function WorkflowConfigProvider({
 
   useEffect(() => {
     if (initialWorkflow) {
-      setWorkflowConfig({ objects: fromWorkflowConfig(initialWorkflow.configuration) });
+      setWorkflowConfig({
+        objects: fromWorkflowConfig(initialWorkflow.configuration),
+      });
       setName(initialWorkflow.name);
       setDescription(initialWorkflow.description);
     }
@@ -239,8 +246,10 @@ export function WorkflowConfigProvider({
         workflowConfig,
         name,
         description,
+        modelType,
         setName,
         setDescription,
+        setModelType,
         createWorkflow,
         updateWorkflow,
         addAnObject,

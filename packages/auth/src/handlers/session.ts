@@ -13,6 +13,14 @@ import { auth } from "../auth";
 import type { SessionWithOrg } from "../types";
 import { detectOrgNameFromEmail } from "../util/email";
 
+function sessionWithOrgAndCustomId(session: Session, orgId: string): SessionWithOrg {
+  return {
+    ...session,
+    activeOrganizationId: orgId,
+    id: generateId(ID_PREFIXES.session),
+  };
+}
+
 export async function beforeSessionCreateHandler(session: Session) {
   const orgId = await getDefaultOrgOrCreate(session.userId);
   if (!orgId) {
@@ -23,12 +31,9 @@ export async function beforeSessionCreateHandler(session: Session) {
     userId: session.userId,
   });
 
+  logger.info(session, "Creating session");
   return {
-    data: {
-      ...session,
-      activeOrganizationId: orgId,
-      id: generateId(ID_PREFIXES.session),
-    },
+    data: sessionWithOrgAndCustomId(session, orgId),
   };
 }
 
@@ -80,7 +85,19 @@ export const getUserSession = async (
     throw new Error("Unauthorized");
   }
   if (!sessionData.session.activeOrganizationId) {
-    throw new Error("Active organization is missing");
+    // api key session aren't real session so no activeOrgID exists
+    if (sessionData.user.lastActiveOrgId) {
+      //TODO: We need to update the api key session logic to bind it directly to the session
+      // Right now we're just using last org which is shitty at best
+      // We'll definitely have to override the auth logic since we can't do any fetching here, this needs to be a quick lookup fn call
+      const mockApiSession = sessionWithOrgAndCustomId(sessionData.session, sessionData.user.lastActiveOrgId);
+      return {
+        user: sessionData.user,
+        session: mockApiSession,
+      };
+    } else {
+      throw new Error("Active organization is missing");
+    }
   }
   return {
     user: sessionData.user,
