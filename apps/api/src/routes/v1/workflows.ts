@@ -9,7 +9,7 @@ import {
   updateExecutionJobId,
   updateWorkflow,
 } from "@paperjet/db";
-import { WorkflowConfiguration, WorkflowConfigurationSchema } from "@paperjet/db/types";
+import { type WorkflowConfiguration, WorkflowConfigurationSchema } from "@paperjet/db/types";
 import { getWorkflows, uploadFileAndCreateExecution } from "@paperjet/engine";
 import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
@@ -30,6 +30,7 @@ const updateWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
   configuration: WorkflowConfigurationSchema,
+  modelType: z.enum(["fast", "accurate"]),
 });
 
 function validateFiles(body: any): { success: true; files: File[] } | { success: false; error: string } {
@@ -241,6 +242,7 @@ const router = app
         await updateWorkflow({
           workflowId,
           name: updateWorkflowData.name,
+          modelType: updateWorkflowData.modelType,
           description: updateWorkflowData.description,
           configuration: updateWorkflowData.configuration,
           organizationId: session.activeOrganizationId,
