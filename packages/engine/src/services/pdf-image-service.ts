@@ -1,11 +1,7 @@
 import { createDocumentData, createDocumentPage, getFileByWorkflowExecutionId } from "@paperjet/db";
-import { db } from "@paperjet/db/db";
-import { documentData } from "@paperjet/db/schema";
 import { envVars, logger } from "@paperjet/shared";
-import { ID_PREFIXES } from "@paperjet/shared/id";
-import { generateId } from "ai";
-import { s3Client } from "../lib/s3";
-import type { PdfSplitResult } from "../types";
+import { s3Client } from "../lib/s3.js";
+import type { OcrResult, PdfSplitResult } from "../types.js";
 
 export async function splitPdfIntoImages(workflowExecutionId: string) {
   const fileData = await getFileByWorkflowExecutionId({ workflowExecutionId });
@@ -24,7 +20,10 @@ export async function splitPdfIntoImages(workflowExecutionId: string) {
   }
 
   const splitResult = (await response.json()) as unknown as PdfSplitResult;
-  const documentData = await createDocumentData({ workflowExecutionId, organizationId: fileData.ownerId });
+  const documentData = await createDocumentData({
+    workflowExecutionId,
+    organizationId: fileData.ownerId,
+  });
 
   for (const page of splitResult.pages) {
     const pageFileName = `executions/${workflowExecutionId}/pages/page-${page.page_number}.png`;
@@ -50,15 +49,12 @@ export async function runNativeOcrOnDocument(workflowExecutionId: string) {
   }
 
   const ocrResult = (await response.json()) as unknown as OcrResult;
-  const documentDataId = generateId(ID_PREFIXES.documentData);
 
   logger.debug(ocrResult, "ocrResult");
 
-  await db.insert(documentData).values({
-    id: documentDataId,
-    workflowExecutionId: workflowExecutionId,
-    ownerId: result[0].ownerId,
+  await createDocumentData({
+    workflowExecutionId,
+    organizationId: fileData.ownerId,
     rawMarkdown: ocrResult.markdown,
-    createdAt: new Date(),
   });
 }

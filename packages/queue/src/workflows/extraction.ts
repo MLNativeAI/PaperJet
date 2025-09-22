@@ -1,5 +1,5 @@
 import { getDocumentPagesByWorkflowExecutionId, updateDocumentMarkdown, updateExecutionStatus } from "@paperjet/db";
-import { WorkflowConfigurationSchema, WorkflowExecutionStatus } from "@paperjet/db/types";
+import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import z from "zod";
@@ -37,7 +37,7 @@ const WorkflowExtractionDataSchema = z.object({
   workflowId: z.string(),
   workflowExecutionId: z.string(),
   modelType: z.enum(["fast", "accurate"]),
-  configuration: WorkflowConfigurationSchema,
+  // configuration: WorkflowConfigurationSchema,
   step: workflowSteps,
 });
 
@@ -46,11 +46,12 @@ export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema
 export const extractionWorkflowWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_WORKFLOW,
   async (job: Job<WorkflowExtractionData>, token?: string) => {
+    const { modelType } = job.data;
     let step = job.data.step || workflowSteps.enum.INIT;
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
-          if (job.data.runtimeConfig === "accurate") {
+          if (modelType === "accurate") {
             await addDocumentSplitJob(job);
             await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
             step = workflowSteps.enum.WAITING_FOR_SPLIT;
@@ -82,6 +83,14 @@ export const extractionWorkflowWorker = new Worker(
           step = workflowSteps.enum.EXTRACTION;
           break;
         }
+        // Branch 2: Fast processing with native OCR
+        case workflowSteps.enum.WAITING_FOR_NATIVE_OCR: {
+          await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_NATIVE_OCR, token);
+          await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
+          step = workflowSteps.enum.EXTRACTION;
+          break;
+        }
+        // Joint finish
         case workflowSteps.enum.EXTRACTION: {
           await addExtractionJob(job);
           await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_EXTRACTION });
@@ -128,7 +137,7 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await splitPdfQueue.add(workflowExecutionId, job.data, {
+  await mlServiceQueue.add(workflowExecutionId, job.data, {
     parent: {
       id: job.id,
       queue: job.queueQualifiedName,

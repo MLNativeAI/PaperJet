@@ -1,4 +1,4 @@
-import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
+import type { DbWorkflowExecution } from "@paperjet/db/types";
 import z from "zod";
 
 export type ConnectionValidationResult = {
@@ -29,10 +29,9 @@ export type PdfSplitResult = {
   }[];
 };
 
-export type IDReference = {
-  userId?: string;
-  workflowId?: string;
-  executionId?: string;
+export type OcrResult = {
+  success: boolean;
+  markdown: string;
 };
 
 export const categoriesConfigurationSchema = z.array(

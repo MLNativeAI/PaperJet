@@ -1,30 +1,22 @@
 import base64
 import logging
-import os
-# import tempfile
-
-from pymupdf.mupdf import pdf_document
 import requests
 import pymupdf
+import tempfile
+import os
 from fastapi import FastAPI, Form
 from typing import Annotated
 from fastapi.middleware.cors import CORSMiddleware
+import pymupdf4llm
+import ocrmypdf
+from ocrmypdf.exceptions import PriorOcrFoundError
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create debug directory
-debug_dir = "debug_ocr"
-os.makedirs(debug_dir, exist_ok=True)
+app = FastAPI(title="PaperJet ML service")
 
-# Create jobs directory for PDF processing
-jobs_dir = "jobs"
-os.makedirs(jobs_dir, exist_ok=True)
-
-app = FastAPI(title="Technical Drawing Analyzer API")
-
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
@@ -36,20 +28,74 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Technical Drawing Analyzer API is running"}
+    return {"message": "PaperJet ML Service is running"}
+
+
+@app.post("/ocr")
+async def ocr(presigned_url: Annotated[str, Form()]):
+    try:
+        # Download the PDF from presigned URL
+        r = requests.get(presigned_url)
+        data = r.content
+
+        # Create temporary files for input and output
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as input_pdf:
+            input_pdf.write(data)
+            input_pdf_path = input_pdf.name
+
+        output_pdf_path = input_pdf_path.replace(".pdf", "_ocr.pdf")
+
+        try:
+            ocrmypdf.ocr(
+                input_pdf_path,
+                output_pdf_path,
+                language=["eng", "pol"],
+                deskew=True,
+                clean=True,
+            )
+            pdf_document = pymupdf.Document(filename=output_pdf_path)
+            md_text = pymupdf4llm.to_markdown(doc=pdf_document)
+
+            return {
+                "success": True,
+                "markdown": md_text,
+            }
+        except PriorOcrFoundError:
+            logger.info("PDF already has text, processing original file directly")
+            pdf_document = pymupdf.Document(stream=data)
+            md_text = pymupdf4llm.to_markdown(doc=pdf_document)
+            return {
+                "success": True,
+                "markdown": md_text,
+            }
+        except Exception as e:
+            # For any other OCR error, fall back to original file processing
+            logger.warning(f"OCR failed, processing original file directly: {str(e)}")
+            pdf_document = pymupdf.Document(stream=data)
+            md_text = pymupdf4llm.to_markdown(doc=pdf_document)
+
+            return {
+                "success": True,
+                "markdown": md_text,
+            }
+        finally:
+            # Clean up temporary files
+            try:
+                if os.path.exists(input_pdf_path):
+                    os.unlink(input_pdf_path)
+                if os.path.exists(output_pdf_path):
+                    os.unlink(output_pdf_path)
+            except Exception as e:
+                logger.warning(f"Error cleaning up temporary files: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"Error parsing PDF: {str(e)}")
+        return {"error": str(e)}
 
 
 @app.post("/split-pdf")
 async def split_pdf(presigned_url: Annotated[str, Form()]):
     try:
-        # # Create a temporary directory for the uploaded PDF
-        # with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
-        #     # Write uploaded file to temporary location
-        #     content = await pdf.read()
-        #     temp_pdf.write(content)
-        #     temp_pdf_path = temp_pdf.name
-
-        # Open the PDF file
         r = requests.get(presigned_url)
         data = r.content
         pdf_document = pymupdf.Document(stream=data)

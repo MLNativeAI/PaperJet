@@ -7,9 +7,11 @@ import type { DbDocumentData } from "../types/tables";
 export async function createDocumentData({
   workflowExecutionId,
   organizationId,
+  rawMarkdown,
 }: {
   workflowExecutionId: string;
   organizationId: string;
+  rawMarkdown?: string;
 }): Promise<DbDocumentData> {
   const documentDataId = generateId(ID_PREFIXES.documentData);
 
@@ -18,6 +20,7 @@ export async function createDocumentData({
     .values({
       id: documentDataId,
       workflowExecutionId: workflowExecutionId,
+      rawMarkdown: rawMarkdown,
       ownerId: organizationId,
       createdAt: new Date(),
     })
