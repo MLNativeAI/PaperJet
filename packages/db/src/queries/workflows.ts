@@ -2,9 +2,9 @@ import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { workflow } from "../schema";
+import type { RuntimeModelType } from "../types/configuration";
 import type { DbWorkflow } from "../types/tables";
 import type { WorkflowConfiguration } from "../types/workflow-config";
-import { RuntimeModelType } from "../types/configuration";
 
 export async function updateWorkflow({
   workflowId,
@@ -33,14 +33,14 @@ export async function createWorkflow({
   name,
   description,
   configuration,
-  runtimeConfig,
+  modelType,
   organizationId,
   userId,
 }: {
   name: string;
   description: string;
   configuration: WorkflowConfiguration;
-  runtimeConfig: RuntimeModelType;
+  modelType: RuntimeModelType;
   organizationId: string;
   userId: string;
 }): Promise<DbWorkflow> {
@@ -50,6 +50,7 @@ export async function createWorkflow({
     name: name,
     description: description || "",
     configuration: configuration,
+    modelType: modelType,
     ownerId: organizationId,
     creatorId: userId,
   };

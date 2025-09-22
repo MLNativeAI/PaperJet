@@ -22,7 +22,7 @@ const createWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
   configuration: WorkflowConfigurationSchema,
-  runtimeConfig: z.enum(["fast", "accurate"]),
+  modelType: z.enum(["fast", "accurate"]),
 });
 
 const updateWorkflowApiSchema = z.object({
@@ -74,7 +74,7 @@ const router = app
         name: createWorkflowData.name,
         description: createWorkflowData.description,
         configuration: createWorkflowData.configuration,
-        runtimeConfig: createWorkflowData.runtimeConfig,
+        modelType: createWorkflowData.modelType,
         organizationId: session.activeOrganizationId,
         userId: session.userId,
       });

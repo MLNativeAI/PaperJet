@@ -80,6 +80,7 @@ export const workflow = pgTable("workflow", {
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
   configuration: jsonb("configuration").notNull(),
+  modelType: text("model_type").notNull().default("fast"),
   ownerId: text("owner_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),

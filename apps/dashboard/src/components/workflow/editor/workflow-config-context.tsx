@@ -60,7 +60,7 @@ export function WorkflowConfigProvider({
       const response = await workflowClient.index.$post({
         json: {
           configuration: toWorkflowConfig(workflowConfig),
-          runtimeConfig: modelType,
+          modelType: modelType,
           name: name,
           description: description,
         },
