@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_app/workflows/new")({
   loader: ({ context }) => {
     context.breadcrumbs = [
       {
-        link: "/workflows",
+        link: "/",
         label: "Workflows",
       },
       {

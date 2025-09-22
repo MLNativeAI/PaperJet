@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_app/workflows/$workflowId/execute")({
     return {
       breadcrumbs: [
         {
-          link: "/workflows",
+          link: "/",
           label: "Workflows",
         },
         {
