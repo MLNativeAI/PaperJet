@@ -4,6 +4,7 @@ import { db } from "../db";
 import { workflow } from "../schema";
 import type { DbWorkflow } from "../types/tables";
 import type { WorkflowConfiguration } from "../types/workflow-config";
+import { RuntimeModelType } from "../types/configuration";
 
 export async function updateWorkflow({
   workflowId,
@@ -32,12 +33,14 @@ export async function createWorkflow({
   name,
   description,
   configuration,
+  runtimeConfig,
   organizationId,
   userId,
 }: {
   name: string;
   description: string;
   configuration: WorkflowConfiguration;
+  runtimeConfig: RuntimeModelType;
   organizationId: string;
   userId: string;
 }): Promise<DbWorkflow> {

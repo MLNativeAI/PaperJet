@@ -7,6 +7,7 @@ export async function createNewWorkflow(name: string, description: string, confi
     name,
     description,
     configuration: config,
+    runtimeConfig: "fast",
   };
   const newWorkflow = await page.request.post("/api/v1/workflows", {
     data: payload,
