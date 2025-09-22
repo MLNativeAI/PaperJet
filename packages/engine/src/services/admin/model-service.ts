@@ -1,12 +1,12 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { getModelConfigForType } from "@paperjet/db";
+import type { RuntimeModelType } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { AISDKError, generateObject, type LanguageModel } from "ai";
 import z from "zod";
 import type { ConnectionValidationResult, ModelConfigParams } from "../../types";
-import { RuntimeModelType } from "@paperjet/db/types";
-import { getModelConfigForType } from "@paperjet/db";
 
 export async function validateConnection(modelConfig: ModelConfigParams): Promise<ConnectionValidationResult> {
   const modelInstance = await getModelInstance(modelConfig);
@@ -17,6 +17,7 @@ export async function validateConnection(modelConfig: ModelConfigParams): Promis
       schema: z.object({
         answer: z.string(),
       }),
+      // mode: "json",
       prompt: `Respond with pong.`,
     });
     logger.info(result.object.answer, "Validation result:");
@@ -72,6 +73,7 @@ export async function getModelInstance(modelConfig: ModelConfigParams): Promise<
         baseURL: modelConfig.baseUrl || "",
         apiKey: modelConfig.providerApiKey,
         name: modelConfig.modelName,
+        supportsStructuredOutputs: true,
       }).chatModel(modelConfig.modelName);
     }
   }
