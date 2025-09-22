@@ -44,7 +44,6 @@ const WorkflowExtractionDataSchema = z.object({
 });
 
 export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema>;
-
 export const extractionWorkflowWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_WORKFLOW,
   async (job: Job<WorkflowExtractionData>, token?: string) => {
