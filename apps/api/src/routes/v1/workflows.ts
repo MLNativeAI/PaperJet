@@ -130,12 +130,20 @@ const router = app
           session.userId,
           file,
         );
-        const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+        const workflow = await getWorkflow({ workflowId });
+        const validConfig = workflow.configuration as WorkflowConfiguration;
+        const workflowExecutionParams = {
           workflowId: execution.workflowId,
           workflowExecutionId: execution.workflowExecutionId,
-        });
-        const jobId = job.id;
-        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: jobId || "" });
+          modelType: workflow.modelType,
+          configuration: validConfig,
+        };
+        logger.info(workflowExecutionParams, "Workflow execuion params:");
+        const job = await workflowExecutionQueue.add(execution.workflowExecutionId, workflowExecutionParams);
+        if (!job.id) {
+          throw new Error("job id not found");
+        }
+        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: job.id });
         return c.json({
           ...execution,
         });
@@ -183,12 +191,14 @@ const router = app
           );
           const workflow = await getWorkflow({ workflowId });
           const validConfig = workflow.configuration as WorkflowConfiguration;
-          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+          const workflowExecutionParams = {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
             modelType: workflow.modelType,
             configuration: validConfig,
-          });
+          };
+          logger.info(workflowExecutionParams, "Workflow execuion params:");
+          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, workflowExecutionParams);
           if (!job.id) {
             throw new Error("job id not found");
           }

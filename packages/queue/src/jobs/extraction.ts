@@ -3,7 +3,7 @@ import { type Job, Queue, Worker } from "bullmq";
 import z from "zod";
 import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
-import { WorkflowExtractionData } from "../workflows/extraction";
+import type { WorkflowExtractionData } from "../workflows/extraction";
 
 export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
   connection: redisConnection,

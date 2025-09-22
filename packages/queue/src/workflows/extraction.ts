@@ -137,13 +137,20 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
     throw new Error("Fatal error, job ID missing");
   }
 
-  await mlServiceQueue.add(workflowExecutionId, job.data, {
-    parent: {
-      id: job.id,
-      queue: job.queueQualifiedName,
+  await mlServiceQueue.add(
+    workflowExecutionId,
+    {
+      ...job.data,
+      operation: "split",
     },
-    failParentOnFailure: true,
-  });
+    {
+      parent: {
+        id: job.id,
+        queue: job.queueQualifiedName,
+      },
+      failParentOnFailure: true,
+    },
+  );
 }
 
 async function addNativeOcrJob(job: Job<WorkflowExtractionData>) {
