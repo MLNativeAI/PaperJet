@@ -64,6 +64,13 @@
       "when": 1758384233608,
       "tag": "0008_charming_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1758553746900,
+      "tag": "0009_perpetual_valeria_richards",
+      "breakpoints": true
     }
   ]
 }
