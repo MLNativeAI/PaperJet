@@ -5,7 +5,7 @@ import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import z from "zod";
 import { extractionQueue } from "../jobs/extraction";
 import { markdownQueue } from "../jobs/markdown";
-import { splitPdfQueue } from "../jobs/split-pdf";
+import { mlServiceQueue } from "../jobs/ml";
 import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
 
@@ -25,6 +25,7 @@ export const workflowExecutionQueue = new Queue(QUEUE_NAMES.EXTRACTION_WORKFLOW,
 const workflowSteps = z.enum([
   "INIT",
   "WAITING_FOR_SPLIT",
+  "WAITING_FOR_NATIVE_OCR",
   "MARKDOWN",
   "WAITING_FOR_MARKDOWN",
   "EXTRACTION",
@@ -49,11 +50,19 @@ export const extractionWorkflowWorker = new Worker(
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
-          await addDocumentSplitJob(job);
-          await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
-          step = workflowSteps.enum.WAITING_FOR_SPLIT;
+          if (job.data.runtimeConfig === "accurate") {
+            await addDocumentSplitJob(job);
+            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
+            step = workflowSteps.enum.WAITING_FOR_SPLIT;
+          } else {
+            // quick path
+            await addNativeOcrJob(job);
+            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_NATIVE_OCR });
+            step = workflowSteps.enum.WAITING_FOR_NATIVE_OCR;
+          }
           break;
         }
+        // Branch 1: Accurate OCR /w LLM's
         case workflowSteps.enum.WAITING_FOR_SPLIT: {
           await checkChildJobsCompletedSuccessfully(job, workflowSteps.enum.WAITING_FOR_SPLIT, token);
           await job.updateData({ ...job.data, step: workflowSteps.enum.MARKDOWN });
