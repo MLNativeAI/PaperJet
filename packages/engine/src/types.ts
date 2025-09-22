@@ -1,4 +1,4 @@
-import type { DbWorkflowExecution } from "@paperjet/db/types";
+import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
 import z from "zod";
 
 export type ConnectionValidationResult = {

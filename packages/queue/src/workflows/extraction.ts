@@ -1,5 +1,5 @@
 import { getDocumentPagesByWorkflowExecutionId, updateDocumentMarkdown, updateExecutionStatus } from "@paperjet/db";
-import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
+import { WorkflowConfigurationSchema, WorkflowExecutionStatus } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
 import { type Job, Queue, WaitingChildrenError, Worker } from "bullmq";
 import z from "zod";
@@ -37,7 +37,7 @@ const WorkflowExtractionDataSchema = z.object({
   workflowId: z.string(),
   workflowExecutionId: z.string(),
   modelType: z.enum(["fast", "accurate"]),
-  // configuration: WorkflowConfigurationSchema,
+  configuration: WorkflowConfigurationSchema,
   step: workflowSteps,
 });
 
