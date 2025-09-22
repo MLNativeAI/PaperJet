@@ -3,12 +3,13 @@ import { getUserSession } from "@paperjet/auth/session";
 import {
   createWorkflow,
   deleteWorkflow,
+  getWorkflow,
   getWorkflowByOwner,
   getWorkflowExecutionWithExtractedData,
   updateExecutionJobId,
   updateWorkflow,
 } from "@paperjet/db";
-import { WorkflowConfigurationSchema } from "@paperjet/db/types";
+import { WorkflowConfiguration, WorkflowConfigurationSchema } from "@paperjet/db/types";
 import { getWorkflows, uploadFileAndCreateExecution } from "@paperjet/engine";
 import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
@@ -179,9 +180,13 @@ const router = app
             session.userId,
             file,
           );
+          const workflow = await getWorkflow({ workflowId });
+          const validConfig = workflow.configuration as WorkflowConfiguration;
           const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
+            modelType: workflow.modelType,
+            configuration: validConfig,
           });
           if (!job.id) {
             throw new Error("job id not found");

@@ -4,11 +4,39 @@ import { modelConfiguration, runtimeConfiguration } from "../schema";
 import type { RuntimeConfiguration, RuntimeModelType } from "../types/configuration";
 import type { DbModelConfiguration } from "../types/tables";
 
-export const listModels = async (): Promise<DbModelConfiguration[]> => {
+export async function listModels(): Promise<DbModelConfiguration[]> {
   return await db.query.modelConfiguration.findMany();
-};
+}
 
-export const getRuntimeConfiguration = async (): Promise<RuntimeConfiguration> => {
+export async function getModelConfigForType(modelType: RuntimeModelType) {
+  if (modelType === "fast") {
+    const runtimeConfig = await db.query.runtimeConfiguration.findFirst();
+    if (!runtimeConfig?.fastModelId) {
+      throw new Error("Fast model is not configured");
+    }
+    const fastModel = await db.query.modelConfiguration.findFirst({
+      where: eq(modelConfiguration.id, runtimeConfig.fastModelId),
+    });
+    if (!fastModel) {
+      throw new Error("Fatal error, fast runtime model is not found");
+    }
+    return fastModel;
+  } else {
+    const runtimeConfig = await db.query.runtimeConfiguration.findFirst();
+    if (!runtimeConfig?.accurateModelId) {
+      throw new Error("Accurate model is not configured");
+    }
+    const accurateModel = await db.query.modelConfiguration.findFirst({
+      where: eq(modelConfiguration.id, runtimeConfig.accurateModelId),
+    });
+    if (!accurateModel) {
+      throw new Error("Fatal error, accurate runtime model is not found");
+    }
+    return accurateModel;
+  }
+}
+
+export async function getRuntimeConfiguration(): Promise<RuntimeConfiguration> {
   const runtimeConfig = await db.query.runtimeConfiguration.findFirst();
   if (!runtimeConfig)
     return {
@@ -41,9 +69,9 @@ export const getRuntimeConfiguration = async (): Promise<RuntimeConfiguration> =
         }
       : null,
   };
-};
+}
 
-export const setRuntimeModel = async (type: RuntimeModelType, modelId: string) => {
+export async function setRuntimeModel(type: RuntimeModelType, modelId: string) {
   const runtimeConfig = await db.query.runtimeConfiguration.findFirst();
 
   if (!runtimeConfig) {
@@ -68,7 +96,7 @@ export const setRuntimeModel = async (type: RuntimeModelType, modelId: string) =
         .where(eq(runtimeConfiguration.id, runtimeConfig.id));
     }
   }
-};
+}
 
 export const addNewModel = async (modelConfig: {
   provider: string;
@@ -89,7 +117,7 @@ export const addNewModel = async (modelConfig: {
     .returning();
 };
 
-export const updateModel = async (
+export async function updateModel(
   modelId: string,
   modelConfig: {
     provider: string;
@@ -98,7 +126,7 @@ export const updateModel = async (
     displayName?: string;
     baseUrl?: string;
   },
-) => {
+) {
   return await db
     .update(modelConfiguration)
     .set({
@@ -110,9 +138,9 @@ export const updateModel = async (
     })
     .where(eq(modelConfiguration.id, modelId))
     .returning();
-};
+}
 
-export const deleteModel = async (modelId: string) => {
+export async function deleteModel(modelId: string) {
   // Check if model is assigned in runtime config
   const runtimeConfig = await db.query.runtimeConfiguration.findFirst();
   if (runtimeConfig) {
@@ -122,4 +150,4 @@ export const deleteModel = async (modelId: string) => {
   }
 
   return await db.delete(modelConfiguration).where(eq(modelConfiguration.id, modelId));
-};
+}

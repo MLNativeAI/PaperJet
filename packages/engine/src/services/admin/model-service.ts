@@ -5,6 +5,8 @@ import { logger } from "@paperjet/shared";
 import { AISDKError, generateObject, type LanguageModel } from "ai";
 import z from "zod";
 import type { ConnectionValidationResult, ModelConfigParams } from "../../types";
+import { RuntimeModelType } from "@paperjet/db/types";
+import { getModelConfigForType } from "@paperjet/db";
 
 export async function validateConnection(modelConfig: ModelConfigParams): Promise<ConnectionValidationResult> {
   const modelInstance = await getModelInstance(modelConfig);
@@ -73,4 +75,15 @@ export async function getModelInstance(modelConfig: ModelConfigParams): Promise<
       }).chatModel(modelConfig.modelName);
     }
   }
+}
+
+export async function getModelForType(modelType: RuntimeModelType) {
+  const dbModelConfig = await getModelConfigForType(modelType);
+  const modelConfig: ModelConfigParams = {
+    ...dbModelConfig,
+    provider: dbModelConfig.provider as "google" | "openai" | "custom",
+    providerApiKey: dbModelConfig.providerApiKey || "undefined",
+    baseUrl: dbModelConfig.baseUrl || undefined,
+  };
+  return getModelInstance(modelConfig);
 }

@@ -172,10 +172,10 @@ export const runtimeConfiguration = pgTable("runtime_configuration", {
 
 export const modelConfiguration = pgTable("model_configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  provider: text("provider"),
+  provider: text("provider").notNull(),
   providerApiKey: text("provider_api_key"),
-  modelName: text("model_name"),
-  displayName: text("display_name"),
+  modelName: text("model_name").notNull(),
+  displayName: text("display_name").notNull(),
   baseUrl: text("base_url"),
 });
 
