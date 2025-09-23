@@ -1,32 +1,30 @@
-import { getUsagePrices } from "@paperjet/db";
-
-const cache = new Map<string, UsagePrice>();
-
-type UsagePrice = {
-  inputCost: number;
-  outputCost: number;
-};
-
-async function getModelPrice(model: string): Promise<UsagePrice | null> {
-  if (cache.has(model)) {
-    return cache.get(model) ?? null;
-  }
-
-  const modelPrices = await getUsagePrices({ model: model });
-
-  if (modelPrices.length > 0 && modelPrices[0]) {
-    const usagePrice = {
-      inputCost: Number(modelPrices[0].inputCostPerMillionTokens),
-      outputCost: Number(modelPrices[0].outputCostPerMillionTokens),
-    };
-
-    cache.set(model, usagePrice);
-    return usagePrice;
-  }
-
-  return null;
-}
-
+// const cache = new Map<string, UsagePrice>();
+//
+// type UsagePrice = {
+//   inputCost: number;
+//   outputCost: number;
+// };
+//
+// async function getModelPrice(model: string): Promise<UsagePrice | null> {
+//   if (cache.has(model)) {
+//     return cache.get(model) ?? null;
+//   }
+//
+//   const modelPrices = await getUsagePrices({ model: model });
+//
+//   if (modelPrices.length > 0 && modelPrices[0]) {
+//     const usagePrice = {
+//       inputCost: Number(modelPrices[0].inputCostPerMillionTokens),
+//       outputCost: Number(modelPrices[0].outputCostPerMillionTokens),
+//     };
+//
+//     cache.set(model, usagePrice);
+//     return usagePrice;
+//   }
+//
+//   return null;
+// }
+//
 // const calculateCost = (
 //   usagePrice: UsagePrice,
 //   usage: LanguageModelUsage,

@@ -100,7 +100,6 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
                     <RocketIcon />
                     Fast
                   </div>
-                  {/** biome-ignore lint/correctness/useUniqueElementIds: this is fine */}
                   <RadioGroupItem value="fast" id="fast" className="mt-2" />
                 </CardTitle>
               </CardHeader>
@@ -124,7 +123,6 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
                     <BrainIcon />
                     Accurate
                   </div>
-                  {/** biome-ignore lint/correctness/useUniqueElementIds: this is fine */}
                   <RadioGroupItem value="accurate" id="accurate" className="mt-2" />
                 </CardTitle>
               </CardHeader>
