@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/MLNativeAI/PaperJet/compare/v1.2.0...v1.2.1) (2025-09-23)
+
+
+### Bug Fixes
+
+* api key dialog ([91e59ed](https://github.com/MLNativeAI/PaperJet/commit/91e59ed892424e473c27f514ec8f64557cb8af07))
+
 # [1.2.0](https://github.com/MLNativeAI/PaperJet/compare/v1.1.5...v1.2.0) (2025-09-23)
 
 
