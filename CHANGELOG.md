@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/MLNativeAI/PaperJet/compare/v1.1.5...v1.2.0) (2025-09-23)
+
+
+### Features
+
+* new model configuration ([#7](https://github.com/MLNativeAI/PaperJet/issues/7)) ([50124d5](https://github.com/MLNativeAI/PaperJet/commit/50124d5c0d5a56ffd462a46a7d8b23b357c803e1))
+
 ## [1.1.5](https://github.com/MLNativeAI/PaperJet/compare/v1.1.4...v1.1.5) (2025-09-18)
 
 
