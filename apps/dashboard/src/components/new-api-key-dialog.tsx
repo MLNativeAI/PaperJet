@@ -24,8 +24,17 @@ interface NewApiKeyDialogProps {
 export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDialogProps) {
   const [name, setName] = useState("");
   const [newKey, setNewKey] = useState<string | null>(null);
-  const [showKeyDialog, setShowKeyDialog] = useState(false);
+  const [isCreated, setIsCreated] = useState(false);
   const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey();
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setName("");
+      setNewKey(null);
+      setIsCreated(false);
+    }
+    onOpenChange(open);
+  };
 
   const handleCreate = () => {
     if (!name.trim()) {
@@ -36,13 +45,8 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
     createApiKey(name.trim(), {
       onSuccess: (data) => {
         setNewKey(data.key);
-        setShowKeyDialog(true);
+        setIsCreated(true);
         setName("");
-        // Close the create dialog after a short delay to ensure the key dialog is visible
-        setTimeout(() => {
-          onOpenChange(false);
-          onSuccess();
-        }, 100);
       },
       onError: () => {
         toast.error("Failed to create API key");
@@ -67,19 +71,48 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
 
   const handleKeyDialogClose = () => {
     setNewKey(null);
-    setShowKeyDialog(false);
+    setIsCreated(false);
+    onOpenChange(false);
+    onSuccess();
   };
 
   return (
-    <>
-      {/* Create API Key Dialog */}
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create API Key</DialogTitle>
-            <DialogDescription>Create a new API key to access the PaperJet API programmatically.</DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className={isCreated ? "max-w-5xl" : ""}>
+        <DialogHeader>
+          {isCreated ? (
+            <div className="flex items-center gap-2">
+              <Key className="h-5 w-5 text-green-600" />
+              <DialogTitle>API Key Created Successfully</DialogTitle>
+            </div>
+          ) : (
+            <>
+              <DialogTitle>Create API Key</DialogTitle>
+              <DialogDescription>Create a new API key to access the PaperJet API programmatically.</DialogDescription>
+            </>
+          )}
+        </DialogHeader>
 
+        {isCreated ? (
+          <div className="space-y-4">
+            <Alert className="border-amber-200 bg-amber-50">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800">
+                Make sure to copy your API key now. You won't be able to see it again!
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <Label>Your API Key</Label>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 p-3 bg-muted rounded-md text-sm font-mono select-all break-all">{newKey}</code>
+                <Button variant="outline" size="icon" onClick={copyToClipboard}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Key Name</Label>
@@ -99,52 +132,23 @@ export function NewApiKeyDialog({ open, onOpenChange, onSuccess }: NewApiKeyDial
               </p>
             </div>
           </div>
+        )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create Key"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Show New Key Dialog */}
-      <Dialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
-        <DialogContent className="max-w-5xl">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <Key className="h-5 w-5 text-green-600" />
-              <DialogTitle>API Key Created Successfully</DialogTitle>
-            </div>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <Alert className="border-amber-200 bg-amber-50">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-amber-800">
-                Make sure to copy your API key now. You won't be able to see it again!
-              </AlertDescription>
-            </Alert>
-
-            <div className="space-y-2">
-              <Label>Your API Key</Label>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 p-3 bg-muted rounded-md text-sm font-mono select-all break-all">{newKey}</code>
-                <Button variant="outline" size="icon" onClick={copyToClipboard}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
+        <DialogFooter>
+          {isCreated ? (
             <Button onClick={handleKeyDialogClose}>I've Copied the Key</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreate} disabled={isCreating}>
+                {isCreating ? "Creating..." : "Create Key"}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
