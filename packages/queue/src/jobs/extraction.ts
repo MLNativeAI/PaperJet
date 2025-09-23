@@ -1,6 +1,6 @@
+import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { extractDataFromMarkdown } from "@paperjet/engine";
 import { type Job, Queue, Worker } from "bullmq";
-import z from "zod";
 import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
 import type { WorkflowExtractionData } from "../workflows/extraction";
@@ -22,7 +22,12 @@ export const extractWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_JOB,
   async (job: Job<WorkflowExtractionData>) => {
     const { workflowId, workflowExecutionId, configuration, modelType } = job.data;
-    const result = await extractDataFromMarkdown(workflowId, workflowExecutionId, configuration, modelType);
+    const result = await extractDataFromMarkdown(
+      workflowId,
+      workflowExecutionId,
+      configuration as WorkflowConfiguration,
+      modelType,
+    );
     return { success: true, extractedData: result };
   },
   {

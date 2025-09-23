@@ -2,7 +2,6 @@ import type { DbModelConfiguration } from "@paperjet/db/types";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import AddEditModelForm from "@/components/admin/add-model-form";
-import EditModelForm from "@/components/admin/edit-model-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
