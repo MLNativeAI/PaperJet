@@ -5,7 +5,9 @@ const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
 
 export const executeWorkflowBulk = async (workflowId: string, files: File[]): Promise<any> => {
   const formData = new FormData();
-  files.forEach((file) => formData.append("files", file));
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
 
   const executeBulkResponse = await fetch(`/api/v1/workflows/${workflowId}/execute-bulk`, {
     method: "POST",

@@ -2,18 +2,21 @@ import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { workflow } from "../schema";
+import type { RuntimeModelType } from "../types/configuration";
 import type { DbWorkflow } from "../types/tables";
 import type { WorkflowConfiguration } from "../types/workflow-config";
 
 export async function updateWorkflow({
   workflowId,
   name,
+  modelType,
   description,
   configuration,
   organizationId,
 }: {
   workflowId: string;
   name: string;
+  modelType: string;
   description: string;
   configuration: WorkflowConfiguration;
   organizationId: string;
@@ -24,6 +27,7 @@ export async function updateWorkflow({
       name: name,
       description: description,
       configuration: configuration,
+      modelType: modelType,
     })
     .where(and(eq(workflow.id, workflowId), eq(workflow.ownerId, organizationId)));
 }
@@ -32,12 +36,14 @@ export async function createWorkflow({
   name,
   description,
   configuration,
+  modelType,
   organizationId,
   userId,
 }: {
   name: string;
   description: string;
   configuration: WorkflowConfiguration;
+  modelType: RuntimeModelType;
   organizationId: string;
   userId: string;
 }): Promise<DbWorkflow> {
@@ -47,6 +53,7 @@ export async function createWorkflow({
     name: name,
     description: description || "",
     configuration: configuration,
+    modelType: modelType,
     ownerId: organizationId,
     creatorId: userId,
   };

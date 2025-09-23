@@ -5,9 +5,9 @@ import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
-    const { isSetupRequired } = await isAdminSetupRequired();
+    const { adminAccountExists } = await isAdminSetupRequired();
 
-    if (isSetupRequired) {
+    if (!adminAccountExists) {
       throw redirect({
         to: "/admin/setup",
       });

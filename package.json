@@ -17,7 +17,6 @@
     "db:seed": "turbo db:seed"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.1.1",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.1",
     "@semantic-release/changelog": "^6.0.3",
@@ -38,5 +37,8 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "1.1.5"
+  "version": "1.1.5",
+  "dependencies": {
+    "@biomejs/biome": "^2.2.4"
+  }
 }

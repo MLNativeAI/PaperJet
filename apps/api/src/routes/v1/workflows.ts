@@ -3,12 +3,13 @@ import { getUserSession } from "@paperjet/auth/session";
 import {
   createWorkflow,
   deleteWorkflow,
+  getWorkflow,
   getWorkflowByOwner,
   getWorkflowExecutionWithExtractedData,
   updateExecutionJobId,
   updateWorkflow,
 } from "@paperjet/db";
-import { WorkflowConfigurationSchema } from "@paperjet/db/types";
+import { type WorkflowConfiguration, WorkflowConfigurationSchema } from "@paperjet/db/types";
 import { getWorkflows, uploadFileAndCreateExecution } from "@paperjet/engine";
 import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
@@ -22,12 +23,14 @@ const createWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
   configuration: WorkflowConfigurationSchema,
+  modelType: z.enum(["fast", "accurate"]),
 });
 
 const updateWorkflowApiSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
   description: z.string().default(""),
   configuration: WorkflowConfigurationSchema,
+  modelType: z.enum(["fast", "accurate"]),
 });
 
 function validateFiles(body: any): { success: true; files: File[] } | { success: false; error: string } {
@@ -73,6 +76,7 @@ const router = app
         name: createWorkflowData.name,
         description: createWorkflowData.description,
         configuration: createWorkflowData.configuration,
+        modelType: createWorkflowData.modelType,
         organizationId: session.activeOrganizationId,
         userId: session.userId,
       });
@@ -126,12 +130,20 @@ const router = app
           session.userId,
           file,
         );
-        const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+        const workflow = await getWorkflow({ workflowId });
+        const validConfig = workflow.configuration as WorkflowConfiguration;
+        const workflowExecutionParams = {
           workflowId: execution.workflowId,
           workflowExecutionId: execution.workflowExecutionId,
-        });
-        const jobId = job.id;
-        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: jobId || "" });
+          modelType: workflow.modelType,
+          configuration: validConfig,
+        };
+        logger.info(workflowExecutionParams, "Workflow execuion params:");
+        const job = await workflowExecutionQueue.add(execution.workflowExecutionId, workflowExecutionParams);
+        if (!job.id) {
+          throw new Error("job id not found");
+        }
+        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: job.id });
         return c.json({
           ...execution,
         });
@@ -177,10 +189,16 @@ const router = app
             session.userId,
             file,
           );
-          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, {
+          const workflow = await getWorkflow({ workflowId });
+          const validConfig = workflow.configuration as WorkflowConfiguration;
+          const workflowExecutionParams = {
             workflowId: execution.workflowId,
             workflowExecutionId: execution.workflowExecutionId,
-          });
+            modelType: workflow.modelType,
+            configuration: validConfig,
+          };
+          logger.info(workflowExecutionParams, "Workflow execuion params:");
+          const job = await workflowExecutionQueue.add(execution.workflowExecutionId, workflowExecutionParams);
           if (!job.id) {
             throw new Error("job id not found");
           }
@@ -234,6 +252,7 @@ const router = app
         await updateWorkflow({
           workflowId,
           name: updateWorkflowData.name,
+          modelType: updateWorkflowData.modelType,
           description: updateWorkflowData.description,
           configuration: updateWorkflowData.configuration,
           organizationId: session.activeOrganizationId,

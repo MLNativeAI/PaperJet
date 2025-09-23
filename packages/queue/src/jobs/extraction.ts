@@ -1,8 +1,9 @@
+import type { WorkflowConfiguration } from "@paperjet/db/types";
 import { extractDataFromMarkdown } from "@paperjet/engine";
 import { type Job, Queue, Worker } from "bullmq";
-import z from "zod";
 import { redisConnection } from "../redis";
 import { QUEUE_NAMES } from "../types";
+import type { WorkflowExtractionData } from "../workflows/extraction";
 
 export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
   connection: redisConnection,
@@ -17,18 +18,16 @@ export const extractionQueue = new Queue(QUEUE_NAMES.EXTRACTION_JOB, {
   },
 });
 
-const extractionJobSchema = z.object({
-  workflowId: z.string(),
-  workflowExecutionId: z.string(),
-});
-
-export type ExtractionJobData = z.infer<typeof extractionJobSchema>;
-
 export const extractWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_JOB,
-  async (job: Job<ExtractionJobData>) => {
-    const { workflowId, workflowExecutionId } = job.data;
-    const result = await extractDataFromMarkdown(workflowId, workflowExecutionId);
+  async (job: Job<WorkflowExtractionData>) => {
+    const { workflowId, workflowExecutionId, configuration, modelType } = job.data;
+    const result = await extractDataFromMarkdown(
+      workflowId,
+      workflowExecutionId,
+      configuration as WorkflowConfiguration,
+      modelType,
+    );
     return { success: true, extractedData: result };
   },
   {

@@ -5,8 +5,7 @@
   "scripts": {
     "devw": "next dev --port 4000",
     "build": "next build",
-    "start": "next start",
-    "lint": "biome check --write"
+    "start": "next start"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",

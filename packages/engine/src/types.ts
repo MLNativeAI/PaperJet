@@ -1,4 +1,4 @@
-import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
+import type { DbWorkflowExecution, RuntimeModelType, WorkflowConfiguration } from "@paperjet/db/types";
 import z from "zod";
 
 export type ConnectionValidationResult = {
@@ -6,40 +6,17 @@ export type ConnectionValidationResult = {
   error: string | null;
 };
 
-export type Configuration = {
-  modelType: ModelType;
-  geminiApiKey?: string;
-  customModelUrl?: string;
-  customModelName?: string;
-  customModelToken?: string;
-  structuredOutputMode?: "json" | "tool";
-};
+const availableProviders = z.enum(["google", "openai", "custom"]);
 
-export type ValidModelConfig =
-  | {
-      type: "cloud";
-      geminiApiKey: string;
-    }
-  | {
-      type: "custom";
-      customModelUrl: string;
-      customModelName: string;
-      customModelToken?: string;
-      structuredOutputMode: "json" | "tool";
-    };
-
-export type ModelType = "cloud" | "custom";
-
-export const configUpdateSchema = z.object({
-  modelType: z.enum(["cloud", "custom"]),
-  geminiApiKey: z.string().optional(),
-  customModelName: z.string().optional(),
-  customModelToken: z.string().optional(),
-  customModelUrl: z.string().optional(),
-  structuredOutputMode: z.enum(["json", "tool"]).optional(),
+export const modelConfigSchema = z.object({
+  provider: availableProviders,
+  providerApiKey: z.string().min(1, "API key is required"),
+  modelName: z.string().min(1, "Model name is required"),
+  displayName: z.string().optional(),
+  baseUrl: z.string().optional(),
 });
 
-export type ConfigurationUpdate = z.infer<typeof configUpdateSchema>;
+export type ModelConfigParams = z.infer<typeof modelConfigSchema>;
 
 export type PdfSplitResult = {
   success: boolean;
@@ -52,10 +29,9 @@ export type PdfSplitResult = {
   }[];
 };
 
-export type IDReference = {
-  userId?: string;
-  workflowId?: string;
-  executionId?: string;
+export type OcrResult = {
+  success: boolean;
+  markdown: string;
 };
 
 export const categoriesConfigurationSchema = z.array(
@@ -121,6 +97,7 @@ export type Workflow = {
   createdAt: string;
   updatedAt: string;
   ownerId: string;
+  modelType: RuntimeModelType;
 };
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {

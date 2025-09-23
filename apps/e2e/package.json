@@ -1,8 +1,5 @@
 {
   "name": "@paperjet/e2e",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
   "scripts": {
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test --project=smoke",
@@ -13,7 +10,7 @@
     "test:e2e:acc:ui": "playwright test --project=acc --ui"
   },
   "devDependencies": {
-    "@ai-sdk/google": "^1.2.19",
+    "@ai-sdk/google": "^2.0.15",
     "@playwright/test": "^1.49.0",
     "@types/bun": "latest",
     "@paperjet/shared": "workspace:*",
@@ -21,5 +18,9 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "ai": "^5.0.49",
+    "dotenv": "^17.2.2"
   }
 }

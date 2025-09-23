@@ -1,12 +1,19 @@
 import fs from "node:fs";
-import { type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/engine/types";
+import { type RuntimeModelType, type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/db/types";
 import { expect, type Page } from "@playwright/test";
 
-export async function createNewWorkflow(name: string, description: string, config: WorkflowConfiguration, page: Page) {
+export async function createNewWorkflow(
+  name: string,
+  description: string,
+  config: WorkflowConfiguration,
+  page: Page,
+  modelType: RuntimeModelType,
+) {
   const payload = {
     name,
     description,
     configuration: config,
+    modelType: modelType,
   };
   const newWorkflow = await page.request.post("/api/v1/workflows", {
     data: payload,

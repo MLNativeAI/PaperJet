@@ -1,4 +1,4 @@
-import type { WorkflowConfiguration } from "@paperjet/engine/types";
+import { WorkflowConfiguration } from "@paperjet/db/types";
 
 export const energyConfig: WorkflowConfiguration = {
   objects: [

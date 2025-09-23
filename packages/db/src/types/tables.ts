@@ -1,9 +1,10 @@
 import type {
   apikey,
-  configuration,
   documentData,
   file,
+  modelConfiguration,
   organization,
+  runtimeConfiguration,
   usageData,
   usageModelPrice,
   workflow,
@@ -24,6 +25,8 @@ export type DbUsageData = typeof usageData.$inferSelect;
 
 export type DbDocumentData = typeof documentData.$inferSelect;
 
-export type DbConfiguration = typeof configuration.$inferSelect;
+export type DbModelConfiguration = typeof modelConfiguration.$inferSelect;
+
+export type DbRuntimeConfiguration = typeof runtimeConfiguration.$inferSelect;
 
 export type DbApiKey = typeof apikey.$inferSelect;

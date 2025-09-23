@@ -1,10 +1,16 @@
 import { getDocumentData, getWorkflow, updateDocumentData } from "@paperjet/db";
-import type { WorkflowConfiguration } from "@paperjet/db/types";
+import type { RuntimeModelType, WorkflowConfiguration } from "@paperjet/db/types";
 import { logger } from "@paperjet/shared";
-import { generateObject } from "../lib/ai-sdk-wrapper";
+import { generateObject } from "ai";
 import { buildExtractionSchema } from "../utils/build-extraction-schema";
+import { getModelForType } from "./admin/model-service";
 
-export async function extractDataFromMarkdown(workflowId: string, workflowExecutionId: string) {
+export async function extractDataFromMarkdown(
+  workflowId: string,
+  workflowExecutionId: string,
+  configuration: WorkflowConfiguration,
+  modelType: RuntimeModelType,
+) {
   logger.debug(
     {
       workflowId,
@@ -22,8 +28,7 @@ export async function extractDataFromMarkdown(workflowId: string, workflowExecut
   if (!workflowData) {
     throw new Error("Fatal error, workflow not found");
   }
-  const validConfig = workflowData.configuration as WorkflowConfiguration;
-  const extractionResult = await runDocumentExtraction(documentData.rawMarkdown, validConfig);
+  const extractionResult = await runDocumentExtraction(documentData.rawMarkdown, configuration, modelType);
   await updateDocumentData({ documentDataId: documentData.id, extractedData: extractionResult });
   logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
@@ -31,6 +36,7 @@ export async function extractDataFromMarkdown(workflowId: string, workflowExecut
 export async function runDocumentExtraction(
   markdownDocument: string,
   configuration: WorkflowConfiguration,
+  modelType: RuntimeModelType,
 ): Promise<any> {
   // Build dynamic schema object based on provided fields and tables
   const schemaObj = buildExtractionSchema(configuration);
@@ -74,7 +80,8 @@ Instructions:
 - For tables, extract all rows found
 - Maintain data accuracy and completeness
 - Structure the output to match the object hierarchy shown above`;
-  const result = await generateObject("document-extraction", {
+  const result = await generateObject({
+    model: await getModelForType(modelType),
     schema: schemaObj,
     messages: [
       {

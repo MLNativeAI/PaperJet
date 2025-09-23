@@ -23,7 +23,7 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
         }
       });
 
-      objectProperties.fields = z.object(fieldsSchema);
+      objectProperties.fields = z.object(fieldsSchema).optional();
     }
 
     if ("tables" in obj) {

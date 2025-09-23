@@ -17,10 +17,12 @@ interface WorkflowConfigContextType {
   workflowConfig: DraftWorkflowConfig;
   name: string;
   description: string;
+  modelType: "fast" | "accurate";
   setName: (name: string) => void;
   setDescription: (description: string) => void;
-  createWorkflow: UseMutationResult<never, Error, void, unknown>;
-  updateWorkflow: UseMutationResult<never, Error, void, unknown>;
+  setModelType: (type: "fast" | "accurate") => void;
+  createWorkflow: UseMutationResult<{ workflowId: string; message: string }, Error, void, unknown>;
+  updateWorkflow: UseMutationResult<{ workflowId: string; message: string }, Error, void, unknown>;
   addAnObject: (initialValues?: { name?: string; description?: string }) => void;
   updateObject: (updatedObject: DraftObject) => void;
   removeObject: (objectId: string) => void;
@@ -47,7 +49,10 @@ export function WorkflowConfigProvider({
 }) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({ objects: [] });
+  const [modelType, setModelType] = useState<"fast" | "accurate">("accurate");
+  const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({
+    objects: [],
+  });
   const queryClient = useQueryClient();
 
   const createWorkflow = useMutation({
@@ -55,6 +60,7 @@ export function WorkflowConfigProvider({
       const response = await workflowClient.index.$post({
         json: {
           configuration: toWorkflowConfig(workflowConfig),
+          modelType: modelType,
           name: name,
           description: description,
         },
@@ -85,6 +91,7 @@ export function WorkflowConfigProvider({
           configuration: toWorkflowConfig(workflowConfig),
           name: name,
           description: description,
+          modelType: modelType,
         },
       });
       if (!response.ok) {
@@ -101,9 +108,12 @@ export function WorkflowConfigProvider({
 
   useEffect(() => {
     if (initialWorkflow) {
-      setWorkflowConfig({ objects: fromWorkflowConfig(initialWorkflow.configuration) });
+      setWorkflowConfig({
+        objects: fromWorkflowConfig(initialWorkflow.configuration),
+      });
       setName(initialWorkflow.name);
       setDescription(initialWorkflow.description);
+      setModelType(initialWorkflow.modelType);
     }
   }, [initialWorkflow]);
 
@@ -239,8 +249,10 @@ export function WorkflowConfigProvider({
         workflowConfig,
         name,
         description,
+        modelType,
         setName,
         setDescription,
+        setModelType,
         createWorkflow,
         updateWorkflow,
         addAnObject,

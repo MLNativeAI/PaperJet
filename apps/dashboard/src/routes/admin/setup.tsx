@@ -4,21 +4,13 @@ import AdminSetupPage from "@/pages/admin-setup-page";
 
 export const Route = createFileRoute("/admin/setup")({
   beforeLoad: async () => {
-    const { isSetupRequired } = await isAdminSetupRequired();
+    const { adminAccountExists } = await isAdminSetupRequired();
 
-    if (!isSetupRequired) {
+    if (adminAccountExists) {
       throw redirect({
         to: "/",
       });
     }
-
-    // const { data: session } = await authClient.getSession();
-    // if (session) {
-    //   throw redirect({
-    //     to: "/",
-    //   });
-    // }
-
     return {
       breadcrumbs: [
         {

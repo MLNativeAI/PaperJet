@@ -1,10 +1,6 @@
 import { sql } from "drizzle-orm";
 import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const modeTypeEnum = pgEnum("modelType", ["cloud", "custom"]);
-
-export const structuredOutputModeEnum = pgEnum("structuredOutputMode", ["json", "tool"]);
-
 export const workflowExecutionStatusEnum = pgEnum("workflowExecutionStatus", [
   "Queued",
   "Processing",
@@ -84,6 +80,7 @@ export const workflow = pgTable("workflow", {
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
   configuration: jsonb("configuration").notNull(),
+  modelType: text("model_type").notNull().default("fast"),
   ownerId: text("owner_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -167,14 +164,19 @@ export const usageData = pgTable("usage_data", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const configuration = pgTable("configuration", {
+export const runtimeConfiguration = pgTable("runtime_configuration", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  modelType: modeTypeEnum().notNull().default("cloud"),
-  geminiApiKey: text("gemini_api_key"),
-  customModelUrl: text("custom_model_url"),
-  customModelName: text("custom_model_name"),
-  customModelToken: text("custom_model_token"),
-  structuredOutputMode: structuredOutputModeEnum().notNull().default("tool"),
+  accurateModelId: text("accurate_model_id").references(() => modelConfiguration.id),
+  fastModelId: text("fast_model_id").references(() => modelConfiguration.id),
+});
+
+export const modelConfiguration = pgTable("model_configuration", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  provider: text("provider").notNull(),
+  providerApiKey: text("provider_api_key"),
+  modelName: text("model_name").notNull(),
+  displayName: text("display_name").notNull(),
+  baseUrl: text("base_url"),
 });
 
 export const apikey = pgTable("apikey", {

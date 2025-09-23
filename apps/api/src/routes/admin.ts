@@ -1,11 +1,19 @@
 import { zValidator } from "@hono/zod-validator";
 import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
-import { doesAdminAccountExist, getConfiguration } from "@paperjet/db";
-import { getUsageStats } from "@paperjet/engine";
-import { configUpdateSchema } from "@paperjet/engine/types";
-import { getAuthMode, logger } from "@paperjet/shared";
+import {
+  addNewModel,
+  deleteModel,
+  doesAdminAccountExist,
+  getRuntimeConfiguration,
+  listModels,
+  setRuntimeModel,
+  updateModel,
+} from "@paperjet/db";
+import { getUsageStats, validateConnection } from "@paperjet/engine";
+import { modelConfigSchema } from "@paperjet/engine/types";
+import { getAuthMode } from "@paperjet/shared";
 import { Hono } from "hono";
-import z from "zod";
+import { z } from "zod";
 
 const app = new Hono();
 
@@ -34,39 +42,82 @@ const router = app
       usageStats: usageStats,
     });
   })
-  .get("/config", async (c) => {
-    const configuration = await getConfiguration();
-    return c.json(configuration);
+  .get("/models", async (c) => {
+    const models = await listModels();
+    return c.json(models);
   })
-  .patch("/config", zValidator("json", configUpdateSchema), async (c) => {
+  .get("/runtime-config", async (c) => {
+    const config = await getRuntimeConfiguration();
+    return c.json(config);
+  })
+  .post("/models/add", zValidator("json", modelConfigSchema), async (c) => {
     try {
-      const _body = c.req.valid("json");
-      return c.json({ message: "Configuration has been updated" });
+      const modelParams = c.req.valid("json");
+      const result = await addNewModel(modelParams);
+      return c.json({ success: true, model: result[0] });
     } catch (error) {
-      logger.error(error, "Update workflow basic data error:");
-      if (error instanceof z.ZodError) {
-        return c.json({ error: "Invalid config data", details: error.errors }, 400);
-      }
-      if (error instanceof Error && error.message === "Workflow not found") {
-        return c.json({ error: "Workflow not found" }, 404);
-      }
-      return c.json({ error: "Internal server error" }, 500);
+      console.error("Failed to add model:", error);
+      return c.json({ error: "Failed to add model configuration" }, 500);
     }
   })
-  .post("/validate-connection", zValidator("json", configUpdateSchema), async (c) => {
+  .post("/models/validate-connection", zValidator("json", modelConfigSchema), async (c) => {
     try {
-      const _body = c.req.valid("json");
-      return c.json({});
+      const modelParams = c.req.valid("json");
+      const result = await validateConnection(modelParams);
+      return c.json(result);
     } catch (error) {
-      logger.error(error, "Update workflow basic data error:");
-      if (error instanceof z.ZodError) {
-        return c.json({ error: "Invalid config data", details: error.errors }, 400);
-      }
-      if (error instanceof Error && error.message === "Workflow not found") {
-        return c.json({ error: "Workflow not found" }, 404);
-      }
-      return c.json({ error: "Internal server error" }, 500);
+      return c.json({ error: error }, 500);
     }
-  });
+  })
+  .put("/models/update", zValidator("json", z.object({ id: z.string() }).merge(modelConfigSchema)), async (c) => {
+    try {
+      const { id, ...modelParams } = c.req.valid("json");
+      const result = await updateModel(id, modelParams);
+      return c.json({ success: true, model: result[0] });
+    } catch (error) {
+      console.error("Failed to update model:", error);
+      return c.json(
+        {
+          error: (error as Error).message || "Failed to update model configuration",
+        },
+        500,
+      );
+    }
+  })
+  .delete("/models/delete", zValidator("json", z.object({ id: z.string() })), async (c) => {
+    try {
+      const { id } = c.req.valid("json");
+      await deleteModel(id);
+      return c.json({ success: true });
+    } catch (error) {
+      console.error("Failed to delete model:", error);
+      return c.json(
+        {
+          error: (error as Error).message || "Failed to delete model configuration",
+        },
+        500,
+      );
+    }
+  })
+  .post(
+    "/runtime-config",
+    zValidator(
+      "json",
+      z.object({
+        type: z.enum(["fast", "accurate"]),
+        modelId: z.string(),
+      }),
+    ),
+    async (c) => {
+      try {
+        const { type, modelId } = c.req.valid("json");
+        await setRuntimeModel(type, modelId);
+        return c.json({ success: true });
+      } catch (error) {
+        console.error("Failed to set runtime model:", error);
+        return c.json({ error: "Failed to set runtime model" }, 500);
+      }
+    },
+  );
 export { router as adminRouter };
 export type AdminRoutes = typeof router;

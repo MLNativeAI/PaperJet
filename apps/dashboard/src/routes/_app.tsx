@@ -9,8 +9,8 @@ import { authClient } from "@/lib/auth-client";
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
   beforeLoad: async () => {
-    const { isSetupRequired } = await isAdminSetupRequired();
-    if (isSetupRequired) {
+    const { adminAccountExists } = await isAdminSetupRequired();
+    if (!adminAccountExists) {
       throw redirect({
         to: "/admin/setup",
       });
