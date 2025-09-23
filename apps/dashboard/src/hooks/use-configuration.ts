@@ -23,27 +23,9 @@ export function useConfiguration() {
     },
   });
 
-  const updateConfiguration = useMutation({
-    mutationFn: async (config: Configuration) => {
-      const response = await adminClient.config.$patch({
-        json: config,
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        console.error(error);
-        throw new Error("Failed to update configuration");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["config"] });
-    },
-  });
-
   return {
     configuration,
     isLoading,
     refetch,
-    updateConfiguration,
   };
 }

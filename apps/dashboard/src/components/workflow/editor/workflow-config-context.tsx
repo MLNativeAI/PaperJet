@@ -49,7 +49,7 @@ export function WorkflowConfigProvider({
 }) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [modelType, setModelType] = useState<"fast" | "accurate">("fast");
+  const [modelType, setModelType] = useState<"fast" | "accurate">("accurate");
   const [workflowConfig, setWorkflowConfig] = useState<DraftWorkflowConfig>({
     objects: [],
   });
@@ -91,6 +91,7 @@ export function WorkflowConfigProvider({
           configuration: toWorkflowConfig(workflowConfig),
           name: name,
           description: description,
+          modelType: modelType,
         },
       });
       if (!response.ok) {
@@ -112,6 +113,7 @@ export function WorkflowConfigProvider({
       });
       setName(initialWorkflow.name);
       setDescription(initialWorkflow.description);
+      setModelType(initialWorkflow.modelType);
     }
   }, [initialWorkflow]);
 

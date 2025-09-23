@@ -1,8 +1,8 @@
 import type { WorkflowRoutes } from "@paperjet/api/routes";
+import type { Workflow } from "@paperjet/engine/types";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import WorkflowEditPage from "@/pages/workflow-edit-page";
-import { Workflow } from "@paperjet/engine/types";
 
 const workflowClient = hc<WorkflowRoutes>("/api/v1/workflows");
 

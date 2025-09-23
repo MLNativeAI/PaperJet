@@ -35,7 +35,7 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
         <div>
           <Label htmlFor="workflow-name">Workflow Name</Label>
           <Input
-            id="workflow-name"
+            id={name}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter workflow name"
@@ -46,7 +46,7 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
         <div>
           <Label htmlFor="workflow-description">Description</Label>
           <Textarea
-            id="workflow-description"
+            id={description}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter workflow description"
@@ -100,6 +100,7 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
                     <RocketIcon />
                     Fast
                   </div>
+                  {/** biome-ignore lint/correctness/useUniqueElementIds: this is fine */}
                   <RadioGroupItem value="fast" id="fast" className="mt-2" />
                 </CardTitle>
               </CardHeader>
@@ -123,6 +124,7 @@ export function WorkflowForm({ title, subtitle, handleSave, isPending, buttonTex
                     <BrainIcon />
                     Accurate
                   </div>
+                  {/** biome-ignore lint/correctness/useUniqueElementIds: this is fine */}
                   <RadioGroupItem value="accurate" id="accurate" className="mt-2" />
                 </CardTitle>
               </CardHeader>

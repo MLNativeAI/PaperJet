@@ -1,4 +1,4 @@
-import type { DbWorkflowExecution, WorkflowConfiguration } from "@paperjet/db/types";
+import type { DbWorkflowExecution, RuntimeModelType, WorkflowConfiguration } from "@paperjet/db/types";
 import z from "zod";
 
 export type ConnectionValidationResult = {
@@ -97,6 +97,7 @@ export type Workflow = {
   createdAt: string;
   updatedAt: string;
   ownerId: string;
+  modelType: RuntimeModelType;
 };
 
 export type WorkflowRun = Omit<DbWorkflowExecution, "ownerId"> & {
