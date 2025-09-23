@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { expect, type Page } from "@playwright/test";
-import { generateObject } from "ai";
 import { z } from "zod";
+import { generateObject } from "ai";
 
 const AccuracyResultSchema = z.object({
   accuracyScore: z.number().min(0).max(100),
@@ -67,12 +67,7 @@ Return a JSON object with accuracyScore (number 0-100), passed (boolean), feedba
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   });
-
-  const model = google("gemini-2.5-flash", {
-    structuredOutputs: true,
-  });
-
-  // Use AI SDK to verify accuracy
+  const model = google("gemini-2.5-flash");
   const result = await generateObject({
     model,
     schema: AccuracyResultSchema,
