@@ -27,12 +27,12 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "PaperJet ML Service is running"}
 
 
 @app.post("/ocr")
-async def ocr(presigned_url: Annotated[str, Form()]):
+def ocr(presigned_url: Annotated[str, Form()]):
     try:
         # Download the PDF from presigned URL
         r = requests.get(presigned_url)
@@ -94,7 +94,7 @@ async def ocr(presigned_url: Annotated[str, Form()]):
 
 
 @app.post("/split-pdf")
-async def split_pdf(presigned_url: Annotated[str, Form()]):
+def split_pdf(presigned_url: Annotated[str, Form()]):
     try:
         r = requests.get(presigned_url)
         data = r.content

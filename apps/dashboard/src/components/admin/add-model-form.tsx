@@ -66,11 +66,9 @@ export default function AddEditModelForm({
     setIsLoading(true);
     try {
       if (model) {
-        console.log("Updating model configuration:", model.id, values);
         updateModel.mutate({ id: model.id, config: values });
         toast.success("Model configuration updated successfully");
       } else {
-        console.log("Creating model configuration:", values);
         addModel.mutate(values);
         toast.success("Model configuration added successfully");
         form.reset();

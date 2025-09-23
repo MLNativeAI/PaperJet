@@ -69,12 +69,13 @@ export async function getModelInstance(modelConfig: ModelConfigParams): Promise<
       return openai(modelConfig.modelName);
     }
     case "custom": {
-      return createOpenAICompatible({
+      const custom = createOpenAICompatible({
         baseURL: modelConfig.baseUrl || "",
         apiKey: modelConfig.providerApiKey,
         name: modelConfig.modelName,
         supportsStructuredOutputs: true,
-      }).chatModel(modelConfig.modelName);
+      });
+      return custom(modelConfig.modelName);
     }
   }
 }

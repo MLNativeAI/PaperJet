@@ -16,7 +16,7 @@ export function AddModelDialog() {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
           <Plus className="h-5 w-5" />
           Add model
