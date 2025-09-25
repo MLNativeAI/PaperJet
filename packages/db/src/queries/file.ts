@@ -40,10 +40,11 @@ export async function getFileByWorkflowExecutionId({
   workflowExecutionId,
 }: {
   workflowExecutionId: string;
-}): Promise<{ filePath: string; ownerId: string }> {
+}): Promise<{ filePath: string; ownerId: string; fileName: string }> {
   const result = await db
     .select({
       filePath: file.filePath,
+      fileName: file.fileName,
       ownerId: file.ownerId,
     })
     .from(file)

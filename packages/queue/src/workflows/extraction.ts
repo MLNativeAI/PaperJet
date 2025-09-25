@@ -26,6 +26,7 @@ const workflowSteps = z.enum([
   "INIT",
   "WAITING_FOR_SPLIT",
   "WAITING_FOR_NATIVE_OCR",
+  "WAITING_FOR_IMAGE",
   "MARKDOWN",
   "WAITING_FOR_MARKDOWN",
   "EXTRACTION",
@@ -55,10 +56,14 @@ export const extractionWorkflowWorker = new Worker(
           switch (inputType) {
             case "image": {
               // handle image flow
+              await updateExecutionStatus({
+                workflowExecutionId: job.data.workflowExecutionId,
+                status: WorkflowExecutionStatus.enum.Processing,
+                isCompleted: false,
+              });
               logger.info("Processing image workflow");
-              await finalizeWorkflow(job);
-              await job.updateData({ ...job.data, step: workflowSteps.enum.FINISHED });
-              step = workflowSteps.enum.FINISHED;
+              await job.updateData({ ...job.data, step: workflowSteps.enum.EXTRACTION });
+              step = workflowSteps.enum.EXTRACTION;
               break;
             }
             case "document": {
@@ -167,7 +172,6 @@ async function addDocumentSplitJob(job: Job<WorkflowExtractionData>) {
     },
   );
 }
-
 async function addNativeOcrJob(job: Job<WorkflowExtractionData>) {
   const { workflowExecutionId } = job.data;
   await updateExecutionStatus({
