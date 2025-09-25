@@ -30,3 +30,5 @@ export const WorkflowConfigurationSchema = z.object({
 });
 
 export type WorkflowConfiguration = z.infer<typeof WorkflowConfigurationSchema>;
+
+export type WorkflowInputType = "image" | "document";

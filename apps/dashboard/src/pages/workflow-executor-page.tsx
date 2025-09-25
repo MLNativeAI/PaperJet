@@ -1,4 +1,4 @@
-import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
+import type { WorkflowExecutionStatus } from "@paperjet/db/types";
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { FileUpload } from "@/components/file-upload";

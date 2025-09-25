@@ -1,3 +1,4 @@
+import type { WorkflowInputType } from "@paperjet/db/types";
 import { z } from "zod";
 
 // Prefixed ID validation schemas
@@ -22,3 +23,39 @@ export const flexibleIdSchema = z.string().refine((val) => {
   const prefixedRegex = /^[a-z]{3}_[a-f0-9]{12}$/;
   return uuidRegex.test(val) || prefixedRegex.test(val);
 }, "Must be a valid UUID or prefixed ID");
+
+export type ValidatedFile = { file: File; type: WorkflowInputType; mimeType: string };
+
+export type FileValidationResponse =
+  | {
+      success: true;
+      files: ValidatedFile[];
+    }
+  | { success: false; error: string };
+
+export function validateFiles(body: any): FileValidationResponse {
+  const files = body.files;
+
+  // Convert to array if single file or already array
+  const fileArray = Array.isArray(files) ? files : [files].filter(Boolean);
+
+  if (fileArray.length === 0) {
+    return { success: false, error: "At least one file is required" };
+  }
+
+  const validatedFiles: ValidatedFile[] = [];
+
+  for (const file of fileArray) {
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, error: "Invalid file" };
+    }
+    if (file.type !== "application/pdf" && !file.type.startsWith("image/")) {
+      return { success: false, error: "All files must be PDFs or images" };
+    }
+
+    const type = file.type === "application/pdf" ? "document" : "image";
+    validatedFiles.push({ file, type, mimeType: file.type });
+  }
+
+  return { success: true, files: validatedFiles };
+}

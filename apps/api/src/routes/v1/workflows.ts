@@ -15,7 +15,7 @@ import { workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
+import { validateFiles, workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
 
 const app = new Hono();
 
@@ -32,30 +32,6 @@ const updateWorkflowApiSchema = z.object({
   configuration: WorkflowConfigurationSchema,
   modelType: z.enum(["fast", "accurate"]),
 });
-
-function validateFiles(body: any): { success: true; files: File[] } | { success: false; error: string } {
-  const files = body.files;
-
-  // Convert to array if single file or already array
-  const fileArray = Array.isArray(files) ? files : [files].filter(Boolean);
-
-  if (fileArray.length === 0) {
-    return { success: false, error: "At least one file is required" };
-  }
-
-  // Validate each file
-  for (const file of fileArray) {
-    if (!(file instanceof File) || file.size === 0) {
-      return { success: false, error: "Invalid file" };
-    }
-    if (file.type !== "application/pdf") {
-      return { success: false, error: "All files must be PDFs" };
-    }
-  }
-
-  return { success: true, files: fileArray };
-}
-
 const router = app
   .get("/", async (c) => {
     try {
@@ -116,7 +92,10 @@ const router = app
         file: z
           .instanceof(File)
           .refine((file) => file.size > 0, "File cannot be empty")
-          .refine((file) => file.type === "application/pdf", "File must be a PDF "),
+          .refine(
+            (file) => file.type === "application/pdf" || file.type.startsWith("image/"),
+            "File must be a PDF or image",
+          ),
       }),
     ),
     async (c) => {
@@ -143,7 +122,10 @@ const router = app
         if (!job.id) {
           throw new Error("job id not found");
         }
-        await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: job.id });
+        await updateExecutionJobId({
+          workflowExecutionId: execution.workflowExecutionId,
+          jobId: job.id,
+        });
         return c.json({
           ...execution,
         });
@@ -182,7 +164,7 @@ const router = app
         const executions = [];
 
         // Process each file and create executions
-        for (const file of fileArray) {
+        for (const { file } of fileArray) {
           const execution = await uploadFileAndCreateExecution(
             workflowId,
             session.activeOrganizationId,
@@ -202,7 +184,10 @@ const router = app
           if (!job.id) {
             throw new Error("job id not found");
           }
-          await updateExecutionJobId({ workflowExecutionId: execution.workflowExecutionId, jobId: job.id });
+          await updateExecutionJobId({
+            workflowExecutionId: execution.workflowExecutionId,
+            jobId: job.id,
+          });
           executions.push(execution);
         }
 
@@ -230,7 +215,10 @@ const router = app
     async (c) => {
       const { session } = await getUserSession(c);
       const { workflowId } = c.req.valid("param");
-      const workflowData = await getWorkflowByOwner({ workflowId, organizationId: session.activeOrganizationId });
+      const workflowData = await getWorkflowByOwner({
+        workflowId,
+        organizationId: session.activeOrganizationId,
+      });
       return c.json(workflowData);
     },
   )
@@ -312,7 +300,10 @@ const router = app
         const { session } = await getUserSession(c);
         const { workflowId } = c.req.valid("param");
 
-        await deleteWorkflow({ workflowId, organizationId: session.activeOrganizationId });
+        await deleteWorkflow({
+          workflowId,
+          organizationId: session.activeOrganizationId,
+        });
 
         return c.json({ message: "Workflow deleted successfully" });
       } catch (error) {

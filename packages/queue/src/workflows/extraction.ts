@@ -38,6 +38,7 @@ const WorkflowExtractionDataSchema = z.object({
   workflowExecutionId: z.string(),
   modelType: z.enum(["fast", "accurate"]),
   configuration: WorkflowConfigurationSchema,
+  inputType: z.enum(["image", "document"]),
   step: workflowSteps,
 });
 
@@ -46,20 +47,31 @@ export type WorkflowExtractionData = z.infer<typeof WorkflowExtractionDataSchema
 export const extractionWorkflowWorker = new Worker(
   QUEUE_NAMES.EXTRACTION_WORKFLOW,
   async (job: Job<WorkflowExtractionData>, token?: string) => {
-    const { modelType } = job.data;
+    const { modelType, inputType } = job.data;
     let step = job.data.step || workflowSteps.enum.INIT;
     while (step !== workflowSteps.enum.FINISHED) {
       switch (step) {
         case workflowSteps.enum.INIT: {
-          if (modelType === "accurate") {
-            await addDocumentSplitJob(job);
-            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
-            step = workflowSteps.enum.WAITING_FOR_SPLIT;
-          } else {
-            // quick path
-            await addNativeOcrJob(job);
-            await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_NATIVE_OCR });
-            step = workflowSteps.enum.WAITING_FOR_NATIVE_OCR;
+          switch (inputType) {
+            case "image": {
+              // handle image flow
+              logger.info("Processing image workflow");
+              break;
+            }
+            case "document": {
+              // handle doc flow
+              if (modelType === "accurate") {
+                await addDocumentSplitJob(job);
+                await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_SPLIT });
+                step = workflowSteps.enum.WAITING_FOR_SPLIT;
+              } else {
+                // quick path
+                await addNativeOcrJob(job);
+                await job.updateData({ ...job.data, step: workflowSteps.enum.WAITING_FOR_NATIVE_OCR });
+                step = workflowSteps.enum.WAITING_FOR_NATIVE_OCR;
+              }
+              break;
+            }
           }
           break;
         }
