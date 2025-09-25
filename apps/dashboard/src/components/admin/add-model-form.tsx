@@ -34,7 +34,7 @@ export default function AddEditModelForm({
   useEffect(() => {
     if (model) {
       form.reset({
-        provider: (model.provider as "google" | "openai" | "custom") || "google",
+        provider: (model.provider as "google" | "openai" | "openrouter" | "custom") || "google",
         providerApiKey: model.providerApiKey || "",
         modelName: model.modelName || "",
         displayName: model.displayName || "",
@@ -100,6 +100,7 @@ export default function AddEditModelForm({
                 <SelectContent>
                   <SelectItem value="google">Google</SelectItem>
                   <SelectItem value="openai">OpenAI</SelectItem>
+                  <SelectItem value="openrouter">OpenRouter</SelectItem>
                   <SelectItem value="custom">Custom (OpenAI-compatible)</SelectItem>
                 </SelectContent>
               </Select>
@@ -115,7 +116,7 @@ export default function AddEditModelForm({
               <FormItem>
                 <FormLabel>Base URL</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://api.openai.com/v1" {...field} disabled={isLoading} />
+                  <Input placeholder="https://api.provider.com/v1" {...field} disabled={isLoading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

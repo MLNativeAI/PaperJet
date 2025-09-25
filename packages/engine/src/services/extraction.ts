@@ -89,6 +89,13 @@ Instructions:
   const result = await generateObject({
     model: await getModelForType("accurate"),
     schema: schemaObj,
+    providerOptions: {
+      provider: {
+        only: ["alibaba"],
+      },
+
+      // only: ["alibaba"],
+    },
     messages: [
       {
         role: "user",

@@ -3,6 +3,8 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { getModelConfigForType } from "@paperjet/db";
 import type { RuntimeModelType } from "@paperjet/db/types";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+
 import { logger } from "@paperjet/shared";
 import { AISDKError, generateObject, type LanguageModel } from "ai";
 import z from "zod";
@@ -67,6 +69,18 @@ export async function getModelInstance(modelConfig: ModelConfigParams): Promise<
         apiKey: modelConfig.providerApiKey,
       });
       return openai(modelConfig.modelName);
+    }
+    case "openrouter": {
+      const openrouter = createOpenRouter({
+        apiKey: modelConfig.providerApiKey,
+        extraBody: {
+          provider: {
+            // only: ["novita"],
+            ignore: ["novita"],
+          },
+        },
+      });
+      return openrouter(modelConfig.modelName);
     }
     case "custom": {
       const custom = createOpenAICompatible({
