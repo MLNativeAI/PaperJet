@@ -56,6 +56,9 @@ export const extractionWorkflowWorker = new Worker(
             case "image": {
               // handle image flow
               logger.info("Processing image workflow");
+              await finalizeWorkflow(job);
+              await job.updateData({ ...job.data, step: workflowSteps.enum.FINISHED });
+              step = workflowSteps.enum.FINISHED;
               break;
             }
             case "document": {

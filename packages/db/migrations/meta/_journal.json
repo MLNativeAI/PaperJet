@@ -71,6 +71,13 @@
       "when": 1758553746900,
       "tag": "0009_perpetual_valeria_richards",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1758785675654,
+      "tag": "0010_big_bullseye",
+      "breakpoints": true
     }
   ]
 }

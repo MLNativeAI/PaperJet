@@ -4,6 +4,7 @@ import { markdownWorker } from "./jobs/markdown";
 import { mlWorker } from "./jobs/ml";
 import { extractionWorkflowWorker } from "./workflows/extraction";
 
+export type { WorkflowExtractionData } from "./workflows/extraction";
 export { workflowExecutionQueue } from "./workflows/extraction";
 export const allWorkers = [extractionWorkflowWorker, markdownWorker, mlWorker, extractWorker];
 

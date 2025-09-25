@@ -72,7 +72,10 @@ export async function getWorkflow({ workflowId }: { workflowId: string }) {
   if (!workflowData) {
     throw new Error("Workflow not found");
   }
-  return workflowData;
+  return {
+    ...workflowData,
+    modelType: workflowData.modelType as RuntimeModelType,
+  };
 }
 
 export async function getWorkflowByOwner({

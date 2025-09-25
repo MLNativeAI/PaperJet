@@ -1,7 +1,7 @@
 import { createFile, createWorkflowExecution, getAllWorkflows, getWorkflowByOwner } from "@paperjet/db";
 import {
   type RuntimeModelType,
-  ValidatedFile,
+  type ValidatedFile,
   type WorkflowConfiguration,
   WorkflowExecutionStatus,
 } from "@paperjet/db/types";

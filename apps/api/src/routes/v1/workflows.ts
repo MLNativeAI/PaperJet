@@ -11,11 +11,11 @@ import {
 } from "@paperjet/db";
 import { type WorkflowConfiguration, WorkflowConfigurationSchema } from "@paperjet/db/types";
 import { getWorkflows, uploadFileAndCreateExecution } from "@paperjet/engine";
-import { workflowExecutionQueue } from "@paperjet/queue";
+import { type WorkflowExtractionData, workflowExecutionQueue } from "@paperjet/queue";
 import { logger } from "@paperjet/shared";
 import { Hono } from "hono";
 import z from "zod";
-import { validateFiles, workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
+import { validateFile, workflowExecutionIdSchema, workflowIdSchema } from "../../lib/validation";
 
 const app = new Hono();
 
@@ -86,36 +86,37 @@ const router = app
         workflowId: workflowIdSchema,
       }),
     ),
-    zValidator(
-      "form",
-      z.object({
-        file: z
-          .instanceof(File)
-          .refine((file) => file.size > 0, "File cannot be empty")
-          .refine(
-            (file) => file.type === "application/pdf" || file.type.startsWith("image/"),
-            "File must be a PDF or image",
-          ),
-      }),
-    ),
     async (c) => {
       try {
         const { session } = await getUserSession(c);
         const { workflowId } = c.req.valid("param");
-        const { file } = c.req.valid("form");
+
+        // Parse and validate file
+        const body = await c.req.parseBody();
+        if (!(body.file instanceof File)) {
+          return c.json({ error: "Invalid file" }, 400);
+        }
+        const validation = validateFile(body.file);
+
+        if (!validation.success) {
+          return c.json({ error: validation.error }, 400);
+        }
+
         const execution = await uploadFileAndCreateExecution(
           workflowId,
           session.activeOrganizationId,
           session.userId,
-          file,
+          validation.file,
         );
         const workflow = await getWorkflow({ workflowId });
         const validConfig = workflow.configuration as WorkflowConfiguration;
-        const workflowExecutionParams = {
+        const workflowExecutionParams: WorkflowExtractionData = {
           workflowId: execution.workflowId,
           workflowExecutionId: execution.workflowExecutionId,
           modelType: workflow.modelType,
           configuration: validConfig,
+          inputType: validation.file.type,
+          step: "INIT",
         };
         logger.info(workflowExecutionParams, "Workflow execuion params:");
         const job = await workflowExecutionQueue.add(execution.workflowExecutionId, workflowExecutionParams);
