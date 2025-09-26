@@ -1,4 +1,4 @@
-import type { WorkflowConfiguration } from "../../../packages/engine/src/types/workflow-config";
+import type { WorkflowConfiguration } from "@paperjet/db/types";
 
 export interface DraftField {
   id: string;

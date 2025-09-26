@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -54,7 +54,7 @@ export function EmailPasswordForm({
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
 }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const emailPasswordSchema = z.object({
     email: z.string().min(2).max(50),
     password: z.string(),
@@ -83,8 +83,12 @@ export function EmailPasswordForm({
     const { data, error } = await callAuthFunction(values);
     setIsLoading(false);
     if (data) {
+      console.log("Signed up");
+      console.log(data);
       toast.success(getSuccessMessage(formMode));
-      await navigate({ to: "/" });
+      await router.invalidate();
+      // workaround: https://github.com/TanStack/router/issues/2072
+      await router.navigate({ to: "/", reloadDocument: true });
     } else {
       setError(error?.message || "");
       toast.error(getFailureMessage(formMode));

@@ -1,3 +1,4 @@
+import { useRouter } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
@@ -41,6 +42,7 @@ export function SocialForm({
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
 }) {
+  const router = useRouter();
   const handleSocialSignIn = async (provider: "google" | "microsoft") => {
     setError("");
     setIsLoading(true);
@@ -48,6 +50,7 @@ export function SocialForm({
     const { error } = await authClient.signIn.social({
       provider,
     });
+    router.invalidate();
 
     if (error) {
       setIsLoading(false);

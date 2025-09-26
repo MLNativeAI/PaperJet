@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAuthMode } from "@/lib/api/admin";
 import SignInPage from "@/pages/sign-in-page";
 
 export const Route = createFileRoute("/auth/sign-in")({
@@ -7,9 +6,8 @@ export const Route = createFileRoute("/auth/sign-in")({
     notFound: search.notFound as string | undefined,
     invite: search.invite as string | undefined,
   }),
-  beforeLoad: async () => {
-    const { authMode } = await getAuthMode();
-    return { authMode };
+  beforeLoad: async ({ context }) => {
+    return { authMode: context.serverInfo?.authMode };
   },
   component: SignInPage,
 });

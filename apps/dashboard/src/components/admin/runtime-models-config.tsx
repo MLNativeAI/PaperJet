@@ -14,7 +14,6 @@ export default function RuntimeModelsConfig({
   isSettingModel,
   availableModels,
 }: RuntimeModelsConfigProps) {
-  console.log(runtimeConfig);
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex items-center justify-between">

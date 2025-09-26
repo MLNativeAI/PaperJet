@@ -18,7 +18,6 @@ export default function RuntimeModelCard({
   isSettingModel,
   availableModels,
 }: RuntimeModelCardProps) {
-  console.log(model);
   const modelNameLabel = modelType === "fast" ? "Fast Model" : "Accurate Model";
   const modelIcon = modelType === "fast" ? <RocketIcon /> : <BrainIcon />;
   const modelDesc =

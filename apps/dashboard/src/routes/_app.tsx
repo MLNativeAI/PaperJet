@@ -2,21 +2,17 @@ import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/rea
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { isAdminSetupRequired } from "@/lib/api/admin";
-import { authClient } from "@/lib/auth-client";
 
-// TODO save auth in context
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
-  beforeLoad: async () => {
-    const { adminAccountExists } = await isAdminSetupRequired();
-    if (!adminAccountExists) {
+  beforeLoad: async ({ context }) => {
+    console.log(context.serverInfo);
+    if (!context.serverInfo?.adminAccountExists) {
       throw redirect({
         to: "/admin/setup",
       });
     }
-    const { data: session } = await authClient.getSession();
-    if (!session) {
+    if (!context.session) {
       throw redirect({
         to: "/auth/sign-in",
         search: {
