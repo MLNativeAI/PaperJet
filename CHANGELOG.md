@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/MLNativeAI/PaperJet/compare/v1.2.1...v1.3.0) (2025-09-26)
+
+
+### Features
+
+* image understanding ([#8](https://github.com/MLNativeAI/PaperJet/issues/8)) ([aebf437](https://github.com/MLNativeAI/PaperJet/commit/aebf4371a93fc2925bcd7298aebe08d247faf422))
+
 ## [1.2.1](https://github.com/MLNativeAI/PaperJet/compare/v1.2.0...v1.2.1) (2025-09-23)
 
 
