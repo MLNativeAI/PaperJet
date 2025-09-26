@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/MLNativeAI/PaperJet/compare/v1.3.0...v1.3.1) (2025-09-26)
+
+
+### Bug Fixes
+
+* include obj description in zod schema ([caa2070](https://github.com/MLNativeAI/PaperJet/commit/caa2070141e9c02b8c83da164859f8c653b0d6f0))
+
 # [1.3.0](https://github.com/MLNativeAI/PaperJet/compare/v1.2.1...v1.3.0) (2025-09-26)
 
 
