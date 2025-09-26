@@ -3,22 +3,20 @@ import { toast } from "sonner";
 
 export function useWorkflowExecution(workflowId: string) {
   const executeWorkflow = useMutation({
-    mutationFn: async (files: File[]) => {
+    mutationFn: async (file: File) => {
       const formData = new FormData();
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
+      formData.append("file", file);
 
-      const executeBulkResponse = await fetch(`/api/v1/workflows/${workflowId}/execute-bulk`, {
+      const executeResponse = await fetch(`/api/v1/workflows/${workflowId}/execute`, {
         method: "POST",
         body: formData,
       });
 
-      if (!executeBulkResponse.ok) {
-        throw new Error(`HTTP error! status: ${executeBulkResponse.status}`);
+      if (!executeResponse.ok) {
+        throw new Error(`HTTP error! status: ${executeResponse.status}`);
       }
 
-      return executeBulkResponse.json();
+      return executeResponse.json();
     },
     onSuccess: () => {
       toast.success("Successfully submitted a new execution");

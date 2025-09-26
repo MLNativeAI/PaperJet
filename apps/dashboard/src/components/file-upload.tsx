@@ -43,12 +43,6 @@ export function FileUpload({ onFileUpload }: FileUploadProps) {
 
   return (
     <Card>
-      {/* <CardHeader> */}
-      {/*   <CardTitle>Upload Documents</CardTitle> */}
-      {/*   <p className="text-sm text-muted-foreground mt-1"> */}
-      {/*     Upload documents to process with this workflow. Supports PDF and image files. */}
-      {/*   </p> */}
-      {/* </CardHeader> */}
       <CardContent className="p-0">
         {/** biome-ignore lint/a11y/noStaticElementInteractions: drag and drop functionality requires these interactions */}
         <div
@@ -59,8 +53,15 @@ export function FileUpload({ onFileUpload }: FileUploadProps) {
         >
           <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-semibold mb-2">Drop your documents here or click to browse</h3>
-          <p className="text-sm text-muted-foreground mb-4">Supports PDF files only</p>
-          <input type="file" accept=".pdf" onChange={handleFileInput} className="hidden" id="file-input" multiple />
+          <p className="text-sm text-muted-foreground mb-4">Supports PDF files and images</p>
+          <input
+            type="file"
+            accept=".pdf,image/*"
+            onChange={handleFileInput}
+            className="hidden"
+            id="file-input"
+            multiple
+          />
           <Button asChild>
             <label htmlFor="file-input" className="cursor-pointer">
               <FileText className="mr-2 h-4 w-4" />

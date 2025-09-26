@@ -1,5 +1,10 @@
 import { createFile, createWorkflowExecution, getAllWorkflows, getWorkflowByOwner } from "@paperjet/db";
-import { type RuntimeModelType, type WorkflowConfiguration, WorkflowExecutionStatus } from "@paperjet/db/types";
+import {
+  type RuntimeModelType,
+  type ValidatedFile,
+  type WorkflowConfiguration,
+  WorkflowExecutionStatus,
+} from "@paperjet/db/types";
 import { generateId, ID_PREFIXES } from "@paperjet/shared/id";
 import { s3Client } from "../lib/s3";
 import type { Workflow } from "../types";
@@ -32,15 +37,18 @@ export async function uploadFileAndCreateExecution(
   workflowId: string,
   organizationId: string,
   userId: string,
-  uploadedFile: File,
+  validatedFile: ValidatedFile,
 ) {
   // TODO make this a transaction
   const executionId = generateId(ID_PREFIXES.workflowExecution);
-  const filePath = `executions/${executionId}/${uploadedFile.name}`;
-  await s3Client.file(filePath).write(await uploadedFile.arrayBuffer());
+  const safeName = validatedFile.file.name.replace(/[^\w.-]+/g, "_").slice(0, 128);
+  const filePath = `executions/${executionId}/${safeName}`;
+  await s3Client.file(filePath).write(await validatedFile.file.arrayBuffer());
   const { id: fileId } = await createFile({
-    fileName: uploadedFile.name,
+    fileName: safeName,
     filePath: filePath,
+    fileType: validatedFile.type,
+    mimeType: validatedFile.mimeType,
     organizationId: organizationId,
   });
   await createWorkflowExecution({
@@ -55,6 +63,6 @@ export async function uploadFileAndCreateExecution(
     workflowId,
     status: WorkflowExecutionStatus.enum.Queued,
     fileId,
-    filename: uploadedFile.name,
+    filename: safeName,
   };
 }

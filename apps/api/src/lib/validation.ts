@@ -1,3 +1,4 @@
+import type { ValidatedFile } from "@paperjet/db/types";
 import { z } from "zod";
 
 // Prefixed ID validation schemas
@@ -22,3 +23,22 @@ export const flexibleIdSchema = z.string().refine((val) => {
   const prefixedRegex = /^[a-z]{3}_[a-f0-9]{12}$/;
   return uuidRegex.test(val) || prefixedRegex.test(val);
 }, "Must be a valid UUID or prefixed ID");
+
+export type FileValidationResponse =
+  | {
+      success: true;
+      file: ValidatedFile;
+    }
+  | { success: false; error: string };
+
+export function validateFile(file: File): FileValidationResponse {
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Invalid file" };
+  }
+  if (file.type !== "application/pdf" && !file.type.startsWith("image/")) {
+    return { success: false, error: "File must be a PDF or image" };
+  }
+
+  const type = file.type === "application/pdf" ? "document" : "image";
+  return { success: true, file: { file, type, mimeType: file.type } };
+}

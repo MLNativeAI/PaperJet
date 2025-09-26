@@ -6,7 +6,7 @@ export type ConnectionValidationResult = {
   error: string | null;
 };
 
-const availableProviders = z.enum(["google", "openai", "custom"]);
+const availableProviders = z.enum(["google", "openai", "openrouter", "custom"]);
 
 export const modelConfigSchema = z.object({
   provider: availableProviders,

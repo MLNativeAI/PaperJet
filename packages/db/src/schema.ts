@@ -69,6 +69,8 @@ export const file = pgTable("file", {
   id: text("id").primaryKey(),
   fileName: text("filename").notNull(),
   filePath: text("filepath").notNull(),
+  mimeType: text("mime_type").notNull().default("application/pdf"),
+  fileType: text("file_type").notNull().default("document"),
   createdAt: timestamp("created_at").notNull(),
   ownerId: text("owner_id")
     .notNull()

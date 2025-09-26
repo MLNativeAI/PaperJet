@@ -1,4 +1,4 @@
-import type { WorkflowExecutionStatus } from "@paperjet/engine/types";
+import type { WorkflowExecutionStatus } from "@paperjet/db/types";
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { FileUpload } from "@/components/file-upload";
@@ -15,27 +15,28 @@ export interface ExecutionResult {
 }
 
 export default function WorkflowExecutorPage() {
-  const { workflowId } = useParams({ from: "/_app/workflows/$workflowId/execute" });
+  const { workflowId } = useParams({
+    from: "/_app/workflows/$workflowId/execute",
+  });
   const [executions, setExecutions] = useState<ExecutionResult[]>([]);
 
   const { executeWorkflow } = useWorkflowExecution(workflowId);
   const handleFileUpload = async (files: FileList) => {
     const fileArray = Array.from(files);
     try {
-      const result = await executeWorkflow.mutateAsync(fileArray);
+      const executionPromises = fileArray.map((file) => executeWorkflow.mutateAsync(file));
+      const results = await Promise.all(executionPromises);
 
       // Add executions to local state
-      if (result?.executions) {
-        const newExecutions: ExecutionResult[] = result.executions.map((execution: any, index: number) => ({
-          workflowExecutionId: execution.workflowExecutionId,
-          workflowId: execution.workflowId,
-          fileName: fileArray[index]?.name || `File ${index + 1}`,
-          fileId: execution.fileId,
-          createdAt: new Date().toISOString(),
-          status: execution.status,
-        }));
-        setExecutions((prev) => [...newExecutions, ...prev]);
-      }
+      const newExecutions: ExecutionResult[] = results.map((execution: any, index: number) => ({
+        workflowExecutionId: execution.workflowExecutionId,
+        workflowId: execution.workflowId,
+        fileName: fileArray[index]?.name || `File ${index + 1}`,
+        fileId: execution.fileId,
+        createdAt: new Date().toISOString(),
+        status: execution.status,
+      }));
+      setExecutions((prev) => [...newExecutions, ...prev]);
     } catch (error) {
       console.error("Upload failed:", error);
     }
@@ -47,7 +48,7 @@ export default function WorkflowExecutorPage() {
         <div>
           <h1 className="text-3xl font-bold">Execute workflow</h1>
           <p className="text-muted-foreground mt-2">
-            Upload documents to process with this workflow. Supports PDFs files only.
+            Upload documents to process with this workflow. Supports PDF files and images.
           </p>
         </div>
       </div>

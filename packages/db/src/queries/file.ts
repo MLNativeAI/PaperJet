@@ -7,10 +7,14 @@ import type { DbFile } from "../types/tables";
 export async function createFile({
   fileName,
   filePath,
+  fileType,
+  mimeType,
   organizationId,
 }: {
   fileName: string;
   filePath: string;
+  fileType: string;
+  mimeType: string;
   organizationId: string;
 }): Promise<DbFile> {
   const fileId = generateId(ID_PREFIXES.file);
@@ -20,6 +24,8 @@ export async function createFile({
       id: fileId,
       fileName: fileName,
       filePath: filePath,
+      fileType: fileType,
+      mimeType: mimeType,
       ownerId: organizationId,
       createdAt: new Date(),
     })
@@ -34,10 +40,11 @@ export async function getFileByWorkflowExecutionId({
   workflowExecutionId,
 }: {
   workflowExecutionId: string;
-}): Promise<{ filePath: string; ownerId: string }> {
+}): Promise<{ filePath: string; ownerId: string; fileName: string }> {
   const result = await db
     .select({
       filePath: file.filePath,
+      fileName: file.fileName,
       ownerId: file.ownerId,
     })
     .from(file)
