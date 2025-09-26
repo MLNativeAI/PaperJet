@@ -51,7 +51,11 @@ export function buildExtractionSchema(configuration: WorkflowConfiguration) {
       objectProperties.tables = z.object(tablesSchema).optional();
     }
 
-    objectSchemas[obj.name] = z.object(objectProperties).optional();
+    let schema = z.object(objectProperties);
+    if (obj.description) {
+      schema = schema.describe(obj.description);
+    }
+    objectSchemas[obj.name] = schema.optional();
   });
 
   return z.object(objectSchemas);
