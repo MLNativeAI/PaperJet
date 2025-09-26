@@ -66,19 +66,22 @@ export async function extractDataFromImage(
   const fileBuffer = await s3Client.file(fileData.filePath).arrayBuffer();
 
   const extractionResult = await runImageExtraction(fileBuffer, configuration);
-  await updateDocumentData({ documentDataId: documentData.id, extractedData: extractionResult });
+  await updateDocumentData({
+    documentDataId: documentData.id,
+    extractedData: extractionResult,
+  });
   logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
 
 export async function runImageExtraction(fileBuffer: ArrayBuffer, configuration: WorkflowConfiguration): Promise<any> {
   const { schemaObj, objectDescriptions } = prepareSchema(configuration);
-  const prompt = `Extract the following information from this document:
+  const prompt = `Extract the following information from this image:
 
 EXTRACTION STRUCTURE:
 ${objectDescriptions.join("\n")}
 
 Instructions:
-- Extract exact values as they appear in the document
+- Extract exact values as they appear in the image
 - For number fields, extract as numbers (remove currency symbols for currency)
 - For date fields, use ISO format (YYYY-MM-DD)
 - If a field is not found or unclear, return null
@@ -92,8 +95,6 @@ Instructions:
       provider: {
         only: ["alibaba"],
       },
-
-      // only: ["alibaba"],
     },
     messages: [
       {
@@ -141,7 +142,10 @@ export async function extractDataFromMarkdown(
     throw new Error("Fatal error, workflow not found");
   }
   const extractionResult = await runDocumentExtraction(documentData.rawMarkdown, configuration, modelType);
-  await updateDocumentData({ documentDataId: documentData.id, extractedData: extractionResult });
+  await updateDocumentData({
+    documentDataId: documentData.id,
+    extractedData: extractionResult,
+  });
   logger.debug({ workflowId, workflowExecutionId, result: extractionResult }, "Extraction completed");
 }
 
