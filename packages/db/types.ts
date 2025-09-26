@@ -1,4 +1,4 @@
-import { WorkflowInputType } from "./src/types/workflow-config";
+import type { WorkflowInputType } from "./src/types/workflow-config";
 
 export * from "./src/types/executions";
 export * from "./src/types/tables";

@@ -1,4 +1,4 @@
-import type { WorkflowInputType } from "@paperjet/db/types";
+import type { ValidatedFile } from "@paperjet/db/types";
 import { z } from "zod";
 
 // Prefixed ID validation schemas
@@ -23,12 +23,6 @@ export const flexibleIdSchema = z.string().refine((val) => {
   const prefixedRegex = /^[a-z]{3}_[a-f0-9]{12}$/;
   return uuidRegex.test(val) || prefixedRegex.test(val);
 }, "Must be a valid UUID or prefixed ID");
-
-export type ValidatedFile = {
-  file: File;
-  type: WorkflowInputType;
-  mimeType: string;
-};
 
 export type FileValidationResponse =
   | {
