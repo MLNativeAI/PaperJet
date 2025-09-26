@@ -1,5 +1,5 @@
 {
-  "id": "40e7cffd-f112-44b4-a076-be63a419b4f2",
+  "id": "5c0f3d35-9afa-4bda-89af-c0aa0ac753bb",
   "prevId": "7eac5d94-10bb-4d34-b018-c9150b25eb94",
   "version": "7",
   "dialect": "postgresql",
@@ -484,13 +484,15 @@
           "name": "mime_type",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'application/pdf'"
         },
         "file_type": {
           "name": "file_type",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'document'"
         },
         "created_at": {
           "name": "created_at",

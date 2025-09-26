@@ -40,6 +40,9 @@ export const extractWorker = new Worker(
         );
         return { success: true, extractedData: result };
       }
+      default: {
+        throw new Error("Unsupported inputType");
+      }
     }
   },
   {

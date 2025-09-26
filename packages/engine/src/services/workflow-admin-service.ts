@@ -41,10 +41,11 @@ export async function uploadFileAndCreateExecution(
 ) {
   // TODO make this a transaction
   const executionId = generateId(ID_PREFIXES.workflowExecution);
-  const filePath = `executions/${executionId}/${validatedFile.file.name}`;
+  const safeName = validatedFile.file.name.replace(/[^\w.-]+/g, "_").slice(0, 128);
+  const filePath = `executions/${executionId}/${safeName}`;
   await s3Client.file(filePath).write(await validatedFile.file.arrayBuffer());
   const { id: fileId } = await createFile({
-    fileName: validatedFile.file.name,
+    fileName: safeName,
     filePath: filePath,
     fileType: validatedFile.type,
     mimeType: validatedFile.mimeType,
@@ -62,6 +63,6 @@ export async function uploadFileAndCreateExecution(
     workflowId,
     status: WorkflowExecutionStatus.enum.Queued,
     fileId,
-    filename: validatedFile.file.name,
+    filename: safeName,
   };
 }

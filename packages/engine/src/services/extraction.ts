@@ -63,8 +63,7 @@ export async function extractDataFromImage(
     organizationId: fileData.ownerId,
   });
 
-  const filePath = `executions/${workflowExecutionId}/${fileData.fileName}`;
-  const fileBuffer = await s3Client.file(filePath).arrayBuffer();
+  const fileBuffer = await s3Client.file(fileData.filePath).arrayBuffer();
 
   const extractionResult = await runImageExtraction(fileBuffer, configuration);
   await updateDocumentData({ documentDataId: documentData.id, extractedData: extractionResult });
