@@ -3,7 +3,6 @@ import AdminSetupPage from "@/pages/admin-setup-page";
 
 export const Route = createFileRoute("/admin/setup")({
   beforeLoad: async ({ context }) => {
-    console.log(context.serverInfo);
     if (context.serverInfo?.adminAccountExists) {
       throw redirect({
         to: "/",

@@ -83,9 +83,6 @@ export function EmailPasswordForm({
     const { data, error } = await callAuthFunction(values);
     setIsLoading(false);
     if (data) {
-      console.log("Signed up");
-      console.log(data);
-      toast.success(getSuccessMessage(formMode));
       await router.invalidate();
       // workaround: https://github.com/TanStack/router/issues/2072
       await router.navigate({ to: "/", reloadDocument: true });

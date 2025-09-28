@@ -6,7 +6,6 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 export const Route = createFileRoute("/_app")({
   component: PathlessLayoutComponent,
   beforeLoad: async ({ context }) => {
-    console.log(context.serverInfo);
     if (!context.serverInfo?.adminAccountExists) {
       throw redirect({
         to: "/admin/setup",

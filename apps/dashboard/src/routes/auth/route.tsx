@@ -3,7 +3,6 @@ import { LogoBanner } from "@/components/logo-banner";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async ({ context }) => {
-    console.log(context.serverInfo);
     if (!context.serverInfo?.adminAccountExists) {
       throw redirect({
         to: "/admin/setup",
