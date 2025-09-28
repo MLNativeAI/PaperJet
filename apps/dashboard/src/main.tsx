@@ -37,14 +37,14 @@ declare module "@tanstack/react-router" {
 }
 
 function InnerApp() {
-  const { session, user } = useAuth();
+  // const { session, user } = useAuth();
   const { serverInfo } = useServerInfo();
   return (
     <RouterProvider
       router={router}
       context={{
-        session,
-        user,
+        // session,
+        // user,
         serverInfo,
       }}
     />
@@ -61,9 +61,9 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <ServerInfoProvider>
-          <AuthProvider>
-            <InnerApp />
-          </AuthProvider>
+          {/* <AuthProvider> */}
+          <InnerApp />
+          {/* </AuthProvider> */}
         </ServerInfoProvider>
       </QueryClientProvider>
       <Toaster position="top-right" />

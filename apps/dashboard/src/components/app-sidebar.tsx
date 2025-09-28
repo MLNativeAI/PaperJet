@@ -14,10 +14,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/contexts/auth";
 import { NavUser } from "./nav-user";
+import { useAuthenticatedUser } from "@/hooks/use-user";
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -50,8 +49,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useAuth();
-
+  const { user } = useAuthenticatedUser();
   const isAdminOrOwner = useMemo(() => user?.role === "admin" || user?.role === "owner", [user?.role]);
 
   return (

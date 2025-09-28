@@ -1,4 +1,5 @@
 import { IconDotsVertical } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -14,19 +15,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth";
+import { useAuthenticatedUser } from "@/hooks/use-user";
 import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user } = useAuth();
-  const router = useRouter();
+  const { user } = useAuthenticatedUser();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-      await router.invalidate();
+      // await flushSync(async () => {
+      await queryClient.resetQueries({ queryKey: ["session"] });
+      // await router.invalidate();
+      // });
+      // await router.navigate({ to: "/auth/sign-in" });
       toast.success("Signed out successfully");
-      await router.navigate({ to: "/auth/sign-in", reloadDocument: true });
     } catch (error) {
       toast.error("Failed to sign out");
       console.error("Sign out error:", error);

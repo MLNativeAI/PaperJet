@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
+import { flushSync } from "react-dom";
 
 export const Route = createFileRoute("/auth/verify-magic-link")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -40,10 +41,12 @@ function VerifyMagicLinkPage() {
         setStatus("success");
         toast.success("Successfully signed in!");
 
-        await router.invalidate();
+        flushSync(() => {
+          router.invalidate();
+        });
         // Redirect to home page after a short delay
         setTimeout(async () => {
-          await router.navigate({ to: "/", reloadDocument: true });
+          await router.navigate({ to: "/" });
         }, 1000);
       } catch (_err) {
         setStatus("error");

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
+import { useNavigate } from "@tanstack/react-router";
 
 export type FormMode = "sign-in" | "sign-up" | "admin-sign-up";
 
@@ -54,7 +55,8 @@ export function EmailPasswordForm({
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
 }) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const emailPasswordSchema = z.object({
     email: z.string().min(2).max(50),
     password: z.string(),
@@ -83,10 +85,9 @@ export function EmailPasswordForm({
     const { data, error } = await callAuthFunction(values);
     setIsLoading(false);
     if (data) {
-      await router.invalidate();
       toast.success(getSuccessMessage(formMode));
-      // workaround: https://github.com/TanStack/router/issues/2072
-      await router.navigate({ to: "/", reloadDocument: true });
+      await queryClient.resetQueries();
+      navigate({ to: "/" });
     } else {
       setError(error?.message || "");
       toast.error(getFailureMessage(formMode));
