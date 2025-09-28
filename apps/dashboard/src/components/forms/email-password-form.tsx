@@ -84,6 +84,7 @@ export function EmailPasswordForm({
     setIsLoading(false);
     if (data) {
       await router.invalidate();
+      toast.success(getSuccessMessage(formMode));
       // workaround: https://github.com/TanStack/router/issues/2072
       await router.navigate({ to: "/", reloadDocument: true });
     } else {
