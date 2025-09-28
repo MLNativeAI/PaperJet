@@ -15,10 +15,6 @@ export const Route = createFileRoute("/_app")({
     if (!context.session) {
       throw redirect({
         to: "/auth/sign-in",
-        search: {
-          invite: "",
-          notFound: "",
-        },
       });
     }
   },

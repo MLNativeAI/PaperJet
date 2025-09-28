@@ -3,11 +3,18 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider, useAuth } from "@/contexts/auth";
 import { ServerInfoProvider, useServerInfo } from "@/contexts/server-info";
 import { routeTree } from "./routeTree.gen";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      retry: 0,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const router = createRouter({
   routeTree,
@@ -27,7 +34,6 @@ const router = createRouter({
   },
   scrollRestoration: true,
   defaultPreload: "intent",
-  defaultPreloadStaleTime: 0,
 });
 
 declare module "@tanstack/react-router" {

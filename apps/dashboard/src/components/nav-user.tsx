@@ -1,6 +1,6 @@
 import { IconDotsVertical } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { useAuth } from "@/contexts/auth";
 import { useAuthenticatedUser } from "@/hooks/use-user";
 import { authClient } from "@/lib/auth-client";
 
@@ -22,20 +21,13 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const { user } = useAuthenticatedUser();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-      // await flushSync(async () => {
-      await queryClient.resetQueries({ queryKey: ["session"] });
-      // await router.invalidate();
-      // });
-      // await router.navigate({ to: "/auth/sign-in" });
-      toast.success("Signed out successfully");
-    } catch (error) {
-      toast.error("Failed to sign out");
-      console.error("Sign out error:", error);
-    }
+    toast.success("Signed out successfully");
+    await authClient.signOut();
+    await queryClient.invalidateQueries();
+    await navigate({ to: "/auth/sign-in" });
   };
 
   // Show loading state or return null if no session
