@@ -5,6 +5,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { Session, User } from "better-auth";
 import { authQueries } from "@/queries/auth";
+import { serverInfoQueries } from "@/queries/server-info";
 
 type RouterContext = {
   session: Session | undefined;
@@ -26,8 +27,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     </>
   ),
   beforeLoad: async ({ context }) => {
+    const serverInfo = await context.queryClient.fetchQuery(serverInfoQueries.serverInfo());
     const userSession = await context.queryClient.fetchQuery(authQueries.session());
-    return { session: userSession.session, user: userSession.user };
+    return { session: userSession.session, user: userSession.user, serverInfo };
   },
   notFoundComponent: () => <div>404 Not Found</div>,
 });

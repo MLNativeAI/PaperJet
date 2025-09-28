@@ -41,22 +41,6 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
-
-function InnerApp() {
-  // const { session, user } = useAuth();
-  const { serverInfo } = useServerInfo();
-  return (
-    <RouterProvider
-      router={router}
-      context={{
-        // session,
-        // user,
-        serverInfo,
-      }}
-    />
-  );
-}
-
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Root element not found");
@@ -66,11 +50,11 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <ServerInfoProvider>
-          {/* <AuthProvider> */}
-          <InnerApp />
-          {/* </AuthProvider> */}
-        </ServerInfoProvider>
+        {/* <ServerInfoProvider> */}
+        {/* <AuthProvider> */}
+        <RouterProvider router={router} />
+        {/* </AuthProvider> */}
+        {/* </ServerInfoProvider> */}
       </QueryClientProvider>
       <Toaster position="top-right" />
     </StrictMode>,

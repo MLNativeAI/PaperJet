@@ -14,8 +14,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavUser } from "./nav-user";
 import { useAuthenticatedUser } from "@/hooks/use-user";
+import { NavUser } from "./nav-user";
 
 const data = {
   navMain: [
@@ -31,7 +31,7 @@ const data = {
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "/settings/api-keys",
       icon: Settings,
     },
     {
@@ -82,6 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           className: "bg-sidebar-accent text-sidebar-accent-foreground",
                         }}
                         className="font-medium flex items-center gap-2"
+                        viewTransition={{ types: ["cross-fade"] }}
                       >
                         <Icon className="h-4 w-4" />
                         <span>{item.title}</span>
