@@ -5,8 +5,8 @@ import SignUpPage from "@/pages/sign-up-page";
 export const Route = createFileRoute("/auth/sign-up")({
   validateSearch: z.object({
     redirectTo: z.string().optional().catch("/"),
-    notFound: z.string().optional(),
-    invite: z.string().optional(),
+    notFound: z.boolean().optional(),
+    invite: z.boolean().optional(),
   }),
   beforeLoad: async ({ context }) => {
     if (context.session) {
