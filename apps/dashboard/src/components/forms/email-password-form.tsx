@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
+import { useNavigate } from "@tanstack/react-router";
 
 export type FormMode = "sign-in" | "sign-up" | "admin-sign-up";
 
@@ -54,6 +55,7 @@ export function EmailPasswordForm({
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const emailPasswordSchema = z.object({
     email: z.string().min(2).max(50),
@@ -84,7 +86,8 @@ export function EmailPasswordForm({
     setIsLoading(false);
     if (data) {
       toast.success(getSuccessMessage(formMode));
-      await navigate({ to: "/" });
+      await queryClient.resetQueries();
+      navigate({ to: "/" });
     } else {
       setError(error?.message || "");
       toast.error(getFailureMessage(formMode));

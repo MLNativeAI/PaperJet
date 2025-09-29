@@ -1,3 +1,4 @@
+import type { auth } from "@paperjet/auth";
 import {
   adminClient,
   apiKeyClient,
@@ -6,7 +7,6 @@ import {
   organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import type { auth } from "../../../api/lib/auth";
 
 export const authClient = createAuthClient({
   /** We only specify the baseURL if we're running locally */

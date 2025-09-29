@@ -1,5 +1,5 @@
 import type { ExecutionRoutes } from "@paperjet/api/routes";
-import type { WorkflowExecutionData, WorkflowExecutionRow } from "@paperjet/engine/types";
+import type { WorkflowExecutionData, WorkflowExecutionRow } from "@paperjet/db/types";
 import { hc, type InferResponseType } from "hono/client";
 
 const executionClient = hc<ExecutionRoutes>("/api/v1/executions");

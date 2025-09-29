@@ -1,5 +1,6 @@
 import { IconDotsVertical, IconMail, IconTrash, IconUserMinus, IconUserX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import {
   type ColumnDef,
   flexRender,
@@ -57,6 +58,7 @@ export function OrgMembersTable({
   isLoading: boolean;
 }) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleRemoveMember = async (memberEmail: string) => {
     try {
@@ -130,8 +132,7 @@ export function OrgMembersTable({
       } else {
         toast.success("You have left the organization");
         await authClient.signOut();
-        navigate({ to: "/auth/sign-in" });
-        // This would typically log the user out or redirect them
+        await router.navigate({ to: "/", reloadDocument: true });
       }
     } catch (err) {
       toast.error("Failed to leave organization");

@@ -1,22 +1,20 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { LogoBanner } from "@/components/logo-banner";
-import { isAdminSetupRequired } from "@/lib/api/admin";
-import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/auth")({
-  beforeLoad: async () => {
-    const { adminAccountExists } = await isAdminSetupRequired();
-
-    if (!adminAccountExists) {
+  beforeLoad: async ({ context }) => {
+    if (!context.serverInfo?.adminAccountExists) {
       throw redirect({
         to: "/admin/setup",
       });
     }
-
-    const { data: session } = await authClient.getSession();
-    if (session) {
+    if (context.session) {
       throw redirect({
         to: "/",
+        search: {
+          invite: "",
+          notFound: "",
+        },
       });
     }
   },

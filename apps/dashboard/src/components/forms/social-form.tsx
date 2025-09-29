@@ -1,3 +1,4 @@
+import { useRouter } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";

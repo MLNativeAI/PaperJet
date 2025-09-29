@@ -1,15 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { getAuthMode } from "@/lib/api/admin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import z from "zod";
 import SignInPage from "@/pages/sign-in-page";
 
 export const Route = createFileRoute("/auth/sign-in")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    notFound: search.notFound as string | undefined,
-    invite: search.invite as string | undefined,
+  validateSearch: z.object({
+    redirectTo: z.string().optional().catch("/"),
+    notFound: z.string().optional(),
+    invite: z.string().optional(),
   }),
-  beforeLoad: async () => {
-    const { authMode } = await getAuthMode();
-    return { authMode };
+  beforeLoad: async ({ context }) => {
+    if (context.session) {
+      throw redirect({ to: "/" });
+    }
   },
   component: SignInPage,
 });

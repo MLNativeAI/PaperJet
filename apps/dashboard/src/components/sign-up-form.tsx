@@ -10,7 +10,7 @@ export function SignUpForm() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const { authMode } = useRouteContext({ from: "/auth/sign-up" });
+  const { serverInfo } = useRouteContext({ from: "/auth/sign-up" });
 
   return (
     <div className={cn("flex flex-col gap-6")}>
@@ -22,7 +22,7 @@ export function SignUpForm() {
         <CardContent>
           <div className="flex flex-col gap-4">
             <SocialForm setError={setError} isLoading={isLoading} setIsLoading={setIsLoading} />
-            {authMode === "magic-link" && (
+            {serverInfo?.authMode === "magic-link" && (
               <MagicLinkForm
                 magicLinkSent={magicLinkSent}
                 setMagicLinkSent={setMagicLinkSent}
@@ -31,7 +31,7 @@ export function SignUpForm() {
                 setIsLoading={setIsLoading}
               />
             )}
-            {authMode === "password" && (
+            {serverInfo?.authMode === "password" && (
               <EmailPasswordForm
                 formMode="sign-up"
                 setError={setError}

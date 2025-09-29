@@ -18,10 +18,12 @@ import { z } from "zod";
 const app = new Hono();
 
 const router = app
-  .get("/setup-required", async (c) => {
+  .get("/server-info", async (c) => {
     const adminAccountExists = await doesAdminAccountExist();
+    const authMode = getAuthMode();
     return c.json({
       adminAccountExists: adminAccountExists,
+      authMode: authMode,
     });
   })
   .get("/accept-invitation", async (c) => {
@@ -29,11 +31,6 @@ const router = app
   })
   .get("/invitations", async (c) => {
     return listUserInvitations(c);
-  })
-  .get("/auth-mode", async (c) => {
-    return c.json({
-      authMode: getAuthMode(),
-    });
   })
   .get("/usage-data", async (c) => {
     const usageStats = getUsageStats([]);

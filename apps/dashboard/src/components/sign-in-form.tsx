@@ -10,7 +10,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const { authMode } = useRouteContext({ from: "/auth/sign-in" });
+  const { serverInfo } = useRouteContext({ from: "/auth/sign-in" });
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -22,7 +22,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
         <CardContent>
           <div className="flex flex-col gap-4">
             <SocialForm setError={setError} isLoading={isLoading} setIsLoading={setIsLoading} />
-            {authMode === "magic-link" && (
+            {serverInfo?.authMode === "magic-link" && (
               <MagicLinkForm
                 magicLinkSent={magicLinkSent}
                 setMagicLinkSent={setMagicLinkSent}
@@ -31,7 +31,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
                 setIsLoading={setIsLoading}
               />
             )}
-            {authMode === "password" && (
+            {serverInfo?.authMode === "password" && (
               <EmailPasswordForm
                 formMode="sign-in"
                 setError={setError}

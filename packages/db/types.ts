@@ -16,4 +16,9 @@ export type RuntimeConfiguration = {
   accurateModel: RuntimeModel | null;
 };
 
+export type ServerInfo = {
+  adminAccountExists: boolean;
+  authMode: string;
+};
+
 export type ValidatedFile = { file: File; type: WorkflowInputType; mimeType: string };

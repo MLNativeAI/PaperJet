@@ -1,6 +1,5 @@
-"use client";
-
 import { IconDotsVertical } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -15,34 +14,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import { useAuthenticatedUser } from "@/hooks/use-user";
 import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const { user } = useAuthenticatedUser();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { data: session, isPending } = authClient.useSession();
 
   const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-      toast.success("Signed out successfully");
-      navigate({ to: "/auth/sign-in", search: { notFound: "", invite: "" } });
-    } catch (error) {
-      toast.error("Failed to sign out");
-      console.error("Sign out error:", error);
-    }
+    toast.success("Signed out successfully");
+    await authClient.signOut();
+    await queryClient.invalidateQueries();
+    await navigate({ to: "/auth/sign-in" });
   };
 
   // Show loading state or return null if no session
-  if (isPending) {
+  if (!user) {
     return null;
   }
-
-  if (!session?.user) {
-    return null;
-  }
-
-  const user = session.user;
 
   return (
     <SidebarMenu>
