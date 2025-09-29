@@ -125,6 +125,20 @@ export const requireAuth = async (c: Context, next: Next) => {
   return next();
 };
 
+// Admin middleware
+export const requireAdmin = async (c: Context, next: Next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    logger.info("missing auth");
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+  if (!(session.user.role === "admin")) {
+    logger.info("missing auth permissions");
+    return c.json({ message: "Unauthorized" }, 403);
+  }
+  return next();
+};
+
 export const authHandler = async (c: Context) => {
   return auth.handler(c.req.raw);
 };
