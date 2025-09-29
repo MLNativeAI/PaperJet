@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/MLNativeAI/PaperJet/compare/v1.3.1...v1.4.0) (2025-09-29)
+
+
+### Features
+
+* auth and server info in context ([#9](https://github.com/MLNativeAI/PaperJet/issues/9)) ([f7b33e6](https://github.com/MLNativeAI/PaperJet/commit/f7b33e6b8565bcc0f15b9719b153cc55ac6a3bed))
+
 ## [1.3.1](https://github.com/MLNativeAI/PaperJet/compare/v1.3.0...v1.3.1) (2025-09-26)
 
 
