@@ -3,7 +3,7 @@ import type { ConnectionValidationResult, ModelConfigParams } from "@paperjet/en
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { hc } from "hono/client";
 
-const adminClient = hc<AdminRoutes>("/api/admin");
+const adminClient = hc<AdminRoutes>("/api/v1/admin");
 
 export function useModelConfiguration() {
   const queryClient = useQueryClient();

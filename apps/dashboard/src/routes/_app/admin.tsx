@@ -1,7 +1,12 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/admin")({
   component: RouteComponent,
+  beforeLoad: ({ context }) => {
+    if (context.user?.role !== "admin") {
+      throw redirect({ to: "/" });
+    }
+  },
 });
 
 function RouteComponent() {
@@ -23,15 +28,17 @@ function RouteComponent() {
                 activeProps={{
                   className: "border-primary text-primary",
                 }}
+                viewTransition={{ types: ["cross-fade"] }}
                 className="py-2 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300"
               >
                 Models
               </Link>
               <Link
-                to="/admin/usage"
+                to="/admin/usage-data"
                 activeProps={{
                   className: "border-primary text-primary",
                 }}
+                viewTransition={{ types: ["cross-fade"] }}
                 className="py-2 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300"
               >
                 Usage Data
