@@ -36,7 +36,7 @@ const data = {
     },
     {
       title: "Admin",
-      url: "/admin",
+      url: "/admin/models",
       icon: Shield,
       adminOnly: true,
     },
