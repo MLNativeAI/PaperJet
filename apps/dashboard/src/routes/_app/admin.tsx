@@ -3,7 +3,7 @@ import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router"
 export const Route = createFileRoute("/_app/admin")({
   component: RouteComponent,
   beforeLoad: ({ context }) => {
-    if (context.user?.role !== "admin") {
+    if (context.user?.serverRole !== "superadmin") {
       throw redirect({ to: "/" });
     }
   },

@@ -29,7 +29,7 @@ export const auth = betterAuth({
   }),
   user: {
     additionalFields: {
-      role: {
+      serverRole: {
         type: "string",
         input: false,
       },
@@ -76,7 +76,9 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin(),
+    admin({
+      adminRoles: ["superadmin"],
+    }),
     apiKey({
       rateLimit: {
         enabled: false,
@@ -132,7 +134,7 @@ export const requireAdmin = async (c: Context, next: Next) => {
     logger.info("missing auth");
     return c.json({ message: "Unauthorized" }, 401);
   }
-  if (!(session.user.role === "admin")) {
+  if (!(session.user.serverRole === "superadmin")) {
     logger.info("missing auth permissions");
     return c.json({ message: "Unauthorized" }, 403);
   }
@@ -146,12 +148,12 @@ export const authHandler = async (c: Context) => {
 export async function beforeUserCreateHandler(user: User) {
   const adminAccountExists = await doesAdminAccountExist();
   if (!adminAccountExists) {
-    // the first user registration will be the admin
+    // the first user registration will be the superadmin
     return {
       data: {
         ...user,
         id: generateId(ID_PREFIXES.user),
-        role: "admin",
+        serverRole: "superadmin",
         emailVerified: true,
       },
     };

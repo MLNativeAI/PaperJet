@@ -50,8 +50,10 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthenticatedUser();
-  const isAdminOrOwner = useMemo(() => user?.role === "admin" || user?.role === "owner", [user?.role]);
+  console.log(user);
+  const isAdmin = useMemo(() => user?.serverRole === "superadmin", [user?.role]);
 
+  console.log(isAdmin);
   return (
     <Sidebar {...props}>
       <SidebarHeader></SidebarHeader>
@@ -64,7 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               const Icon = item.icon;
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton hidden={item.adminOnly && !isAdminOrOwner} asChild>
+                  <SidebarMenuButton hidden={item.adminOnly && !isAdmin} asChild>
                     {isExternal ? (
                       <a
                         href={item.url}
