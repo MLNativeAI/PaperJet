@@ -136,7 +136,7 @@ export const requireAdmin = async (c: Context, next: Next) => {
   }
   if (!(session.user.serverRole === "superadmin")) {
     logger.info("missing auth permissions");
-    return c.json({ message: "Unauthorized" }, 403);
+    return c.json({ message: "Forbidden" }, 403);
   }
   return next();
 };

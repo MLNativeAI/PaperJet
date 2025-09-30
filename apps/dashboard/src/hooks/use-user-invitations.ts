@@ -1,11 +1,12 @@
-import type { AdminRoutes } from "@paperjet/api/routes";
+import type { InternalRoutes } from "@paperjet/api/routes";
+import type { UserInvitation } from "@paperjet/auth/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { hc } from "hono/client";
 import { toast } from "sonner";
 import { useOrganization } from "@/hooks/use-organization";
 import { authClient } from "@/lib/auth-client";
 
-const internalClient = hc<AdminRoutes>("/api/internal");
+const internalClient = hc<InternalRoutes>("/api/internal");
 
 export function useUserInvitations() {
   const { setActiveOrganization } = useOrganization();

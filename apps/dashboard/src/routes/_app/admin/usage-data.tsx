@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_app/admin/usage-data")({
           label: "Admin",
         },
         {
-          link: "/admin/usage",
+          link: "/admin/usage-data",
           label: "Usage",
         },
       ],
