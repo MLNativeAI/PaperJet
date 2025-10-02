@@ -20,6 +20,7 @@ export function PasswordResetForm({ setError }: { setError: (_: string) => void 
     try {
       const { error } = await authClient.requestPasswordReset({
         email,
+        redirectTo: `${window.location.origin}/auth/finish-password-reset`,
       });
 
       if (error) {
@@ -28,7 +29,7 @@ export function PasswordResetForm({ setError }: { setError: (_: string) => void 
       }
 
       setResetLinkSent(true);
-      toast.success("Passoword reset link sent! Check your email.");
+      toast.success("Password reset link sent! Check your email.");
     } catch (_err) {
       setError("An unexpected error occurred");
     } finally {
