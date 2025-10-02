@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/MLNativeAI/PaperJet/compare/v1.5.0...v1.6.0) (2025-10-02)
+
+
+### Features
+
+* password reset ([#11](https://github.com/MLNativeAI/PaperJet/issues/11)) ([7af3ca3](https://github.com/MLNativeAI/PaperJet/commit/7af3ca395d648860df65b7e72b49f07c54a87533))
+
 # [1.5.0](https://github.com/MLNativeAI/PaperJet/compare/v1.4.0...v1.5.0) (2025-10-02)
 
 
