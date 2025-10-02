@@ -50,9 +50,11 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
                 Sign up
               </Link>
             </div>
-            <Link from="/auth/sign-in" to="/auth/reset-password" className="underline underline-offset-4">
-              Reset password
-            </Link>
+            {serverInfo?.authMode === "password" && (
+              <Link from="/auth/sign-in" to="/auth/reset-password" className="underline underline-offset-4">
+                Reset password
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>
