@@ -82,13 +82,6 @@ export const auth = betterAuth({
   plugins: [
     admin({
       adminRoles: ["superadmin"],
-      schema: {
-        user: {
-          fields: {
-            role: "server_role",
-          },
-        },
-      },
     }),
     apiKey({
       rateLimit: {
