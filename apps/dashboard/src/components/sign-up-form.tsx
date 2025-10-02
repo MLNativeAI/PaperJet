@@ -6,7 +6,7 @@ import { SocialForm } from "@/components/forms/social-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export function SignUpForm({ invite }: { invite?: string }) {
+export function SignUpForm({ invite, email }: { invite?: string; email?: string }) {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -38,6 +38,7 @@ export function SignUpForm({ invite }: { invite?: string }) {
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
                 invite={invite}
+                email={email}
               />
             )}
             {error && <div className="text-sm text-red-500">{error}</div>}

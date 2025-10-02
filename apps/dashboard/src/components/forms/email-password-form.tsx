@@ -50,12 +50,14 @@ export function EmailPasswordForm({
   isLoading,
   setIsLoading,
   invite,
+  email,
 }: {
   formMode: FormMode;
   setError: (_: string) => void;
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
   invite?: string;
+  email?: string;
 }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -65,6 +67,10 @@ export function EmailPasswordForm({
   });
   const form = useForm<z.infer<typeof emailPasswordSchema>>({
     resolver: zodResolver(emailPasswordSchema),
+    defaultValues: {
+      email: email || "",
+      password: "",
+    },
   });
 
   const callAuthFunction = async (values: z.infer<typeof emailPasswordSchema>) => {

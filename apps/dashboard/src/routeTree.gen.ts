@@ -16,6 +16,7 @@ import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthFinishPasswordResetRouteImport } from './routes/auth/finish-password-reset'
+import { Route as AuthAcceptInviteRouteImport } from './routes/auth/accept-invite'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppExecutionsRouteImport } from './routes/_app.executions'
@@ -66,6 +67,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
 const AuthFinishPasswordResetRoute = AuthFinishPasswordResetRouteImport.update({
   id: '/finish-password-reset',
   path: '/finish-password-reset',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthAcceptInviteRoute = AuthAcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AdminSetupRoute = AdminSetupRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/executions': typeof AppExecutionsRouteWithChildren
   '/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/_app/executions': typeof AppExecutionsRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/executions'
     | '/settings'
     | '/admin/setup'
+    | '/auth/accept-invite'
     | '/auth/finish-password-reset'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/admin/setup'
+    | '/auth/accept-invite'
     | '/auth/finish-password-reset'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/_app/executions'
     | '/_app/settings'
     | '/admin/setup'
+    | '/auth/accept-invite'
     | '/auth/finish-password-reset'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -362,6 +374,13 @@ declare module '@tanstack/react-router' {
       path: '/finish-password-reset'
       fullPath: '/auth/finish-password-reset'
       preLoaderRoute: typeof AuthFinishPasswordResetRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/accept-invite': {
+      id: '/auth/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/auth/accept-invite'
+      preLoaderRoute: typeof AuthAcceptInviteRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/admin/setup': {
@@ -487,6 +506,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthAcceptInviteRoute: typeof AuthAcceptInviteRoute
   AuthFinishPasswordResetRoute: typeof AuthFinishPasswordResetRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
@@ -494,6 +514,7 @@ interface AuthRouteRouteChildren {
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthAcceptInviteRoute: AuthAcceptInviteRoute,
   AuthFinishPasswordResetRoute: AuthFinishPasswordResetRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,

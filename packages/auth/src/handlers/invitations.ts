@@ -53,12 +53,14 @@ export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-inv
     const userData = await getUserByEmail({ email: email });
     if (!userData) {
       logger.debug(`User not found, redirecting to sign up`);
-      return c.redirect(`${envVars.BASE_URL}/auth/sign-up?invite=${invitationId}`);
+      return c.redirect(`${envVars.BASE_URL}/auth/sign-up?invite=${invitationId}&email=${encodeURIComponent(email)}`);
     } else {
       const session = await auth.api.getSession({ headers: c.req.raw.headers });
       if (!session) {
-        logger.debug("User exists but not signed in, redirecting to sign-in");
-        return c.redirect(`${envVars.BASE_URL}/auth/sign-in?invite=${invitationId}`);
+        logger.debug("User exists but not signed in, redirecting to accept-invite");
+        return c.redirect(
+          `${envVars.BASE_URL}/auth/accept-invite?token=${invitationId}&email=${encodeURIComponent(email)}`,
+        );
       } else {
         logger.debug("User exists and signed in, accepting invitation and redirect to org settings page");
         await auth.api.acceptInvitation({

@@ -7,6 +7,7 @@ export const Route = createFileRoute("/auth/sign-up")({
     redirectTo: z.string().optional().catch("/"),
     notFound: z.boolean().optional(),
     invite: z.string().optional(),
+    email: z.string().optional(),
   }),
   beforeLoad: async ({ context }) => {
     if (context.session) {

@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Route } from "@/routes/auth/sign-up";
 
 export default function SignUpPage() {
-  const { invite, notFound } = Route.useSearch();
+  const { invite, notFound, email } = Route.useSearch();
   return (
     <div className="flex flex-col gap-4">
       {invite && (
@@ -21,7 +21,7 @@ export default function SignUpPage() {
           <AlertDescription>This invitation code does not exist</AlertDescription>
         </Alert>
       )}
-      <SignUpForm invite={invite} />
+      <SignUpForm invite={invite} email={email} />
     </div>
   );
 }
