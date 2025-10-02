@@ -3,7 +3,7 @@ import type { DbModelConfiguration } from "@paperjet/db/types";
 import { useQuery } from "@tanstack/react-query";
 import { hc } from "hono/client";
 
-const adminClient = hc<AdminRoutes>("/api/admin");
+const adminClient = hc<AdminRoutes>("/api/v1/admin");
 
 export function useModels() {
   const {

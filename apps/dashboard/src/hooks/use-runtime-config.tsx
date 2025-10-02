@@ -1,4 +1,8 @@
+import type { AdminRoutes } from "@paperjet/api/routes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { hc } from "hono/client";
+
+const adminClient = hc<AdminRoutes>("/api/v1/admin");
 
 export function useRuntimeConfig() {
   const queryClient = useQueryClient();
@@ -10,7 +14,7 @@ export function useRuntimeConfig() {
   } = useQuery({
     queryKey: ["runtime-config"],
     queryFn: async () => {
-      const response = await fetch("/api/admin/runtime-config");
+      const response = await adminClient["runtime-config"].$get({});
 
       if (!response.ok) {
         console.log("Failed to fetch runtime config");
@@ -23,14 +27,12 @@ export function useRuntimeConfig() {
 
   const setRuntimeModelMutation = useMutation({
     mutationFn: async ({ type, modelId }: { type: "fast" | "accurate"; modelId: string }) => {
-      const response = await fetch("/api/admin/runtime-config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await adminClient["runtime-config"].$post({
+        json: {
+          type,
+          modelId,
         },
-        body: JSON.stringify({ type, modelId }),
       });
-
       if (!response.ok) {
         throw new Error("Failed to set runtime model");
       }

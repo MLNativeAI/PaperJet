@@ -3,7 +3,6 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { Toaster } from "@/components/ui/sonner";
-import { ServerInfoProvider, useServerInfo } from "@/contexts/server-info";
 import { routeTree } from "./routeTree.gen";
 
 const queryClient = new QueryClient({
