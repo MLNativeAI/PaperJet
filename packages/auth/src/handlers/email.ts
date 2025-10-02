@@ -15,14 +15,14 @@ function getApiBaseUrl() {
   }
 }
 
-export async function sendMagicLink({ email, token, url }: { email: string; token: string; url: string }) {
+export async function sendMagicLink({ email, url }: { email: string; url: string }) {
   if (!resend) {
     logger.info(`Magic link for ${email}: ${url}`);
     return;
   }
   try {
     logger.info({ email, url }, `Sending magic link to ${email}: ${url}`);
-    const emailHtml = await render(MagicLinkEmail({ url, token }));
+    const emailHtml = await render(MagicLinkEmail({ url }));
 
     await resend.emails.send({
       from: envVars.FROM_EMAIL,

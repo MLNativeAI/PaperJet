@@ -48,6 +48,8 @@ export function SocialForm({
 
     const { error } = await authClient.signIn.social({
       provider,
+      callbackURL: "/api/internal/auth-callback?signedIn=true",
+      newUserCallbackURL: "/api/internal/auth-callback?newUser=true",
     });
 
     if (error) {

@@ -68,6 +68,7 @@ export function EmailPasswordForm({
       const { data, error } = await authClient.signIn.email({
         email: values.email,
         password: values.password,
+        callbackURL: "/api/internal/auth-callback?signedIn=true",
       });
       return { data, error };
     } else {
@@ -75,6 +76,7 @@ export function EmailPasswordForm({
         email: values.email,
         password: values.password,
         name: values.email,
+        callbackURL: "/api/internal/auth-callback?newUser=true",
       });
       return { data, error };
     }

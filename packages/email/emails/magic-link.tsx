@@ -6,7 +6,7 @@ export interface MagicLinkEmailProps {
   token?: string;
 }
 
-export const MagicLinkEmail = ({ url, token }: MagicLinkEmailProps) => {
+export const MagicLinkEmail = ({ url }: MagicLinkEmailProps) => {
   const previewText = "Sign in to PaperJet";
 
   return (
