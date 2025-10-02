@@ -1,4 +1,3 @@
-import { useRouter } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
@@ -48,6 +47,8 @@ export function SocialForm({
 
     const { error } = await authClient.signIn.social({
       provider,
+      callbackURL: "/api/internal/auth-callback?signedIn=true",
+      newUserCallbackURL: "/api/internal/auth-callback?newUser=true",
     });
 
     if (error) {

@@ -11,10 +11,6 @@ export const Route = createFileRoute("/auth")({
     if (context.session) {
       throw redirect({
         to: "/",
-        search: {
-          invite: "",
-          notFound: "",
-        },
       });
     }
   },

@@ -6,7 +6,7 @@ import { EmailPasswordForm } from "./forms/email-password-form";
 import MagicLinkForm from "./forms/magic-link-form";
 import { SocialForm } from "./forms/social-form";
 
-export function SignInForm({ className, ...props }: React.ComponentProps<"div">) {
+export function SignInForm({ className, invite, ...props }: React.ComponentProps<"div"> & { invite?: string }) {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -37,17 +37,25 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
                 setError={setError}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
+                invite={invite}
               />
             )}
 
             {error && <div className="text-sm text-red-500">{error}</div>}
           </div>
 
-          <div className="mt-6 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link from="/auth/sign-in" to="/auth/sign-up" className="underline underline-offset-4">
-              Sign up
-            </Link>
+          <div className="flex flex-col mt-6 text-center text-sm gap-2">
+            <div>
+              Don&apos;t have an account?{" "}
+              <Link from="/auth/sign-in" to="/auth/sign-up" className="underline underline-offset-4">
+                Sign up
+              </Link>
+            </div>
+            {serverInfo?.authMode === "password" && (
+              <Link from="/auth/sign-in" to="/auth/reset-password" className="underline underline-offset-4">
+                Reset password
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>

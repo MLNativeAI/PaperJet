@@ -1,9 +1,9 @@
 import { CircleX, Info } from "lucide-react";
-import { SignInForm } from "@/components/sign-in-form";
+import { SignUpForm } from "@/components/sign-up-form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Route } from "@/routes/auth/sign-in";
+import { Route } from "@/routes/auth/sign-up";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const { invite, notFound } = Route.useSearch();
   return (
     <div className="flex flex-col gap-4">
@@ -21,7 +21,7 @@ export default function SignInPage() {
           <AlertDescription>This invitation code does not exist</AlertDescription>
         </Alert>
       )}
-      <SignInForm />
+      <SignUpForm invite={invite} />
     </div>
   );
 }

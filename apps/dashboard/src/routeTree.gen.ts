@@ -12,9 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as AuthVerifyMagicLinkRouteImport } from './routes/auth/verify-magic-link'
 import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthFinishPasswordResetRouteImport } from './routes/auth/finish-password-reset'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppExecutionsRouteImport } from './routes/_app.executions'
@@ -47,11 +48,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AuthVerifyMagicLinkRoute = AuthVerifyMagicLinkRouteImport.update({
-  id: '/verify-magic-link',
-  path: '/verify-magic-link',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -60,6 +56,16 @@ const AuthSignUpRoute = AuthSignUpRouteImport.update({
 const AuthSignInRoute = AuthSignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthFinishPasswordResetRoute = AuthFinishPasswordResetRouteImport.update({
+  id: '/finish-password-reset',
+  path: '/finish-password-reset',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AdminSetupRoute = AdminSetupRouteImport.update({
@@ -157,9 +163,10 @@ export interface FileRoutesByFullPath {
   '/executions': typeof AppExecutionsRouteWithChildren
   '/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
   '/': typeof AppIndexRoute
   '/admin/models': typeof AppAdminModelsRoute
   '/admin/usage-data': typeof AppAdminUsageDataRoute
@@ -178,9 +185,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
   '/': typeof AppIndexRoute
   '/admin/models': typeof AppAdminModelsRoute
   '/admin/usage-data': typeof AppAdminUsageDataRoute
@@ -204,9 +212,10 @@ export interface FileRoutesById {
   '/_app/executions': typeof AppExecutionsRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteWithChildren
   '/admin/setup': typeof AdminSetupRoute
+  '/auth/finish-password-reset': typeof AuthFinishPasswordResetRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/auth/verify-magic-link': typeof AuthVerifyMagicLinkRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/models': typeof AppAdminModelsRoute
   '/_app/admin/usage-data': typeof AppAdminUsageDataRoute
@@ -230,9 +239,10 @@ export interface FileRouteTypes {
     | '/executions'
     | '/settings'
     | '/admin/setup'
+    | '/auth/finish-password-reset'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/auth/verify-magic-link'
     | '/'
     | '/admin/models'
     | '/admin/usage-data'
@@ -251,9 +261,10 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/admin/setup'
+    | '/auth/finish-password-reset'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/auth/verify-magic-link'
     | '/'
     | '/admin/models'
     | '/admin/usage-data'
@@ -276,9 +287,10 @@ export interface FileRouteTypes {
     | '/_app/executions'
     | '/_app/settings'
     | '/admin/setup'
+    | '/auth/finish-password-reset'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/auth/verify-magic-link'
     | '/_app/'
     | '/_app/admin/models'
     | '/_app/admin/usage-data'
@@ -324,13 +336,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/auth/verify-magic-link': {
-      id: '/auth/verify-magic-link'
-      path: '/verify-magic-link'
-      fullPath: '/auth/verify-magic-link'
-      preLoaderRoute: typeof AuthVerifyMagicLinkRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
     '/auth/sign-up': {
       id: '/auth/sign-up'
       path: '/sign-up'
@@ -343,6 +348,20 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/auth/sign-in'
       preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/finish-password-reset': {
+      id: '/auth/finish-password-reset'
+      path: '/finish-password-reset'
+      fullPath: '/auth/finish-password-reset'
+      preLoaderRoute: typeof AuthFinishPasswordResetRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/admin/setup': {
@@ -468,15 +487,17 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthFinishPasswordResetRoute: typeof AuthFinishPasswordResetRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
-  AuthVerifyMagicLinkRoute: typeof AuthVerifyMagicLinkRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthFinishPasswordResetRoute: AuthFinishPasswordResetRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
-  AuthVerifyMagicLinkRoute: AuthVerifyMagicLinkRoute,
 }
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(

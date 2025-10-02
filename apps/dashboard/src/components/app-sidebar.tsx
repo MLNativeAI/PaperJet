@@ -50,7 +50,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthenticatedUser();
-  const isAdmin = useMemo(() => user?.serverRole === "superadmin", [user?.serverRole]);
+  const isAdmin = useMemo(() => user?.role === "superadmin", [user?.role]);
 
   return (
     <Sidebar {...props}>
