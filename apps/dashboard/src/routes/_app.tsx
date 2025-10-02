@@ -1,9 +1,15 @@
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import z from "zod";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useQueryNoficiations } from "@/hooks/use-query-notifications";
 
 export const Route = createFileRoute("/_app")({
+  validateSearch: z.object({
+    signedIn: z.boolean().optional(),
+    newUser: z.boolean().optional(),
+  }),
   component: PathlessLayoutComponent,
   beforeLoad: async ({ context }) => {
     if (!context.serverInfo.adminAccountExists) {
@@ -27,6 +33,7 @@ function PathlessLayoutComponent() {
     },
   });
 
+  const _ = useQueryNoficiations();
   const { useFullWidth } = context;
 
   return (
