@@ -37,7 +37,7 @@ export const LogoSection = () => (
     <Img
       width={100}
       height="auto"
-      src="https://staging.getpaperjet.com/logo.png"
+      src={`${process.env.BASE_URL || "http://localhost:5173"}/logo.png`}
       alt="PaperJet logo"
       className="my-0 mx-auto"
     />
