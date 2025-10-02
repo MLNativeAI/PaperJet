@@ -43,10 +43,15 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
             {error && <div className="text-sm text-red-500">{error}</div>}
           </div>
 
-          <div className="mt-6 text-center text-sm">
-            Don&apos;t have an account?{" "}
+          <div className="mt-6 text-center text-sm gap-4">
+            <div>
+              Don&apos;t have an account?{" "}
+              <Link from="/auth/sign-in" to="/auth/sign-up" className="underline underline-offset-4">
+                Sign up
+              </Link>
+            </div>
             <Link from="/auth/sign-in" to="/auth/sign-up" className="underline underline-offset-4">
-              Sign up
+              Reset password
             </Link>
           </div>
         </CardContent>

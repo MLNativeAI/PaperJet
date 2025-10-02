@@ -1,7 +1,8 @@
 import { handleOrganizationInvite, listUserInvitations } from "@paperjet/auth/invitations";
-import { doesAdminAccountExist } from "@paperjet/db";
-import { envVars, getAuthMode, logger } from "@paperjet/shared";
+import { envVars, getAuthMode } from "@paperjet/shared";
 import { Hono } from "hono";
+
+import { doesAdminAccountExist } from "@paperjet/db";
 
 const app = new Hono();
 

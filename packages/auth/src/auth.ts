@@ -7,7 +7,7 @@ import { betterAuth, type User } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, magicLink, organization } from "better-auth/plugins";
 import type { Context, Next } from "hono";
-import { sendInvitationEmail, sendMagicLink } from "./handlers/email";
+import { sendInvitationEmail, sendMagicLink, sendPasswordResetEmail } from "./handlers/email";
 import { beforeSessionCreateHandler } from "./handlers/session";
 import { matchesPattern } from "./util/pattern";
 
@@ -22,6 +22,10 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: sendPasswordResetEmail,
+    onPasswordReset: async ({ user }, _) => {
+      logger.info(`Password for user ${user.email} has been reset.`);
+    },
   },
   database: drizzleAdapter(db, {
     provider: "pg",
