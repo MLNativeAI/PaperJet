@@ -10,8 +10,8 @@ export default function SignInPage() {
       {invite && (
         <Alert variant="default">
           <Info />
-          <AlertTitle>Create an account first</AlertTitle>
-          <AlertDescription>You need to create an account to accept the invitation</AlertDescription>
+          <AlertTitle>Accept invitation</AlertTitle>
+          <AlertDescription>Sign in to accept the organization invitation</AlertDescription>
         </Alert>
       )}
       {notFound && (
@@ -21,7 +21,7 @@ export default function SignInPage() {
           <AlertDescription>This invitation code does not exist</AlertDescription>
         </Alert>
       )}
-      <SignInForm />
+      <SignInForm invite={invite} />
     </div>
   );
 }

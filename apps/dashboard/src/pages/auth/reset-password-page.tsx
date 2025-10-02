@@ -1,8 +1,8 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PasswordResetForm } from "@/components/forms/password-reset-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Link } from "@tanstack/react-router";
 
 export default function ResetPasswordPage() {
   const [error, setError] = useState<string>("");

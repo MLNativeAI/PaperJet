@@ -21,7 +21,7 @@ export default function SignUpPage() {
           <AlertDescription>This invitation code does not exist</AlertDescription>
         </Alert>
       )}
-      <SignUpForm />
+      <SignUpForm invite={invite} />
     </div>
   );
 }

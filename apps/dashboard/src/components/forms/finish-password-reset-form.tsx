@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -7,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { Route } from "@/routes/auth/finish-password-reset";
-import { useNavigate } from "@tanstack/react-router";
 
 type FormValues = {
   password: string;

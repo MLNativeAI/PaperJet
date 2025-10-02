@@ -6,7 +6,7 @@ import { EmailPasswordForm } from "./forms/email-password-form";
 import MagicLinkForm from "./forms/magic-link-form";
 import { SocialForm } from "./forms/social-form";
 
-export function SignInForm({ className, ...props }: React.ComponentProps<"div">) {
+export function SignInForm({ className, invite, ...props }: React.ComponentProps<"div"> & { invite?: string }) {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -37,6 +37,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<"div">)
                 setError={setError}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
+                invite={invite}
               />
             )}
 

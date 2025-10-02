@@ -11,7 +11,6 @@ export function useQueryNotifications() {
   }, [signedIn]);
   useEffect(() => {
     if (newUser === true) {
-      toast.success("Welcome back!");
       toast.success("Hi new user");
     }
   }, [newUser]);

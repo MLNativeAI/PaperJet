@@ -49,11 +49,13 @@ export function EmailPasswordForm({
   setError,
   isLoading,
   setIsLoading,
+  invite,
 }: {
   formMode: FormMode;
   setError: (_: string) => void;
   isLoading: boolean;
   setIsLoading: (_: boolean) => void;
+  invite?: string;
 }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -61,7 +63,9 @@ export function EmailPasswordForm({
     email: z.string().min(2).max(50),
     password: z.string(),
   });
-  const form = useForm<z.infer<typeof emailPasswordSchema>>({ resolver: zodResolver(emailPasswordSchema) });
+  const form = useForm<z.infer<typeof emailPasswordSchema>>({
+    resolver: zodResolver(emailPasswordSchema),
+  });
 
   const callAuthFunction = async (values: z.infer<typeof emailPasswordSchema>) => {
     if (formMode === "sign-in") {
@@ -89,7 +93,20 @@ export function EmailPasswordForm({
     if (data) {
       toast.success(getSuccessMessage(formMode));
       await queryClient.resetQueries();
-      navigate({ to: "/" });
+      if (invite) {
+        try {
+          await authClient.organization.acceptInvitation({
+            invitationId: invite,
+          });
+          navigate({ to: "/settings/organization" });
+        } catch (acceptError) {
+          console.error("Failed to accept invitation:", acceptError);
+          toast.error("Account created but failed to accept invitation. Please try again.");
+          navigate({ to: "/" });
+        }
+      } else {
+        navigate({ to: "/" });
+      }
     } else {
       setError(error?.message || "");
       toast.error(getFailureMessage(formMode));
