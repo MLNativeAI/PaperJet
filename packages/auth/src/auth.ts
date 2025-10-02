@@ -29,7 +29,7 @@ export const auth = betterAuth({
   }),
   user: {
     additionalFields: {
-      serverRole: {
+      role: {
         type: "string",
         input: false,
       },
@@ -78,6 +78,13 @@ export const auth = betterAuth({
   plugins: [
     admin({
       adminRoles: ["superadmin"],
+      schema: {
+        user: {
+          fields: {
+            role: "server_role",
+          },
+        },
+      },
     }),
     apiKey({
       rateLimit: {
@@ -98,7 +105,7 @@ export const auth = betterAuth({
       enabled: envVars.GOOGLE_CLIENT_ID !== undefined && envVars.GOOGLE_CLIENT_SECRET !== undefined,
       clientId: envVars.GOOGLE_CLIENT_ID || "",
       clientSecret: envVars.GOOGLE_CLIENT_SECRET || "",
-      redirectUri: envVars.BASE_URL,
+      redirectURI: envVars.BASE_URL,
     },
     microsoft: {
       enabled: envVars.MICROSOFT_CLIENT_ID !== undefined && envVars.MICROSOFT_CLIENT_SECRET !== undefined,
@@ -134,7 +141,7 @@ export const requireAdmin = async (c: Context, next: Next) => {
     logger.info("missing auth");
     return c.json({ message: "Unauthorized" }, 401);
   }
-  if (!(session.user.serverRole === "superadmin")) {
+  if (!(session.user.role === "superadmin")) {
     logger.info("missing auth permissions");
     return c.json({ message: "Forbidden" }, 403);
   }
@@ -153,7 +160,7 @@ export async function beforeUserCreateHandler(user: User) {
       data: {
         ...user,
         id: generateId(ID_PREFIXES.user),
-        serverRole: "superadmin",
+        role: "superadmin",
         emailVerified: true,
       },
     };

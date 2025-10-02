@@ -30,6 +30,10 @@ app.use("/api/*", corsMiddleware);
 app.use("/api/v1/*", requireAuth);
 app.use("/api/v1/admin/*", requireAdmin);
 app.on(["POST", "GET"], "/api/auth/*", authHandler);
+app.onError((err, c) => {
+  logger.error(err, "API request error");
+  return c.text("Backend request failure", 500);
+});
 
 app.get("/api/health", async (c) => {
   logger.info({ endpoint: "/api/health", method: "GET" }, "health check");

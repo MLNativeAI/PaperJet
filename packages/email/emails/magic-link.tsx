@@ -27,12 +27,6 @@ export const MagicLinkEmail = ({ url, token }: MagicLinkEmailProps) => {
           If the button doesn't work, copy and paste this link into your browser:
         </Text>
         <Text className="text-[#666666] text-[12px] leading-[24px] break-all">{url}</Text>
-        {token && (
-          <Text className="text-[#666666] text-[12px] leading-[24px]">
-            <br />
-            Alternatively, you can use this one-time code: <strong>{token}</strong>
-          </Text>
-        )}
       </FooterSection>
     </EmailLayout>
   );

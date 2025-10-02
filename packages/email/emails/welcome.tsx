@@ -12,9 +12,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => {
     <EmailLayout previewText={previewText}>
       <LogoSection />
 
-      <EmailHeading>
-        Welcome to <strong>PaperJet</strong>! 🚀
-      </EmailHeading>
+      <EmailHeading>Welcome to PaperJet</EmailHeading>
 
       <Text className="text-black text-[14px] leading-[24px]">Hi there,</Text>
 
@@ -43,7 +41,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => {
         We'll notify you as soon as we launch. Get ready to revolutionize your document processing workflow!
       </Text>
 
-      <ActionButton href="https://github.com/paperjet-ai/paperjet">⭐ Star us on GitHub</ActionButton>
+      <ActionButton href="https://github.com/mlnative-ai/paperjet">⭐ Star us on GitHub</ActionButton>
 
       <FooterSection>
         <Text className="text-[#666666] text-[12px] leading-[24px]">

@@ -49,11 +49,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        {/* <ServerInfoProvider> */}
-        {/* <AuthProvider> */}
         <RouterProvider router={router} />
-        {/* </AuthProvider> */}
-        {/* </ServerInfoProvider> */}
       </QueryClientProvider>
       <Toaster position="top-right" />
     </StrictMode>,
