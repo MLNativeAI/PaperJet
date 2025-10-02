@@ -1,4 +1,4 @@
-import { InvitationEmail, MagicLinkEmail, render, ResetPasswordEmailTemplate } from "@paperjet/email";
+import { InvitationEmail, MagicLinkEmail, ResetPasswordEmailTemplate, render } from "@paperjet/email";
 import { envVars, logger } from "@paperjet/shared";
 import type { User } from "better-auth";
 import type { Member, Organization } from "better-auth/plugins";

@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import z from "zod";
-import SignUpPage from "@/pages/sign-up-page";
+import SignUpPage from "@/pages/auth/sign-up-page";
 
 export const Route = createFileRoute("/auth/sign-up")({
   validateSearch: z.object({
