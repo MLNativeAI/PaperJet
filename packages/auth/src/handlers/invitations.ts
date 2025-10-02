@@ -35,11 +35,6 @@ export async function listUserInvitations(c: Context<BlankEnv, "/invitations", B
 export async function handleOrganizationInvite(c: Context<BlankEnv, "/accept-invitation", BlankInput>) {
   logger.debug(`Handling invitation ${c.req.query("id")}`);
 
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  if (!session) {
-    return c.redirect("/auth/sign-in");
-  }
-
   const invitationId = c.req.query("id");
   if (!invitationId) {
     return c.redirect(`${envVars.BASE_URL}/auth/sign-in`);

@@ -3,7 +3,7 @@ import z from "zod";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useQueryNoficiations } from "@/hooks/use-query-notifications";
+import { useQueryNotifications } from "@/hooks/use-query-notifications";
 
 export const Route = createFileRoute("/_app")({
   validateSearch: z.object({
@@ -33,7 +33,7 @@ function PathlessLayoutComponent() {
     },
   });
 
-  const _ = useQueryNoficiations();
+  const _ = useQueryNotifications();
   const { useFullWidth } = context;
 
   return (

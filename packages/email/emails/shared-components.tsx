@@ -37,7 +37,7 @@ export const LogoSection = () => (
     <Img
       width={100}
       height="auto"
-      src={"http://getpaperjet.com/android-chrome-192x192.png"}
+      src={"https://getpaperjet.com/android-chrome-192x192.png"}
       alt="PaperJet logo"
       className="my-0 mx-auto"
     />
