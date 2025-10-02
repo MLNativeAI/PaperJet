@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/MLNativeAI/PaperJet/compare/v1.4.0...v1.5.0) (2025-10-02)
+
+
+### Features
+
+* auth route guard ([#10](https://github.com/MLNativeAI/PaperJet/issues/10)) ([56763b9](https://github.com/MLNativeAI/PaperJet/commit/56763b93b1f562e3603245f95e80532aec3dd714))
+
 # [1.4.0](https://github.com/MLNativeAI/PaperJet/compare/v1.3.1...v1.4.0) (2025-09-29)
 
 
